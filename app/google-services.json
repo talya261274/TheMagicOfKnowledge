@@ -1,0 +1,30 @@
+{
+  "project_info": {
+    "project_number": "287096373129",
+    "firebase_url": "https://themagicofknowledge-8ad4a-default-rtdb.europe-west1.firebasedatabase.app",
+    "project_id": "themagicofknowledge-8ad4a",
+    "storage_bucket": "themagicofknowledge-8ad4a.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:287096373129:android:bedb5486507d3bb60eab58",
+        "android_client_info": {
+          "package_name": "com.example.themagicofknowledge"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAhP3kCBCcgZwn2X6vQ9P_bNsVDmfGP6CM"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

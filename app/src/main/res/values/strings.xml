@@ -1,0 +1,15 @@
+<resources>
+    <string name="app_name">TheMagicOfKnowledge</string>
+    <string name="Register">הרשמה</string>
+    <string name="FirstName">שם פרטי</string>
+    <string name="LastName">שם משפחה</string>
+    <string name="Email">דוא״ל</string>
+    <string name="PhoneNumber">מספר נייד</string>
+    <string name="DateOfBirth">תאריך לידה</string>
+    <string name="UserName">שם משתמש</string>
+    <string name="Password">סיסמה</string>
+    <string name="PassVer">אימות סיסמה</string>
+    <string name="SignUp">הירשם</string>
+    <string name="SignIn">היכנס</string>
+    <string name="Login">התחבר</string>
+</resources>

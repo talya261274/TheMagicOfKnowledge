@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <item name="tvTitle" type="id" />
+    <item name="firstNameLayout" type="id" />
+    <item name="etFirstName" type="id" />
+    <item name="lastNameLayout" type="id" />
+    <item name="etLastName" type="id" />
+    <item name="emailLayout" type="id" />
+    <item name="etEmail" type="id" />
+    <item name="phoneLayout" type="id" />
+    <item name="etPhone" type="id" />
+    <item name="birthDateLayout" type="id" />
+    <item name="etBirthDate" type="id" />
+    <item name="usernameLayout" type="id" />
+    <item name="etUsername" type="id" />
+    <item name="passwordLayout" type="id" />
+    <item name="etPassword" type="id" />
+    <item name="confirmPasswordLayout" type="id" />
+    <item name="etConfirmPassword" type="id" />
+    <item name="btnRegister" type="id" />
+</resources>
