@@ -1,5 +1,7 @@
 package com.example.themagicofknowledge.models;
 
+import androidx.annotation.NonNull;
+
 import java.util.ArrayList;
 
 public class UserParent {
@@ -16,18 +18,19 @@ public class UserParent {
 
     public ArrayList<UserChild> childrenList;
 
-    public UserParent(String uid, String fName, String lName, String email, String phone, String BDate, String UName, String password, boolean b) {
+    public UserParent() {
     }
 
-    public UserParent(String id, String firstName, String lastName,
-                      String email, String phone, String userName, String password,
-                      boolean isAdmin, ArrayList<UserChild> childrenList) {
+    public UserParent(String id, String firstName, String lastName, String email,
+                      String phone, String birthDate, String userName,
+                      String password, boolean isAdmin, ArrayList<UserChild> childrenList) {
         this.id = id;
         this.firstName = firstName;
         this.lastName = lastName;
         this.email = email;
         this.phone = phone;
-        this.birthDate = phone;
+        this.birthDate = birthDate;
+        this.userName = userName;
         this.password = password;
         this.isAdmin = isAdmin;
         this.childrenList = childrenList;
@@ -71,23 +74,21 @@ public class UserParent {
 
     public void setPhone(String phone) {
         this.phone = phone;
-
     }
 
     public String getBirthDate() {
         return birthDate;
     }
 
-    public void setBirthDate(String phone) {
+    public void setBirthDate(String birthDate) {
         this.birthDate = birthDate;
-
     }
 
     public String getUserName() {
         return userName;
     }
 
-    public void setUserName(String phone) {
+    public void setUserName(String userName) {
         this.userName = userName;
     }
 
@@ -115,6 +116,7 @@ public class UserParent {
         this.childrenList = childrenList;
     }
 
+    @NonNull
     @Override
     public String toString() {
         return "UserParent{" +
@@ -130,4 +132,5 @@ public class UserParent {
                 ", childrenList=" + childrenList +
                 '}';
     }
+
 }

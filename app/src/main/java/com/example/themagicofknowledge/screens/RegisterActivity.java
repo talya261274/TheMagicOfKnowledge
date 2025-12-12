@@ -21,6 +21,8 @@ import com.example.themagicofknowledge.utils.SharedPreferencesUtil;
 import com.example.themagicofknowledge.utils.Validator;
 import com.google.android.material.textfield.TextInputLayout;
 
+import java.util.ArrayList;
+
 /// Activity for registering the user
 /// This activity is used to register the user
 /// It contains fields for the user to enter their information
@@ -43,6 +45,14 @@ public class RegisterActivity extends BaseActivity implements View.OnClickListen
             Insets systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars());
             v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom);
             return insets;
+        });
+        Button btnGoBack = findViewById(R.id.goBackBtn2);
+        btnGoBack.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Intent intent = new Intent(RegisterActivity.this, LandingActivity.class);
+                startActivity(intent);
+            }
         });
 
         /// get the views
@@ -125,12 +135,14 @@ public class RegisterActivity extends BaseActivity implements View.OnClickListen
 
         if (!Validator.isEmailValid(email)) {
             etEmail.setError("כתובת אימייל לא חוקית");
+            Log.i(TAG, "כתובת אימייל לא חוקית");
             etEmail.requestFocus();
             return false;
         }
 
         if (!Validator.isPhoneValid(phone)) {
             etPhone.setError("מספר טלפון חייב להכיל לפחות 10 ספרות");
+            Log.i(TAG, "מספר טלפון חייב להכיל לפחות 10 ספרות");
             etPhone.requestFocus();
             return false;
         }
@@ -138,24 +150,29 @@ public class RegisterActivity extends BaseActivity implements View.OnClickListen
         if (!Validator.isUserNameValid(UName)) {
             etUName.setError("שם משתמש חייב להכיל לפחות 3 תווים, אותיות ומספרים בלבד");
             etUName.requestFocus();
+            Log.i(TAG, "שם משתמש חייב להכיל לפחות 3 תווים, אותיות ומספרים בלבד");
+
             return false;
         }
 
         if (!Validator.isBirthDateValid(BDate)) {
             etBDate.setError("תאריך לידה לא חוקי או בעתיד");
             etBDate.requestFocus();
+            Log.i(TAG, "תאריך לידה לא חוקי או בעתיד");
             return false;
         }
 
         if (!Validator.isPasswordValid(password)) {
             etPassword.setError("סיסמה חייבת להכיל לפחות 6 תווים, אותיות גדולות, קטנות ומספרים");
             etPassword.requestFocus();
+            Log.i(TAG, "סיסמה חייבת להכיל לפחות 6 תווים, אותיות גדולות, קטנות ומספרים");
             return false;
         }
 
         if (!password.equals(CPassword)) {
             etCPassword.setError("הסיסמאות אינן תואמות");
             etCPassword.requestFocus();
+            Log.i(TAG, "הסיסמאות אינן תואמות");
             return false;
         }
 
@@ -170,7 +187,7 @@ public class RegisterActivity extends BaseActivity implements View.OnClickListen
         String uid = databaseService.generateUserId();
 
         /// create a new user object
-        UserParent user = new UserParent(uid, fName, lName,  email, phone, BDate, UName, password,  false);
+        UserParent user = new UserParent(uid, fName, lName, email, phone, BDate, UName, password, false, new ArrayList<>());
 
         databaseService.checkIfEmailExists(email, new DatabaseService.DatabaseCallback<>() {
             @Override

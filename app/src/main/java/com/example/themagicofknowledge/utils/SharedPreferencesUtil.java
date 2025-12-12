@@ -128,11 +128,11 @@ public class SharedPreferencesUtil {
     /// @return The user object stored in shared preferences
     /// @see UserChild
     /// @see #isUserLoggedIn(Context)
-    public static UserChild getUser(Context context) {
+    public static UserParent getUser(Context context) {
         if (!isUserLoggedIn(context)) {
             return null;
         }
-        return getObject(context, "user", UserChild.class);
+        return getObject(context, "user", UserParent.class);
     }
 
     /// Sign out the user by removing user data from shared preferences
@@ -154,12 +154,10 @@ public class SharedPreferencesUtil {
     /// @return The user id of the logged in user, or null if no user is logged in
     @Nullable
     public static String getUserId(Context context) {
-        UserChild user = getUser(context);
+        UserParent user = getUser(context);
         if (user != null) {
             return user.getId();
         }
         return null;
     }
-
-
 }

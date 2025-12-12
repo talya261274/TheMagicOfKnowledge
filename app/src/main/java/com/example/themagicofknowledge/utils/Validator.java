@@ -58,38 +58,44 @@ public class Validator {
         }
 
         // בדיקה שכל התווים הם אותיות או מספרים בלבד
-        // [a-zA-Z0-9]+ -> תווים גדולים וקטנים ומספרים בלבד
         if (!uName.matches("[a-zA-Z0-9]+")) {
             return false;
         }
-        return false;
+
+        return true; // ← בסוף מחזיר true אם הכל תקין
     }
 
 
     public static boolean isBirthDateValid(String birthDate) {
         if (birthDate == null || birthDate.trim().isEmpty()) {
-            return false; // לא ריק
+            return false;
         }
 
-        // הגדרת פורמט התאריך
         SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy");
-        sdf.setLenient(false); // מוודא שהתאריך תקין באמת
+        sdf.setLenient(false);
 
         try {
             Date date = sdf.parse(birthDate);
 
-            // בדיקה שהמשתמש לא "מעופף בזמן" (גיל מינימלי 3)
+            // לא עתיד
+            Date today = new Date();
+            if (date.after(today)) {
+                return false;
+            }
+
+            // גיל מינימלי 3
             Calendar cal = Calendar.getInstance();
             cal.add(Calendar.YEAR, -3);
             Date minDate = cal.getTime();
 
             if (date.after(minDate)) {
-                return false; // גיל קטן מדי
+                return false;
             }
 
-            return true; // תאריך חוקי
+            return true;
+
         } catch (ParseException e) {
-            return false; // פורמט שגוי
+            return false;
         }
     }
 }

@@ -6,8 +6,8 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:fillViewport="true"
-    android:background="@drawable/main_background"
     android:id="@+id/register"
+    android:background="@drawable/main_background"
     tools:context=".screens.RegisterActivity">
 
     <androidx.constraintlayout.widget.ConstraintLayout
@@ -18,10 +18,10 @@
 
         <!-- כותרת -->
         <TextView
-            android:id="@+id/tvTitleRegister"
+            android:id="@+id/tvTitleUpdateDetails"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="@string/Register"
+            android:text="עדכון פרטים"
             android:textSize="40sp"
             android:shadowColor="@android:color/holo_blue_light"
             android:shadowDx="5"
@@ -37,11 +37,13 @@
 
         <!-- שם פרטי -->
         <com.google.android.material.textfield.TextInputLayout
-            android:id="@+id/et_register_first_name"
+            android:id="@+id/et_update_first_name"
             style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
+            android:layout_marginStart="16dp"
             android:layout_marginTop="24dp"
+            android:layout_marginEnd="16dp"
             android:hint="@string/FirstName"
             android:maxWidth="488dp"
             app:boxBackgroundColor="#66FFFFFF"
@@ -49,7 +51,7 @@
             app:hintTextColor="#5C6166"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/tvTitleRegister">
+            app:layout_constraintTop_toBottomOf="@id/tvTitleUpdateDetails">
 
             <com.google.android.material.textfield.TextInputEditText
                 android:id="@+id/etFirstName"
@@ -61,11 +63,13 @@
 
         <!-- שם משפחה -->
         <com.google.android.material.textfield.TextInputLayout
-            android:id="@+id/et_register_last_name"
+            android:id="@+id/et_update_last_name"
             style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
+            android:layout_marginStart="16dp"
             android:layout_marginTop="16dp"
+            android:layout_marginEnd="16dp"
             android:hint="@string/LastName"
             android:maxWidth="488dp"
             app:boxBackgroundColor="#66FFFFFF"
@@ -73,7 +77,7 @@
             app:hintTextColor="#5C6166"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/et_register_first_name">
+            app:layout_constraintTop_toBottomOf="@id/et_update_first_name">
 
             <com.google.android.material.textfield.TextInputEditText
                 android:id="@+id/etLastName"
@@ -85,11 +89,13 @@
 
         <!-- דוא"ל -->
         <com.google.android.material.textfield.TextInputLayout
-            android:id="@+id/et_register_email"
+            android:id="@+id/et_update_email"
             style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
+            android:layout_marginStart="16dp"
             android:layout_marginTop="16dp"
+            android:layout_marginEnd="16dp"
             android:hint="@string/Email"
             android:maxWidth="488dp"
             app:boxBackgroundColor="#66FFFFFF"
@@ -97,7 +103,7 @@
             app:hintTextColor="#5C6166"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/et_register_last_name">
+            app:layout_constraintTop_toBottomOf="@id/et_update_last_name">
 
             <com.google.android.material.textfield.TextInputEditText
                 android:id="@+id/etEmail"
@@ -109,11 +115,13 @@
 
         <!-- נייד -->
         <com.google.android.material.textfield.TextInputLayout
-            android:id="@+id/et_register_phone"
+            android:id="@+id/et_update_phone"
             style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
+            android:layout_marginStart="16dp"
             android:layout_marginTop="16dp"
+            android:layout_marginEnd="16dp"
             android:hint="@string/PhoneNumber"
             android:maxWidth="488dp"
             app:boxBackgroundColor="#66FFFFFF"
@@ -121,7 +129,7 @@
             app:hintTextColor="#5C6166"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/et_register_email">
+            app:layout_constraintTop_toBottomOf="@id/et_update_email">
 
             <com.google.android.material.textfield.TextInputEditText
                 android:id="@+id/etPhone"
@@ -133,11 +141,13 @@
 
         <!-- תאריך לידה -->
         <com.google.android.material.textfield.TextInputLayout
-            android:id="@+id/et_register_birth_date"
+            android:id="@+id/et_update_birth_date"
             style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
+            android:layout_marginStart="16dp"
             android:layout_marginTop="16dp"
+            android:layout_marginEnd="16dp"
             android:hint="@string/DateOfBirth"
             android:maxWidth="488dp"
             app:boxBackgroundColor="#66FFFFFF"
@@ -145,7 +155,7 @@
             app:hintTextColor="#5C6166"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/et_register_phone">
+            app:layout_constraintTop_toBottomOf="@id/et_update_phone">
 
             <com.google.android.material.textfield.TextInputEditText
                 android:id="@+id/etBirthDate"
@@ -157,11 +167,13 @@
 
         <!-- שם משתמש -->
         <com.google.android.material.textfield.TextInputLayout
-            android:id="@+id/et_register_user_name"
+            android:id="@+id/et_update_user_name"
             style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
+            android:layout_marginStart="16dp"
             android:layout_marginTop="16dp"
+            android:layout_marginEnd="16dp"
             android:hint="@string/UserName"
             android:maxWidth="488dp"
             app:boxBackgroundColor="#66FFFFFF"
@@ -169,7 +181,7 @@
             app:hintTextColor="#5C6166"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/et_register_birth_date">
+            app:layout_constraintTop_toBottomOf="@id/et_update_birth_date">
 
             <com.google.android.material.textfield.TextInputEditText
                 android:id="@+id/etUsername"
@@ -181,20 +193,22 @@
 
         <!-- סיסמה -->
         <com.google.android.material.textfield.TextInputLayout
-            android:id="@+id/et_register_password"
+            android:id="@+id/et_update_password"
             style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
+            android:layout_marginStart="16dp"
             android:layout_marginTop="16dp"
+            android:layout_marginEnd="16dp"
             android:hint="@string/Password"
             android:maxWidth="488dp"
-            app:endIconMode="password_toggle"
             app:boxBackgroundColor="#66FFFFFF"
             app:boxBackgroundMode="outline"
             app:hintTextColor="#5C6166"
+            app:endIconMode="password_toggle"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/et_register_user_name">
+            app:layout_constraintTop_toBottomOf="@id/et_update_user_name">
 
             <com.google.android.material.textfield.TextInputEditText
                 android:id="@+id/etPassword"
@@ -206,20 +220,23 @@
 
         <!-- אימות סיסמה -->
         <com.google.android.material.textfield.TextInputLayout
-            android:id="@+id/et_register_confirm_password"
+            android:id="@+id/et_update_confirm_password"
             style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
+            android:layout_marginStart="16dp"
             android:layout_marginTop="16dp"
+            android:layout_marginEnd="16dp"
             android:hint="@string/PassVer"
             android:maxWidth="488dp"
-            app:endIconMode="password_toggle"
             app:boxBackgroundColor="#66FFFFFF"
             app:boxBackgroundMode="outline"
             app:hintTextColor="#5C6166"
+            app:endIconMode="custom"
+            app:endIconDrawable="@drawable/ic_visibility"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/et_register_password">
+            app:layout_constraintTop_toBottomOf="@id/et_update_password">
 
             <com.google.android.material.textfield.TextInputEditText
                 android:id="@+id/etConfirmPassword"
@@ -231,31 +248,28 @@
 
         <!-- כפתור הרשמה -->
         <com.google.android.material.button.MaterialButton
-            android:id="@+id/btn_register_register"
-            android:layout_width="206dp"
-            android:layout_height="49dp"
-            android:layout_marginTop="32dp"
+            android:id="@+id/btn_edit_profile"
+            android:layout_width="224dp"
+            android:layout_height="53dp"
+            android:maxWidth="488dp"
+            android:layout_marginTop="24dp"
             android:background="@drawable/btn_blue_selector"
             app:backgroundTint="@null"
-            android:maxWidth="488dp"
-            android:text="@string/SignUp"
+            android:text="שמור"
             android:textColor="#FFFFFF"
             android:textSize="18sp"
             android:textStyle="bold"
             app:cornerRadius="50dp"
-            android:shadowColor="@color/hint_text_color"
-            android:shadowDx="5"
-            android:shadowDy="5"
-            android:shadowRadius="10"
-            android:elevation="8dp"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/et_register_confirm_password" />
+            app:layout_constraintTop_toBottomOf="@id/et_update_confirm_password" />
 
         <Button
-            android:id="@+id/goBackBtn2"
+            android:id="@+id/goBackBtn3"
             android:layout_width="81dp"
             android:layout_height="56dp"
+            android:layout_marginTop="4dp"
+            android:layout_marginEnd="8dp"
             android:backgroundTint="@android:color/transparent"
             android:gravity="right"
             android:text="➜"

@@ -13,6 +13,24 @@
         android:theme="@style/Theme.TheMagicOfKnowledge"
         tools:targetApi="31">
         <activity
+            android:name=".screens.UsersListActivity"
+            android:exported="false" />
+        <activity
+            android:name=".screens.ForgotPasswordActivity"
+            android:exported="false" />
+        <activity
+            android:name=".screens.UserProfileActivity"
+            android:exported="false" />
+        <activity
+            android:name=".screens.SignoutActivity"
+            android:exported="false" />
+        <activity
+            android:name=".screens.UpdateDetailsActivity"
+            android:exported="false" />
+        <activity
+            android:name=".UserProfileActivity"
+            android:exported="false" />
+        <activity
             android:name=".wand_swing"
             android:exported="false" />
         <activity
