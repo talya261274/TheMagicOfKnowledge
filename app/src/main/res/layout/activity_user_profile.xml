@@ -61,7 +61,7 @@
                         android:id="@+id/tv_user_display_name"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="User Name"
+                        android:text="שם משתמש"
                         android:textSize="24sp"
                         android:textStyle="bold"
                         android:textColor="?attr/colorOnBackground"
@@ -126,13 +126,14 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:orientation="vertical"
+                    android:gravity="right"
                     android:background="#E0E9E9"
                     android:padding="24dp">
 
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="Personal Information"
+                        android:text="פרטים אישיים:"
                         android:textStyle="bold"
                         android:textSize="18sp"
                         android:textColor="?attr/colorOnBackground"
@@ -142,6 +143,7 @@
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:orientation="horizontal"
+                        android:gravity="right"
                         android:layout_marginBottom="16dp">
 
                         <com.google.android.material.textfield.TextInputLayout
@@ -159,7 +161,7 @@
                                 android:id="@+id/et_user_first_name"
                                 android:layout_width="match_parent"
                                 android:layout_height="wrap_content"
-                                android:hint="First Name"
+                                android:hint="שם פרטי"
                                 android:inputType="textPersonName" />
 
                         </com.google.android.material.textfield.TextInputLayout>
@@ -179,7 +181,7 @@
                                 android:id="@+id/et_user_last_name"
                                 android:layout_width="match_parent"
                                 android:layout_height="wrap_content"
-                                android:hint="Last Name"
+                                android:hint="שם משפחה"
                                 android:inputType="textPersonName" />
 
                         </com.google.android.material.textfield.TextInputLayout>
@@ -201,7 +203,7 @@
                             android:id="@+id/et_user_email"
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
-                            android:hint="Email"
+                            android:hint="אימייל"
                             android:inputType="textEmailAddress" />
 
                     </com.google.android.material.textfield.TextInputLayout>
@@ -221,7 +223,7 @@
                             android:id="@+id/et_user_phone"
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
-                            android:hint="Phone Number"
+                            android:hint="מספר טלפון"
                             android:inputType="phone" />
 
                     </com.google.android.material.textfield.TextInputLayout>
@@ -241,7 +243,7 @@
                             android:id="@+id/et_user_birth_date"
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
-                            android:hint="Birth Date"
+                            android:hint="תאריך לידה"
                             android:inputType="datetime" />
 
                     </com.google.android.material.textfield.TextInputLayout>
@@ -259,7 +261,7 @@
                 android:id="@+id/btn_sign_out"
                 android:layout_width="match_parent"
                 android:layout_height="56dp"
-                android:text="Sign Out"
+                android:text="התנתקות"
                 android:textAllCaps="false"
                 app:cornerRadius="26dp"
                 style="@style/Widget.MaterialComponents.Button.OutlinedButton"

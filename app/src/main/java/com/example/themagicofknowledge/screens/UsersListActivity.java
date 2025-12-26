@@ -78,7 +78,7 @@ public class UsersListActivity extends BaseActivity {
             @Override
             public void onCompleted(List<UserParent> users) {
                 userAdapter.setUserList(users);
-                tvUserCount.setText("Total users: " + users.size());
+                tvUserCount.setText("מספר משתמשים: " + users.size());
             }
 
             @Override
