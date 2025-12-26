@@ -138,10 +138,11 @@
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_marginTop="16dp"
-            android:hint="@string/DateOfBirth"
-            android:maxWidth="488dp"
+            android:hint="תאריך לידה"
             app:boxBackgroundColor="#66FFFFFF"
             app:boxBackgroundMode="outline"
+            app:endIconDrawable="@drawable/ic_calendar2"
+            app:endIconMode="custom"
             app:hintTextColor="#5C6166"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
@@ -151,7 +152,9 @@
                 android:id="@+id/etBirthDate"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:inputType="date"
+                android:clickable="true"
+                android:focusable="false"
+                android:inputType="none"
                 android:textColor="#000000" />
         </com.google.android.material.textfield.TextInputLayout>
 

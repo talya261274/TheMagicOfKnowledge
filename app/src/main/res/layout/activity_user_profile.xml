@@ -5,7 +5,7 @@
     android:id="@+id/main"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="?attr/android:colorBackground"
+    android:background="@drawable/main_background"
     tools:context=".screens.UserProfileActivity">
 
     <com.google.android.material.appbar.AppBarLayout
@@ -17,7 +17,8 @@
             android:id="@+id/toolbar"
             android:layout_width="match_parent"
             android:layout_height="?attr/actionBarSize"
-            android:background="?attr/colorPrimary"
+            android:background="#FA4493E0"
+            app:titleTextColor="@color/white"
             app:popupTheme="@style/ThemeOverlay.AppCompat.Light"
             app:title="פרופיל משתמש"
             app:navigationIcon="?attr/homeAsUpIndicator" />
@@ -46,6 +47,7 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:orientation="vertical"
+                    android:background="#E0E9E9"
                     android:gravity="center"
                     android:padding="32dp">
 
@@ -66,10 +68,10 @@
                         android:layout_marginBottom="8dp" />
 
                     <TextView
-                        android:id="@+id/tv_user_display_email"
+                        android:id="@+id/tv_user_display_id"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="user@example.com"
+                        android:text="000000000"
                         android:textSize="14sp"
                         android:textColor="?attr/colorOnSurfaceVariant" />
 
@@ -124,6 +126,7 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:orientation="vertical"
+                    android:background="#E0E9E9"
                     android:padding="24dp">
 
                     <TextView
@@ -259,10 +262,13 @@
                 android:layout_height="56dp"
                 android:text="Sign Out"
                 android:textAllCaps="false"
-                app:cornerRadius="28dp"
+                app:cornerRadius="26dp"
                 style="@style/Widget.MaterialComponents.Button.OutlinedButton"
-                app:strokeColor="?attr/colorError"
-                android:textColor="?attr/colorError" />
+                app:strokeColor="#4493E0"
+                android:textColor="#4493E0"
+                app:strokeWidth="1.5dp"
+                android:textSize="17dp"
+                android:textStyle="bold"/>
 
         </LinearLayout>
 

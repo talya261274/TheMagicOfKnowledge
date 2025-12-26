@@ -4,10 +4,10 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
-import android.widget.EditText;
 import android.widget.Button;
-import android.widget.TextView;
 import android.widget.Toast;
+import java.util.Calendar;
+import android.app.DatePickerDialog;
 
 import androidx.activity.EdgeToEdge;
 import androidx.core.graphics.Insets;
@@ -53,6 +53,27 @@ public class RegisterActivity extends BaseActivity implements View.OnClickListen
                 Intent intent = new Intent(RegisterActivity.this, LandingActivity.class);
                 startActivity(intent);
             }
+        });
+        etBDate = findViewById(R.id.et_register_birth_date);
+
+        etBDate.getEditText().setFocusable(false);
+        etBDate.getEditText().setClickable(true);
+
+        etBDate.getEditText().setOnClickListener(v -> {
+            final Calendar calendar = Calendar.getInstance();
+            int year = calendar.get(Calendar.YEAR);
+            int month = calendar.get(Calendar.MONTH);
+            int day = calendar.get(Calendar.DAY_OF_MONTH);
+
+            DatePickerDialog datePickerDialog = new DatePickerDialog(
+                    RegisterActivity.this,
+                    (view, selectedYear, selectedMonth, selectedDay) -> {
+                        String date = String.format("%02d/%02d/%04d", selectedDay, selectedMonth + 1, selectedYear);
+                        etBDate.getEditText().setText(date);
+                    },
+                    year, month, day
+            );
+            datePickerDialog.show();
         });
 
         /// get the views
@@ -220,7 +241,7 @@ public class RegisterActivity extends BaseActivity implements View.OnClickListen
                 SharedPreferencesUtil.saveUser(RegisterActivity.this, user);
                 Log.d(TAG, "createUserInDatabase: Redirecting to MainActivity");
                 /// Redirect to MainActivity and clear back stack to prevent user from going back to register screen
-                Intent mainIntent = new Intent(RegisterActivity.this, MainActivity.class);
+                Intent mainIntent = new Intent(RegisterActivity.this, Total.class);
                 /// clear the back stack (clear history) and start the MainActivity
                 mainIntent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
                 startActivity(mainIntent);
