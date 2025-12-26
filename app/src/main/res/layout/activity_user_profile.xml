@@ -14,7 +14,7 @@
         android:theme="@style/ThemeOverlay.AppCompat.Dark.ActionBar">
 
         <androidx.appcompat.widget.Toolbar
-            android:id="@+id/toolbar"
+            android:id="@+id/toolbar_user_profile"
             android:layout_width="match_parent"
             android:layout_height="?attr/actionBarSize"
             android:background="#FA4493E0"
@@ -215,8 +215,7 @@
                         app:boxCornerRadiusTopEnd="12dp"
                         app:boxCornerRadiusBottomStart="12dp"
                         app:boxCornerRadiusBottomEnd="12dp"
-                        app:startIconDrawable="@android:drawable/sym_action_call"
-                        app:prefixText="+972">
+                        app:startIconDrawable="@android:drawable/sym_action_call">
 
                         <com.google.android.material.textfield.TextInputEditText
                             android:id="@+id/et_user_phone"

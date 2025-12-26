@@ -5,11 +5,14 @@ import android.os.Bundle;
 import android.util.Log;
 
 import androidx.activity.EdgeToEdge;
+import androidx.appcompat.widget.Toolbar;
 import androidx.core.graphics.Insets;
 import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
+
+import android.view.View;
 import android.widget.TextView;
 
 import com.example.themagicofknowledge.R;
@@ -56,6 +59,15 @@ public class UsersListActivity extends BaseActivity {
             }
         });
         usersList.setAdapter(userAdapter);
+
+        Toolbar toolbar = findViewById(R.id.toolbar_user_list);
+
+        toolbar.setNavigationOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                finish();
+            }
+        });
     }
 
 
