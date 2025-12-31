@@ -2,36 +2,50 @@ package com.example.themagicofknowledge.models;
 
 public class UserChild {
 
-    public String id;
-    public String age;
-    public String level; //// רמה לימודית
+    public int id;
+    ///public String parent_id;
+    public int age;
+    public String level;//// רמה לימודית
+    /// enum: 3-4 5-6 7-8 ???
     public String progress;
+
+    public static int counterUserChild;
 
     public UserChild() {
     }
-
-
-
-    public UserChild(String id, String userName, String password, String age, String level, String progress) {
-        this.id = id;
+    public UserChild(String userName, int age) {
+        counterUserChild++;
+        id = counterUserChild;
+        /// in the database for all parents and childs
+        /// find child - find child's parent
+        ///  parent_id = parent(that we found).id
         this.age = age;
-        this.level = level;
+        switch (age){
+            case 3: case 4:
+                level = "three-four";
+                break;
+            case 5: case 6:
+                level = "five-six";
+                break;
+            case 7: case 8:
+                level = "seven-eight";
+        }
         this.progress = progress;
     }
 
-    public String getId() {
+    public int getId() {
         return id;
     }
 
-    public void setId(String id) {
+    public void setId(int id) {
         this.id = id;
     }
 
-    public String getAge() {
+    public int getAge() {
         return age;
     }
 
-    public void setAge(String age) {
+    public void setAge(int age) {
         this.age = age;
     }
 
