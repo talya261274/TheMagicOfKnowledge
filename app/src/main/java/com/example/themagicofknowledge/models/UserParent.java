@@ -116,7 +116,6 @@ public class UserParent {
         this.childrenList = childrenList;
     }
 
-    public
 
     @NonNull
     @Override
