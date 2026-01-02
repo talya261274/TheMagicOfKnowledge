@@ -13,7 +13,7 @@
         android:theme="@style/Theme.TheMagicOfKnowledge"
         tools:targetApi="31">
         <activity
-            android:name=".SelectSubjectActivity"
+            android:name=".screens.SelectSubjectActivity"
             android:exported="false" />
         <activity
             android:name=".screens.Total"
@@ -34,14 +34,9 @@
             android:name=".screens.UpdateDetailsActivity"
             android:exported="false" />
         <activity
-            android:name=".UserProfileActivity"
-            android:exported="false" />
-        <activity
-            android:name=".wand_swing"
-            android:exported="false" />
-        <activity
-            android:name=".screens.activity_landing1"
-            android:exported="false" />
+            android:name=".screens.UserProfileActivity"
+            android:exported="false"
+            tools:ignore="DuplicateActivity,MissingClass" />
         <activity
             android:name=".utils.Validator"
             android:exported="false"

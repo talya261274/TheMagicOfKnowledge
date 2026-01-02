@@ -3,6 +3,7 @@ package com.example.themagicofknowledge.screens;
 import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
+import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -58,12 +59,12 @@ public class UserProfileActivity extends AppCompatActivity {
         });
 
 
-        Toolbar toolbar = findViewById(R.id.toolbar_user_profile);
-
-        toolbar.setNavigationOnClickListener(new View.OnClickListener() {
+        Button btnGoBack2 = findViewById(R.id.goBackBtn2);
+        btnGoBack2.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                finish();
+                Intent intent = new Intent(UserProfileActivity.this, UsersListActivity.class);
+                startActivity(intent);
             }
         });
     }

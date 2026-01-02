@@ -13,6 +13,7 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import android.view.View;
+import android.widget.Button;
 import android.widget.TextView;
 
 import com.example.themagicofknowledge.R;
@@ -60,12 +61,12 @@ public class UsersListActivity extends BaseActivity {
         });
         usersList.setAdapter(userAdapter);
 
-        Toolbar toolbar = findViewById(R.id.toolbar_user_list);
-
-        toolbar.setNavigationOnClickListener(new View.OnClickListener() {
+        Button btnGoBack = findViewById(R.id.goBackBtn2);
+        btnGoBack.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                finish();
+                Intent intent = new Intent(UsersListActivity.this, LandingActivity.class);
+                startActivity(intent);
             }
         });
     }

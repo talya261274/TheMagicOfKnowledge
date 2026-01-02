@@ -1,9 +1,7 @@
 package com.example.themagicofknowledge.screens;
 
 import android.content.Intent;
-import android.content.SharedPreferences;
 import android.os.Bundle;
-import android.view.View;
 import android.widget.Button;
 
 import androidx.activity.EdgeToEdge;
@@ -44,6 +42,12 @@ public class Total extends AppCompatActivity {
         Button btn_TLogout = findViewById(R.id.btn_TLogout);
         btn_TLogout.setOnClickListener(view -> {
             signOut();
+        });
+
+        Button btn_SelectSubject = findViewById(R.id.btn_SelectSubject);
+        btn_SelectSubject.setOnClickListener(view -> {
+            Intent intent = new Intent(Total.this, SelectSubjectActivity.class);
+            startActivity(intent);
         });
     }
 
