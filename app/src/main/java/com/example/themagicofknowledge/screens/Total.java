@@ -15,6 +15,7 @@ import com.example.themagicofknowledge.utils.SharedPreferencesUtil;
 
 public class Total extends AppCompatActivity {
 
+    Button btn_TUserList ;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -26,14 +27,7 @@ public class Total extends AppCompatActivity {
             return insets;
         });
 
-
-        Button btn_TUpdate = findViewById(R.id.btn_TUpdate);
-        btn_TUpdate.setOnClickListener(view -> {
-            Intent intent = new Intent(Total.this, UpdateDetailsActivity.class);
-            startActivity(intent);
-        });
-
-        Button btn_TUserList = findViewById(R.id.btn_TUserList);
+        btn_TUserList = findViewById(R.id.btn_TUserList);
         btn_TUserList.setOnClickListener(view -> {
             Intent intent = new Intent(Total.this, UsersListActivity.class);
             startActivity(intent);

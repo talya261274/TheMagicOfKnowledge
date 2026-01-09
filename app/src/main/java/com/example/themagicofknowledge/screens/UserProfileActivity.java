@@ -11,6 +11,7 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
 
 import com.example.themagicofknowledge.R;
+import com.example.themagicofknowledge.models.UserChild;
 import com.example.themagicofknowledge.models.UserParent;
 import com.example.themagicofknowledge.utils.SharedPreferencesUtil;
 import com.google.android.material.button.MaterialButton;
@@ -64,6 +65,15 @@ public class UserProfileActivity extends AppCompatActivity {
             @Override
             public void onClick(View view) {
                 Intent intent = new Intent(UserProfileActivity.this, UsersListActivity.class);
+                startActivity(intent);
+            }
+        });
+
+        TextView et_update = findViewById(R.id.et_update);
+        et_update.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Intent intent = new Intent(UserProfileActivity.this, UpdateDetailsActivity.class);
                 startActivity(intent);
             }
         });

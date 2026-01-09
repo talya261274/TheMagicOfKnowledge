@@ -2,43 +2,50 @@ package com.example.themagicofknowledge.models;
 
 public class UserChild {
 
-    public int id;
-    ///public String parent_id;
-    public int age;
-    public String level;//// רמה לימודית
-    /// enum: 3-4 5-6 7-8 ???
-    public String progress;
-
-    public static int counterUserChild;
+    String id;
+    String parentId;
+    String name;
+    int age;
+    int currentLevel;
+    double gradeAvg;
+    long totalTimeSeconds;
 
     public UserChild() {
     }
-    public UserChild(String userName, int age) {
-        counterUserChild++;
-        id = counterUserChild;
-        /// in the database for all parents and childs
-        /// find child - find child's parent
-        ///  parent_id = parent(that we found).id
+
+
+    public UserChild(String id, String parentId, String name, int age) {
+        this.id = id;
+        this.parentId = parentId;
+        this.name = name;
         this.age = age;
-        switch (age){
-            case 3: case 4:
-                level = "three-four";
-                break;
-            case 5: case 6:
-                level = "five-six";
-                break;
-            case 7: case 8:
-                level = "seven-eight";
-        }
-        this.progress = progress;
+        this.currentLevel = 0;
+        this.gradeAvg = 0.0;
+        this.totalTimeSeconds = 0;
     }
 
-    public int getId() {
+    public String getId() {
         return id;
     }
 
-    public void setId(int id) {
+    public void setId(String id) {
         this.id = id;
+    }
+
+    public String getParentId() {
+        return parentId;
+    }
+
+    public void setParentId(String parentId) {
+        this.parentId = parentId;
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
     }
 
     public int getAge() {
@@ -49,30 +56,52 @@ public class UserChild {
         this.age = age;
     }
 
-    public String getLevel() {
-        return level;
+    public int getCurrentLevel() {
+        return currentLevel;
     }
 
-    public void setLevel(String level) {
-        this.level = level;
+    public void setCurrentLevel(int currentLevel) {
+        this.currentLevel = currentLevel;
     }
 
-    public String getProgress() {
-        return progress;
+    public double getGradeAvg() {
+        return gradeAvg;
     }
 
-    public void setProgress(String progress) {
-        this.progress = progress;
+    public void setGradeAvg(double gradeAvg) {
+        this.gradeAvg = gradeAvg;
+    }
+
+    public long getTotalTimeSeconds() {
+        return totalTimeSeconds;
+    }
+
+    public void setTotalTimeSeconds(long totalTimeSeconds) {
+        this.totalTimeSeconds = totalTimeSeconds;
+    }
+
+    public String getFormattedTime() {
+        long hours = totalTimeSeconds / 3600;
+        long minutes = (totalTimeSeconds % 3600) / 60;
+        long seconds = totalTimeSeconds % 60;
+
+        return String.format("%02d:%02d:%02d", hours, minutes, seconds);
+    }
+
+    public void addTime(long secondsToAdd) {
+        this.totalTimeSeconds += secondsToAdd;
     }
 
     @Override
     public String toString() {
         return "UserChild{" +
                 "id='" + id + '\'' +
-                ", age='" + age + '\'' +
-                ", level='" + level + '\'' +
-                ", progress='" + progress + '\'' +
+                ", parentId='" + parentId + '\'' +
+                ", name='" + name + '\'' +
+                ", age=" + age +
+                ", currentLevel=" + currentLevel +
+                ", gradeAvg=" + gradeAvg +
+                ", totalTimeSeconds=" + totalTimeSeconds +
                 '}';
     }
-
 }

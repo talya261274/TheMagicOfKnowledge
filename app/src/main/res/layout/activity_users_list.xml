@@ -56,7 +56,7 @@
                 android:layout_marginTop="30dp"
                 android:layout_gravity="right"
                 android:text="מספר משתמשים: 0"
-                android:textColor="?attr/colorOnSurfaceVariant"
+                android:textColor="#FFC0CB"
                 android:textSize="20sp" />
 
         </LinearLayout>
@@ -104,7 +104,7 @@
                         android:layout_height="wrap_content"
                         android:text="No Users Found"
                         android:textSize="18sp"
-                        android:textColor="?attr/colorOnSurfaceVariant"
+                        android:textColor="#FFC0CB"
                         android:layout_marginBottom="8dp" />
 
                     <TextView
@@ -112,7 +112,7 @@
                         android:layout_height="wrap_content"
                         android:text="Users will appear here"
                         android:textSize="14sp"
-                        android:textColor="?attr/colorOnSurfaceVariant" />
+                        android:textColor="#FFC0CB" />
 
                 </LinearLayout>
 

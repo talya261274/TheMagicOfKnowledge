@@ -43,7 +43,7 @@ public class UpdateDetailsActivity extends BaseActivity implements View.OnClickL
         btnGoBack.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Intent intent = new Intent(UpdateDetailsActivity.this, LandingActivity.class);
+                Intent intent = new Intent(UpdateDetailsActivity.this, UserProfileActivity.class);
                 startActivity(intent);
             }
         });

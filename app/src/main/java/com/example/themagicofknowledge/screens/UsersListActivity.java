@@ -71,22 +71,30 @@ public class UsersListActivity extends BaseActivity {
         });
     }
 
-
     @Override
     protected void onResume() {
         super.onResume();
         databaseService.getUserList(new DatabaseService.DatabaseCallback<>() {
             @Override
             public void onCompleted(List<UserParent> users) {
-                userAdapter.setUserList(users);
-                tvUserCount.setText("מספר משתמשים: " + users.size());
+
+                runOnUiThread(() -> {
+                    tvUserCount.setText("מספר משתמשים: " + users.size());
+                    userAdapter.setUserList(users);
+                });
             }
 
             @Override
             public void onFailed(Exception e) {
                 Log.e(TAG, "Failed to get users list", e);
+                runOnUiThread(() -> {
+                    tvUserCount.setText("שגיאה בטעינת משתמשים");
+                });
             }
         });
     }
+
+
+
 
 }

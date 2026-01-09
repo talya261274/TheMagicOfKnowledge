@@ -10,7 +10,7 @@
     app:cardElevation="2dp"
     android:clickable="true"
     android:focusable="true"
-    android:foreground="?attr/selectableItemBackground">
+    android:foreground="#FFC0CB">
 
     <LinearLayout
         android:layout_width="match_parent"
@@ -24,7 +24,7 @@
             android:layout_height="56dp"
             app:cardCornerRadius="28dp"
             app:cardElevation="0dp"
-            app:cardBackgroundColor="?attr/colorSurfaceVariant">
+            app:cardBackgroundColor="#FFC0CB">
 
             <TextView
                 android:id="@+id/tv_user_initials"
@@ -34,7 +34,7 @@
                 android:text="JD"
                 android:textSize="20sp"
                 android:textStyle="bold"
-                android:textColor="?attr/colorPrimary" />
+                android:textColor="#FFC0CB" />
 
         </com.google.android.material.card.MaterialCardView>
 
@@ -53,7 +53,7 @@
                 android:text="John Doe"
                 android:textSize="16sp"
                 android:textStyle="bold"
-                android:textColor="?attr/colorOnSurface"
+                android:textColor="#FFC0CB"
                 android:layout_marginBottom="4dp"
                 tools:text="@tools:sample/full_names" />
 
@@ -77,7 +77,7 @@
                     android:layout_height="wrap_content"
                     android:text="john.doe@example.com"
                     android:textSize="14sp"
-                    android:textColor="?attr/colorOnSurfaceVariant"
+                    android:textColor="#FFC0CB"
                     tools:text="user@example.com" />
 
             </LinearLayout>
@@ -101,7 +101,7 @@
                     android:layout_height="wrap_content"
                     android:text="+1 234 567 8900"
                     android:textSize="14sp"
-                    android:textColor="?attr/colorOnSurfaceVariant"
+                    android:textColor="#FFC0CB"
                     tools:text="@tools:sample/us_phones" />
 
             </LinearLayout>
@@ -121,7 +121,7 @@
                 android:text="Admin"
                 android:textSize="12sp"
                 android:visibility="gone"
-                app:chipBackgroundColor="?attr/colorSecondary"
+                app:chipBackgroundColor="#FFC0CB"
                 app:chipStrokeWidth="0dp"
                 tools:visibility="visible" />
 
