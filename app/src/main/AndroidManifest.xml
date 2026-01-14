@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:tools="http://schemas.android.com/tools">
+    xmlns:tools="http://schemas.android.com/tools" >
 
     <application
         android:allowBackup="true"
@@ -11,7 +11,13 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/Theme.TheMagicOfKnowledge"
-        tools:targetApi="31">
+        tools:targetApi="31" >
+        <activity
+            android:name=".screens.FlashCardColors"
+            android:exported="false" />
+        <activity
+            android:name=".screens.FlashCardMain"
+            android:exported="false" />
         <activity
             android:name=".screens.SelectSubjectActivity"
             android:exported="false" />
@@ -28,15 +34,15 @@
             android:name=".screens.UserProfileActivity"
             android:exported="false" />
         <activity
+            android:name=".screens.UserProfileActivity"
+            android:exported="false"
+            tools:ignore="DuplicateActivity,MissingClass" />
+        <activity
             android:name=".screens.SignoutActivity"
             android:exported="false" />
         <activity
             android:name=".screens.UpdateDetailsActivity"
             android:exported="false" />
-        <activity
-            android:name=".screens.UserProfileActivity"
-            android:exported="false"
-            tools:ignore="DuplicateActivity,MissingClass" />
         <activity
             android:name=".utils.Validator"
             android:exported="false"
@@ -52,7 +58,7 @@
             android:exported="false" />
         <activity
             android:name=".screens.LandingActivity"
-            android:exported="true">
+            android:exported="true" >
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 

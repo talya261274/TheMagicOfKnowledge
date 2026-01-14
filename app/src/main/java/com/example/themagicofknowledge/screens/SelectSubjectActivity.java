@@ -2,40 +2,71 @@ package com.example.themagicofknowledge.screens;
 
 import android.content.Intent;
 import android.os.Bundle;
-import android.view.View;
 import android.widget.Button;
 
-import androidx.activity.EdgeToEdge;
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.core.graphics.Insets;
-import androidx.core.view.ViewCompat;
-import androidx.core.view.WindowInsetsCompat;
+import androidx.cardview.widget.CardView;
 
 import com.example.themagicofknowledge.R;
-import com.example.themagicofknowledge.screens.LandingActivity;
-import com.example.themagicofknowledge.screens.RegisterActivity;
-import com.example.themagicofknowledge.screens.Total;
 
 public class SelectSubjectActivity extends AppCompatActivity {
+
+    private CardView btnAnimals, btnColors, btnNumbers, btnLetters, btnShapes, btnBodyParts;
+    private Button goBackBtn2;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        EdgeToEdge.enable(this);
-        setContentView(R.layout.activity_select_subject);
-        ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.main), (v, insets) -> {
-            Insets systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars());
-            v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom);
-            return insets;
+        setContentView(R.layout.activity_select_subject); // הקובץ XML שלך
+
+        // חיבור הכרטיסים והכפתור מה־XML
+        btnAnimals = findViewById(R.id.btnAnimals);
+        btnColors = findViewById(R.id.btnColors);
+        btnNumbers = findViewById(R.id.btnNumbers);
+        btnLetters = findViewById(R.id.btnLetters);
+        btnShapes = findViewById(R.id.btnShapes);
+        btnBodyParts = findViewById(R.id.btnBodyParts);
+        goBackBtn2 = findViewById(R.id.goBackBtn2);
+
+        // לדוגמה: לחיצה על חיות
+        btnAnimals.setOnClickListener(v -> {
+            Intent intent = new Intent(SelectSubjectActivity.this, FlashCardMain.class);
+            intent.putExtra("subject", "animals"); // אם רוצים להעביר נושא
+            startActivity(intent);
         });
 
-        Button goBackBtn2 = findViewById(R.id.goBackBtn2);
-        goBackBtn2.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                Intent intent = new Intent(com.example.themagicofknowledge.screens.SelectSubjectActivity.this, Total.class);
-                startActivity(intent);
-            }
+        btnColors.setOnClickListener(v -> {
+            Intent intent = new Intent(SelectSubjectActivity.this, FlashCardMain.class);
+            intent.putExtra("subject", "colors");
+            startActivity(intent);
         });
+
+        // אפשר להוסיף גם לכל שאר הכרטיסים באופן דומה
+        btnNumbers.setOnClickListener(v -> {
+            Intent intent = new Intent(SelectSubjectActivity.this, FlashCardMain.class);
+            intent.putExtra("subject", "numbers");
+            startActivity(intent);
+        });
+
+        btnLetters.setOnClickListener(v -> {
+            Intent intent = new Intent(SelectSubjectActivity.this, FlashCardMain.class);
+            intent.putExtra("subject", "letters");
+            startActivity(intent);
+        });
+
+        btnShapes.setOnClickListener(v -> {
+            Intent intent = new Intent(SelectSubjectActivity.this, FlashCardMain.class);
+            intent.putExtra("subject", "shapes");
+            startActivity(intent);
+        });
+
+        btnBodyParts.setOnClickListener(v -> {
+            Intent intent = new Intent(SelectSubjectActivity.this, FlashCardMain.class);
+            intent.putExtra("subject", "bodyparts");
+            startActivity(intent);
+        });
+
+        // כפתור חזרה
+        goBackBtn2.setOnClickListener(v -> finish()); // סוגר את המסך ומחזיר למסך הקודם
     }
 }
