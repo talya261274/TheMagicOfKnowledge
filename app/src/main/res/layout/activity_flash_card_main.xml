@@ -8,23 +8,23 @@
     android:gravity="center"
     android:padding="24dp">
 
+    <!-- כרטיס -->
     <TextView
         android:id="@+id/tvTitle"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="מי אני?"
-        android:textSize="36sp"
-        android:textStyle="bold"
-        android:textColor="@color/white"
+        android:layout_marginBottom="70dp"
         android:fontFamily="@font/gan"
-        android:layout_marginBottom="24dp"
+        android:gravity="center"
         android:shadowColor="@android:color/holo_blue_light"
         android:shadowDx="4"
         android:shadowDy="4"
         android:shadowRadius="8"
-        android:gravity="center"/>
+        android:text="מי אני?"
+        android:textColor="@color/white"
+        android:textSize="50sp"
+        android:textStyle="bold" />
 
-    <!-- כרטיס -->
     <com.google.android.material.card.MaterialCardView
         android:id="@+id/card"
         android:layout_width="280dp"
@@ -56,7 +56,7 @@
                 android:layout_height="wrap_content"
                 android:layout_gravity="center"
                 android:gravity="center"
-                android:textSize="26sp"
+                android:textSize="40sp"
                 android:textStyle="bold"
                 android:textColor="#000000"
                 android:visibility="gone"/>
@@ -69,6 +69,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:gravity="center"
+        android:layout_marginTop="20dp"
         android:orientation="horizontal">
 
         <Button
