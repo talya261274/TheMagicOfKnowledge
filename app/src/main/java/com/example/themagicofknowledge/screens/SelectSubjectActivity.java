@@ -41,7 +41,6 @@ public class SelectSubjectActivity extends AppCompatActivity {
             startActivity(intent);
         });
 
-        // אפשר להוסיף גם לכל שאר הכרטיסים באופן דומה
         btnNumbers.setOnClickListener(v -> {
             Intent intent = new Intent(SelectSubjectActivity.this, FlashCardMain.class);
             intent.putExtra("subject", "numbers");
