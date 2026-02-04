@@ -160,4 +160,27 @@ public class SharedPreferencesUtil {
         }
         return null;
     }
+
+    // מפתח לשמירת הילד הנבחר
+    private static final String KEY_SELECTED_CHILD = "selected_child";
+
+    /// שמירת הילד שנבחר כרגע למשחק
+    public static void saveCurrentChild(Context context, UserChild child) {
+        saveObject(context, KEY_SELECTED_CHILD, child);
+    }
+
+    /// שליפת הילד שמשחק כרגע
+    public static UserChild getCurrentChild(Context context) {
+        return getObject(context, KEY_SELECTED_CHILD, UserChild.class);
+    }
+
+    /// בדיקה האם נבחר ילד למשחק (שימושי למעברי מסכים)
+    public static boolean isChildSelected(Context context) {
+        return contains(context, KEY_SELECTED_CHILD);
+    }
+
+    /// איפוס בחירת הילד (למשל כשרוצים לחזור למסך בחירת ילד)
+    public static void clearSelectedChild(Context context) {
+        remove(context, KEY_SELECTED_CHILD);
+    }
 }

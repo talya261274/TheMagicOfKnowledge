@@ -3,8 +3,13 @@ package com.example.themagicofknowledge.screens;
 import android.annotation.SuppressLint;
 import android.os.Bundle;
 import android.widget.Button;
+import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.TextView;
+import android.media.MediaPlayer;
+import android.media.AudioManager;
+
+
 
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.cardview.widget.CardView;
@@ -19,7 +24,8 @@ public class FlashCardMain extends AppCompatActivity {
     private TextView tvTitle, tvCardText;
     private ImageView imgCard;
     private CardView card;
-    private Button btnNext, btnPrev;
+    private ImageButton btnNext, btnPrev, btnPlaySound;
+    ;
 
     private ArrayList<FlashCard> cards;
     private int currentIndex = 0;
@@ -38,6 +44,7 @@ public class FlashCardMain extends AppCompatActivity {
         card = findViewById(R.id.card);
         btnNext = findViewById(R.id.btnNext);
         btnPrev = findViewById(R.id.btnPrev);
+        btnPlaySound = findViewById(R.id.btnPlaySound);
 
         // קבלת נושא מה-Intent
         String subject = getIntent().getStringExtra("subject");
@@ -66,6 +73,9 @@ public class FlashCardMain extends AppCompatActivity {
             showingImage = true;
             showImage();
         });
+
+        btnPlaySound.setOnClickListener(v -> playSound());
+
     }
 
     private void createCards(String subject) {
@@ -168,8 +178,6 @@ public class FlashCardMain extends AppCompatActivity {
                 cards.add(new FlashCard(R.drawable.ss_letters_r, "ריש", R.raw.reish));
                 cards.add(new FlashCard(R.drawable.ss_letters_sh, "שין", R.raw.shin));
                 cards.add(new FlashCard(R.drawable.ss_letters_tav, "תיו", R.raw.tav));
-
-
                 break;
 
             case "shapes":
@@ -219,20 +227,25 @@ public class FlashCardMain extends AppCompatActivity {
                 cards.add(new FlashCard(R.drawable.ss_body_foot, "כף רגל", R.raw.foot));
 
                 break;
+
         }
+
     }
 
     private void showImage() {
         imgCard.setVisibility(ImageView.VISIBLE);
         tvCardText.setVisibility(TextView.GONE);
+        btnPlaySound.setVisibility(Button.GONE);  // הכפתור מוסתר
         imgCard.setImageResource(cards.get(currentIndex).getImageResId());
     }
 
     private void showText() {
         tvCardText.setVisibility(TextView.VISIBLE);
         imgCard.setVisibility(ImageView.GONE);
+        btnPlaySound.setVisibility(Button.VISIBLE); // הכפתור מופיע
         tvCardText.setText(cards.get(currentIndex).getAnswer());
     }
+
 
     private void flipCard() {
         if (showingImage) {
@@ -242,4 +255,23 @@ public class FlashCardMain extends AppCompatActivity {
         }
         showingImage = !showingImage;
     }
+
+    private void playSound() {
+
+        AudioManager audioManager = (AudioManager) getSystemService(AUDIO_SERVICE);
+        audioManager.setStreamVolume(
+                AudioManager.STREAM_MUSIC,
+                audioManager.getStreamMaxVolume(AudioManager.STREAM_MUSIC),
+                0
+        );
+
+        MediaPlayer mp = MediaPlayer.create(this, cards.get(currentIndex).getSoundResId());
+
+        mp.setVolume(2.0f, 2.0f); // שמאל, ימין (0.0 עד 1.0)
+
+        mp.start();
+        mp.setOnCompletionListener(MediaPlayer::release);
+    }
+
+
 }

@@ -33,7 +33,7 @@ public class LandingActivity extends AppCompatActivity {
 
         UserParent = SharedPreferencesUtil.getUser(LandingActivity.this);
         if(SharedPreferencesUtil.isUserLoggedIn(LandingActivity.this)){
-            Intent intent = new Intent(LandingActivity.this, Total.class);
+            Intent intent = new Intent(LandingActivity.this, SelectChildActivity.class);
             intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
             startActivity(intent);
             finish();

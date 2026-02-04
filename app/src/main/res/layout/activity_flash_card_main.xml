@@ -79,6 +79,10 @@
             android:id="@+id/btnPrev"
             android:layout_width="60dp"
             android:layout_height="60dp"
+            android:shadowColor="@android:color/holo_blue_light"
+            android:shadowDx="4"
+            android:shadowDy="4"
+            android:shadowRadius="8"
             android:background="@drawable/btn_movesides"
             android:src="@drawable/ic_arrow_back" />
 
@@ -102,7 +106,7 @@
         android:background="@drawable/btn_orange_selector"
         android:src="@drawable/ic_volume_up"
         android:scaleType="centerInside"
-        android:visibility="visible"
+        android:visibility="gone"
         android:contentDescription="Play Sound"/>
 
 </LinearLayout>

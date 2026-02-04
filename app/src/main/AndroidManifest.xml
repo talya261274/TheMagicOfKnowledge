@@ -13,7 +13,7 @@
         android:theme="@style/Theme.TheMagicOfKnowledge"
         tools:targetApi="31" >
         <activity
-            android:name=".screens.FlashCardColors"
+            android:name=".screens.SelectChildActivity"
             android:exported="false" />
         <activity
             android:name=".screens.FlashCardMain"
