@@ -69,3 +69,6 @@ public class SelectSubjectActivity extends AppCompatActivity {
         goBackBtn2.setOnClickListener(v -> finish()); // סוגר את המסך ומחזיר למסך הקודם
     }
 }
+
+
+

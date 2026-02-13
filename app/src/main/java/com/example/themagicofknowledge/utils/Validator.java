@@ -66,9 +66,9 @@ public class Validator {
     }
 
 
-    public static boolean isBirthDateValid(String birthDate) {
+    public static boolean isParentBirthDateValid(String birthDate) {
         if (birthDate == null || birthDate.trim().isEmpty()) {
-            return false;
+            return false; // חייב להזין תאריך
         }
 
         SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy");
@@ -76,27 +76,23 @@ public class Validator {
 
         try {
             Date date = sdf.parse(birthDate);
-
-            // לא עתיד
             Date today = new Date();
+
+            // התאריך לא יכול להיות בעתיד
             if (date.after(today)) {
                 return false;
             }
 
-            // גיל מינימלי 3
-            Calendar cal = Calendar.getInstance();
-            cal.add(Calendar.YEAR, -3);
-            Date minDate = cal.getTime();
-
-            if (date.after(minDate)) {
-                return false;
-            }
-
-            return true;
+            return true; // תקין
 
         } catch (ParseException e) {
-            return false;
+            return false; // פורמט תאריך לא תקין
         }
     }
+
+
 }
+
+
+
 

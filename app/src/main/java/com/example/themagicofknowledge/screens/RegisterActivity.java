@@ -176,7 +176,7 @@ public class RegisterActivity extends BaseActivity implements View.OnClickListen
             return false;
         }
 
-        if (!Validator.isBirthDateValid(BDate)) {
+        if (!Validator.isParentBirthDateValid(BDate)) {
             etBDate.setError("תאריך לידה לא חוקי או בעתיד");
             etBDate.requestFocus();
             Log.i(TAG, "תאריך לידה לא חוקי או בעתיד");

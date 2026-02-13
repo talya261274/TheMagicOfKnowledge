@@ -5,14 +5,21 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.widget.EditText;
 import android.widget.LinearLayout;
+import android.widget.TextView;
+import android.widget.Toast;
+
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
+
 import com.example.themagicofknowledge.R;
 import com.example.themagicofknowledge.models.UserChild;
 import com.example.themagicofknowledge.models.UserParent;
 import com.example.themagicofknowledge.utils.SharedPreferencesUtil;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
+
 import java.util.ArrayList;
 
 public class SelectChildActivity extends AppCompatActivity {
@@ -28,24 +35,41 @@ public class SelectChildActivity extends AppCompatActivity {
 
         rvChildren = findViewById(R.id.rvChildren);
 
-        // שליפת ההורה מהזכרון
+        // שליפת ההורה מהזיכרון
         currentParent = SharedPreferencesUtil.getUser(this);
 
-        // אם אין רשימה, ניצור אחת ריקה כדי שלא יקרוס
-        if (currentParent.childrenList == null) {
-            currentParent.childrenList = new ArrayList<>();
+        // אם הרשימה ריקה, יוצרים רשימה ריקה
+        if (currentParent.getChildrenList() == null) {
+            currentParent.setChildrenList(new ArrayList<>());
         }
 
-        currentParent.getChildrenList().add(new UserChild("1", currentParent.getId(), "יוסי הקטן", 4));
-
-        // הגדרת הרשימה
+        // הגדרת RecyclerView
         rvChildren.setLayoutManager(new LinearLayoutManager(this));
-        adapter = new ChildAdapter(currentParent.childrenList, child -> {
-            // כאן יקרה המעבר למשחק
+        adapter = new ChildAdapter(currentParent.getChildrenList(), child -> {
             SharedPreferencesUtil.saveCurrentChild(this, child);
             startActivity(new Intent(this, Total.class));
         });
         rvChildren.setAdapter(adapter);
+
+        // משיכת נתונים מעודכנים מהענן
+        DatabaseReference mDatabase = FirebaseDatabase.getInstance().getReference("Users").child(currentParent.getId());
+        mDatabase.get().addOnCompleteListener(task -> {
+            if (task.isSuccessful() && task.getResult().exists()) {
+                currentParent = task.getResult().getValue(UserParent.class);
+
+                // עדכון בזיכרון המקומי
+                SharedPreferencesUtil.saveUser(this, currentParent);
+
+                // עדכון הרשימה על המסך
+                if (currentParent.getChildrenList() != null) {
+                    adapter = new ChildAdapter(currentParent.getChildrenList(), child -> {
+                        SharedPreferencesUtil.saveCurrentChild(this, child);
+                        startActivity(new Intent(this, Total.class));
+                    });
+                    rvChildren.setAdapter(adapter);
+                }
+            }
+        });
 
         FloatingActionButton fabAddChild = findViewById(R.id.fabAddChild);
         fabAddChild.setOnClickListener(v -> showAddChildDialog());
@@ -55,7 +79,6 @@ public class SelectChildActivity extends AppCompatActivity {
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
         builder.setTitle("הוספת ילד חדש");
 
-        // יצירת עיצוב פשוט לחלון דרך הקוד
         LinearLayout layout = new LinearLayout(this);
         layout.setOrientation(LinearLayout.VERTICAL);
         layout.setPadding(40, 20, 40, 20);
@@ -65,36 +88,70 @@ public class SelectChildActivity extends AppCompatActivity {
         layout.addView(etName);
 
         final EditText etAge = new EditText(this);
-        etAge.setHint("גיל");
+        etAge.setHint("גיל (3–8)");
         etAge.setInputType(android.text.InputType.TYPE_CLASS_NUMBER);
         layout.addView(etAge);
 
+        final TextView tvError = new TextView(this);
+        tvError.setTextColor(getResources().getColor(android.R.color.holo_red_dark));
+        layout.addView(tvError);
+
         builder.setView(layout);
 
-        builder.setPositiveButton("הוסף", (dialog, which) -> {
-            String name = etName.getText().toString();
-            String ageStr = etAge.getText().toString();
+        builder.setPositiveButton("הוסף", null); // נבטל את ההגדרה הראשונית
+        AlertDialog dialog = builder.create();
 
-            if (!name.isEmpty() && !ageStr.isEmpty()) {
-                int age = Integer.parseInt(ageStr);
+        dialog.setOnShowListener(dialogInterface -> {
+            dialog.getButton(AlertDialog.BUTTON_POSITIVE).setOnClickListener(v -> {
+                String name = etName.getText().toString().trim();
+                String ageStr = etAge.getText().toString().trim();
 
-                // יצירת אובייקט ילד חדש
-                String childId = String.valueOf(System.currentTimeMillis()); // ID זמני
+                // בדיקות קלט
+                if (name.isEmpty()) {
+                    tvError.setText("אנא הזן שם לילד");
+                    return;
+                }
+
+                if (ageStr.isEmpty()) {
+                    tvError.setText("אנא הזן גיל לילד");
+                    return;
+                }
+
+                int age;
+                try {
+                    age = Integer.parseInt(ageStr);
+                } catch (NumberFormatException e) {
+                    tvError.setText("גיל חייב להיות מספר");
+                    return;
+                }
+
+                if (age < 3 || age > 8) {
+                    tvError.setText("גיל הילד חייב להיות בין 3 ל-8");
+                    return;
+                }
+
+                // יצירת ילד חדש והוספה לרשימה
+                String childId = String.valueOf(System.currentTimeMillis());
                 UserChild newChild = new UserChild(childId, currentParent.getId(), name, age);
-
-                // הוספה לרשימה ועדכון
                 currentParent.getChildrenList().add(newChild);
 
-                // חשוב: שמירת ההורה המעודכן בזיכרון!
+                // שמירה בזיכרון המקומי
                 SharedPreferencesUtil.saveUser(this, currentParent);
+
+                // שמירה בענן
+                DatabaseReference mDatabase = FirebaseDatabase.getInstance().getReference("Users");
+                mDatabase.child(currentParent.getId())
+                        .setValue(currentParent)
+                        .addOnSuccessListener(aVoid -> Toast.makeText(this, "הילד נשמר בהצלחה!", Toast.LENGTH_SHORT).show())
+                        .addOnFailureListener(e -> Toast.makeText(this, "שגיאה בשמירה: " + e.getMessage(), Toast.LENGTH_SHORT).show());
 
                 // עדכון הרשימה במסך
                 adapter.notifyDataSetChanged();
-            }
+
+                dialog.dismiss();
+            });
         });
 
-        builder.setNegativeButton("ביטול", null);
-        builder.show();
+        dialog.show();
     }
-
 }

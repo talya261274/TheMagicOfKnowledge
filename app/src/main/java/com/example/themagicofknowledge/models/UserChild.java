@@ -5,6 +5,7 @@ public class UserChild {
     String id;
     String parentId;
     String name;
+    String ageGroup; // יכול להיות "3-4", "5-6", "7-8"
     int age;
     int currentLevel;
     double gradeAvg;
@@ -22,6 +23,15 @@ public class UserChild {
         this.currentLevel = 0;
         this.gradeAvg = 0.0;
         this.totalTimeSeconds = 0;
+
+        // קביעת קבוצת הגיל אוטומטית לפי הגיל שהוזן
+        if (age >= 3 && age <= 4) {
+            this.ageGroup = "3-4";
+        } else if (age >= 5 && age <= 6) {
+            this.ageGroup = "5-6";
+        } else if (age >= 7 && age <= 8) {
+            this.ageGroup = "7-8";
+        }
     }
 
     public String getId() {
@@ -80,6 +90,14 @@ public class UserChild {
         this.totalTimeSeconds = totalTimeSeconds;
     }
 
+    public String getAgeGroup() {
+        return ageGroup;
+    }
+
+    public void setAgeGroup(String ageGroup) {
+        this.ageGroup = ageGroup;
+    }
+
     public String getFormattedTime() {
         long hours = totalTimeSeconds / 3600;
         long minutes = (totalTimeSeconds % 3600) / 60;
@@ -98,6 +116,7 @@ public class UserChild {
                 "id='" + id + '\'' +
                 ", parentId='" + parentId + '\'' +
                 ", name='" + name + '\'' +
+                ", ageGroup='" + ageGroup + '\'' +
                 ", age=" + age +
                 ", currentLevel=" + currentLevel +
                 ", gradeAvg=" + gradeAvg +

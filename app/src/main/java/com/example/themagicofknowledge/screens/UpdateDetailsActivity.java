@@ -173,7 +173,7 @@ public class UpdateDetailsActivity extends BaseActivity implements View.OnClickL
             etUserEmail.requestFocus();
             return false;
         }
-        if (!Validator.isBirthDateValid(birthDate)) {
+        if (!Validator.isParentBirthDateValid(birthDate)) {
             etUserBirthDate.setError("Birth Date is required");
             etUserBirthDate.requestFocus();
             return false;
