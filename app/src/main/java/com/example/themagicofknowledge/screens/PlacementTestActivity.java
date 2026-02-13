@@ -28,6 +28,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class PlacementTestActivity extends AppCompatActivity {
+    /*
     private List<Question> testQuestions = new ArrayList<>();
     private int currentQuestionIndex = 0;
     private int score = 0;
@@ -164,4 +165,7 @@ public class PlacementTestActivity extends AppCompatActivity {
         Toast.makeText(this, "סיימת! ציון: " + (int)finalGrade, Toast.LENGTH_LONG).show();
         finish();
     }
+
+
+     */
 }

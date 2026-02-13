@@ -15,7 +15,7 @@ import com.example.themagicofknowledge.utils.SharedPreferencesUtil;
 
 public class Total extends AppCompatActivity {
 
-    Button btn_TUserList ;
+    Button btn_TUserList , btn_TLogout, btn_SelectSubject , btn_SelectChild;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -33,14 +33,20 @@ public class Total extends AppCompatActivity {
             startActivity(intent);
         });
 
-        Button btn_TLogout = findViewById(R.id.btn_TLogout);
+        btn_TLogout = findViewById(R.id.btn_TLogout);
         btn_TLogout.setOnClickListener(view -> {
             signOut();
         });
 
-        Button btn_SelectSubject = findViewById(R.id.btn_SelectSubject);
+        btn_SelectSubject = findViewById(R.id.btn_SelectSubject);
         btn_SelectSubject.setOnClickListener(view -> {
             Intent intent = new Intent(Total.this, SelectSubjectActivity.class);
+            startActivity(intent);
+        });
+
+        btn_SelectChild = findViewById(R.id.btn_SelectChild);
+        btn_SelectChild.setOnClickListener(view -> {
+            Intent intent = new Intent(Total.this, SelectChildActivity.class);
             startActivity(intent);
         });
     }

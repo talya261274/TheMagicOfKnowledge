@@ -21,6 +21,8 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 
 import java.util.ArrayList;
+import java.util.LinkedHashMap;
+import java.util.Map;
 
 public class SelectChildActivity extends AppCompatActivity {
 
@@ -97,10 +99,9 @@ public class SelectChildActivity extends AppCompatActivity {
         layout.addView(tvError);
 
         builder.setView(layout);
-
         builder.setPositiveButton("הוסף", null); // נבטל את ההגדרה הראשונית
-        AlertDialog dialog = builder.create();
 
+        AlertDialog dialog = builder.create();
         dialog.setOnShowListener(dialogInterface -> {
             dialog.getButton(AlertDialog.BUTTON_POSITIVE).setOnClickListener(v -> {
                 String name = etName.getText().toString().trim();
@@ -111,7 +112,6 @@ public class SelectChildActivity extends AppCompatActivity {
                     tvError.setText("אנא הזן שם לילד");
                     return;
                 }
-
                 if (ageStr.isEmpty()) {
                     tvError.setText("אנא הזן גיל לילד");
                     return;
@@ -130,9 +130,16 @@ public class SelectChildActivity extends AppCompatActivity {
                     return;
                 }
 
-                // יצירת ילד חדש והוספה לרשימה
+                // יצירת רשימת ילדים אם היא null
+                if (currentParent.getChildrenList() == null) {
+                    currentParent.setChildrenList(new ArrayList<>());
+                }
+
+                // יצירת ילד חדש עם ID ייחודי
                 String childId = String.valueOf(System.currentTimeMillis());
                 UserChild newChild = new UserChild(childId, currentParent.getId(), name, age);
+
+                // הוספה לרשימת הילדים
                 currentParent.getChildrenList().add(newChild);
 
                 // שמירה בזיכרון המקומי
@@ -140,18 +147,23 @@ public class SelectChildActivity extends AppCompatActivity {
 
                 // שמירה בענן
                 DatabaseReference mDatabase = FirebaseDatabase.getInstance().getReference("Users");
-                mDatabase.child(currentParent.getId())
-                        .setValue(currentParent)
-                        .addOnSuccessListener(aVoid -> Toast.makeText(this, "הילד נשמר בהצלחה!", Toast.LENGTH_SHORT).show())
-                        .addOnFailureListener(e -> Toast.makeText(this, "שגיאה בשמירה: " + e.getMessage(), Toast.LENGTH_SHORT).show());
-
-                // עדכון הרשימה במסך
-                adapter.notifyDataSetChanged();
-
-                dialog.dismiss();
+                mDatabase.child(currentParent.getId()).setValue(currentParent)
+                        .addOnSuccessListener(aVoid -> {
+                            Toast.makeText(this, "הילד נשמר בהצלחה!", Toast.LENGTH_SHORT).show();
+                            adapter.notifyDataSetChanged(); // עדכון הרשימה
+                            dialog.dismiss(); // סגירת הדיאלוג
+                        })
+                        .addOnFailureListener(e -> {
+                            tvError.setText("שגיאה בשמירה בענן: " + e.getMessage());
+                        });
             });
         });
 
         dialog.show();
     }
+
+
+
+
+
 }

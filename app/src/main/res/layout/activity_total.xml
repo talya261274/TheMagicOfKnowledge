@@ -59,6 +59,25 @@
         app:layout_constraintTop_toBottomOf="@id/btn_TUserList"
         app:layout_constraintVertical_bias="0.038" />
 
+
+    <com.google.android.material.button.MaterialButton
+        android:id="@+id/btn_SelectChild"
+        android:layout_width="294dp"
+        android:layout_height="74dp"
+        android:layout_marginEnd="48dp"
+        android:background="@drawable/btn_blue_selector"
+        android:fontFamily="@font/varelaround"
+        android:text="בחירת ילד"
+        android:textColor="@android:color/white"
+        android:textSize="27sp"
+        android:textStyle="bold"
+        app:backgroundTint="@null"
+        app:cornerRadius="40dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/btn_SelectSubject"
+        app:layout_constraintVertical_bias="0.057" />
+
     <com.google.android.material.button.MaterialButton
         android:id="@+id/btn_TLogout"
         android:layout_width="294dp"
@@ -75,8 +94,8 @@
         app:cornerRadius="40dp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/btn_TUserList"
-        app:layout_constraintVertical_bias="0.203" />
+        app:layout_constraintTop_toBottomOf="@id/btn_SelectChild"
+        app:layout_constraintVertical_bias="0.048" />
 
 
 </androidx.constraintlayout.widget.ConstraintLayout>
