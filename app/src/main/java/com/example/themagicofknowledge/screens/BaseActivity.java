@@ -5,6 +5,7 @@ import android.os.Bundle;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.FrameLayout;
+import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.ActionBarDrawerToggle;
@@ -14,6 +15,7 @@ import androidx.core.view.GravityCompat;
 import androidx.drawerlayout.widget.DrawerLayout;
 
 import com.example.themagicofknowledge.R;
+import com.example.themagicofknowledge.models.UserParent;
 import com.example.themagicofknowledge.services.DatabaseService;
 import com.example.themagicofknowledge.utils.SharedPreferencesUtil;
 import com.google.android.material.navigation.NavigationView;
@@ -23,6 +25,8 @@ public abstract class BaseActivity extends AppCompatActivity
 
     protected DatabaseService databaseService;
     protected DrawerLayout drawerLayout;
+    protected NavigationView navigationView;
+    protected Toolbar toolbar;
 
     protected boolean hasSideMenu() {
         return true; // ברירת מחדל – יש Drawer
@@ -37,21 +41,26 @@ public abstract class BaseActivity extends AppCompatActivity
         super.setContentView(R.layout.activity_base);
 
         // Toolbar
-        Toolbar toolbar = findViewById(R.id.toolBar);
+        toolbar = findViewById(R.id.toolBar);
         setSupportActionBar(toolbar);
+
         // Drawer
         drawerLayout = findViewById(R.id.nav_layout);
-        NavigationView navigationView = findViewById(R.id.nav_view);
+        navigationView = findViewById(R.id.nav_view);
         navigationView.setNavigationItemSelectedListener(this);
-        if (hasSideMenu()) {
 
+        // עדכון שם המשתמש ב-Header
+        updateNavigationHeader();
+
+        if (hasSideMenu()) {
+            // הגדרת ActionBar
             if (getSupportActionBar() != null) {
                 getSupportActionBar().setDisplayHomeAsUpEnabled(true);
                 getSupportActionBar().setDisplayShowTitleEnabled(false);
                 getSupportActionBar().setTitle("");
-                getSupportActionBar().setHomeAsUpIndicator(R.drawable.baseline_menu_24);
             }
 
+            // הגדרת Toggle
             ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(
                     this,
                     drawerLayout,
@@ -61,96 +70,99 @@ public abstract class BaseActivity extends AppCompatActivity
             );
             drawerLayout.addDrawerListener(toggle);
             toggle.syncState();
-        } else{
+
+        } else {
+            // נעילת התפריט
             drawerLayout.setDrawerLockMode(DrawerLayout.LOCK_MODE_LOCKED_CLOSED);
             navigationView.setVisibility(View.GONE);
 
             if (getSupportActionBar() != null) {
                 getSupportActionBar().setTitle("");
                 getSupportActionBar().setDisplayHomeAsUpEnabled(false);
-                getSupportActionBar().setHomeAsUpIndicator(null);
             }
         }
     }
 
     @Override
     public void setContentView(int layoutResID) {
-//        super.setContentView(layoutResID);
         setContentLayout(layoutResID);
     }
 
-    // 👇 מזריק את ה-layout של המסך לתוך Base
+    // מזריק את ה-layout של המסך לתוך Base
     protected void setContentLayout(int layoutResId) {
         FrameLayout contentFrame = findViewById(R.id.content_frame);
-        getLayoutInflater().inflate(layoutResId, contentFrame, true);
+        if (contentFrame != null) {
+            getLayoutInflater().inflate(layoutResId, contentFrame, true);
+        }
+    }
+
+    // עדכון שם המשתמש בתפריט
+    protected void updateNavigationHeader() {
+        if (navigationView != null) {
+            View headerView = navigationView.getHeaderView(0);
+            TextView usernameText = headerView.findViewById(R.id.usernameText);
+
+            UserParent currentUser = SharedPreferencesUtil.getUser(this);
+            if (currentUser != null && usernameText != null) {
+                usernameText.setText("שלום, " + currentUser.getFirstName());
+            }
+        }
     }
 
     protected void navigateTo(Class<?> targetActivity) {
-
         if (!this.getClass().equals(targetActivity)) {
             Intent intent = new Intent(this, targetActivity);
             startActivity(intent);
             finish();
         }
-
-        drawerLayout.closeDrawer(GravityCompat.START);
+        drawerLayout.closeDrawer(GravityCompat.END);
     }
-
-
 
     @Override
     public boolean onNavigationItemSelected(@NonNull MenuItem item) {
-
         int id = item.getItemId();
 
         if (id == R.id.nav_home) {
-
-            navigateTo(MainActivity.class);
+            navigateTo(Total.class);
 
         } else if (id == R.id.nav_profile) {
-
             navigateTo(UserProfileActivity.class);
 
         } else if (id == R.id.nav_cards) {
-
-            navigateTo(FlashCardMain.class);
+            navigateTo(SelectSubjectActivity.class);
 
         } else if (id == R.id.nav_quiz) {
-
-            navigateTo(PlacementTestActivity.class);
+            // navigateTo(PlacementTestActivity.class);
 
         } else if (id == R.id.nav_progrees) {
-
-            ///navigateTo(SettingsActivity.class);
+            // navigateTo(ProgressActivity.class);
 
         } else if (id == R.id.nav_logout) {
-
-            drawerLayout.closeDrawer(GravityCompat.START);
+            drawerLayout.closeDrawer(GravityCompat.END);
             showLogoutDialog();
         }
         return true;
     }
+
     private void showLogoutDialog() {
-
         new androidx.appcompat.app.AlertDialog.Builder(this)
-                .setTitle("Sign Out")
-                .setMessage("Are you sure you want to sign out?")
-                .setPositiveButton("Yes", (dialog, which) -> {
-
+                .setTitle("התנתקות")
+                .setMessage("האם אתה בטוח שברצונך להתנתק?")
+                .setPositiveButton("כן", (dialog, which) -> {
                     SharedPreferencesUtil.signOutUser(this);
 
                     Intent intent = new Intent(this, LandingActivity.class);
                     intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
                     startActivity(intent);
                 })
-                .setNegativeButton("No", (dialog, which) -> dialog.dismiss())
+                .setNegativeButton("לא", (dialog, which) -> dialog.dismiss())
                 .show();
     }
 
     @Override
     public void onBackPressed() {
-        if (drawerLayout != null && drawerLayout.isDrawerOpen(GravityCompat.START)) {
-            drawerLayout.closeDrawer(GravityCompat.START);
+        if (drawerLayout != null && drawerLayout.isDrawerOpen(GravityCompat.END)) {
+            drawerLayout.closeDrawer(GravityCompat.END);
         } else {
             super.onBackPressed();
         }

@@ -25,12 +25,14 @@ import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 
 import java.util.ArrayList;
+import java.util.List;
 
 public class SelectChildActivity extends AppCompatActivity {
 
     private RecyclerView rvChildren;
     private ChildAdapter adapter;
     private UserParent currentParent;
+    private List<UserChild> childrenList; // רשימה שתנהל את הילדים במסך
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -38,24 +40,23 @@ public class SelectChildActivity extends AppCompatActivity {
         setContentView(R.layout.activity_select_child);
 
         rvChildren = findViewById(R.id.rvChildren);
-
-        // שליפת ההורה מהזיכרון
         currentParent = SharedPreferencesUtil.getUser(this);
 
-        // אם הרשימה ריקה, יוצרים רשימה ריקה
-        if (currentParent.getChildrenList() == null) {
-            currentParent.setChildrenList(new ArrayList<>());
+        // אתחול הרשימה
+        childrenList = new ArrayList<>();
+        if (currentParent.getChildrenList() != null) {
+            childrenList.addAll(currentParent.getChildrenList());
         }
 
-        // הגדרת RecyclerView
+        // הגדרת RecyclerView פעם אחת בלבד
         rvChildren.setLayoutManager(new LinearLayoutManager(this));
-        adapter = new ChildAdapter(currentParent.getChildrenList(), child -> {
+        adapter = new ChildAdapter(childrenList, child -> {
             SharedPreferencesUtil.saveCurrentChild(this, child);
+            // שימי לב: שיניתי ל-Total.class כפי שמופיע אצלך, וודאי שזה ה-Activity הנכון
             startActivity(new Intent(this, Total.class));
         });
         rvChildren.setAdapter(adapter);
 
-        // משיכת נתונים מעודכנים מהענן
         loadChildrenFromFirebase();
 
         FloatingActionButton fabAddChild = findViewById(R.id.fabAddChild);
@@ -67,54 +68,33 @@ public class SelectChildActivity extends AppCompatActivity {
                 .getReference("Users")
                 .child(currentParent.getId());
 
-        mDatabase.addListenerForSingleValueEvent(new ValueEventListener() {
+        mDatabase.addValueEventListener(new ValueEventListener() { // שימוש ב-addValueEventListener לעדכון חי
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
                 if (snapshot.exists()) {
-                    // טעינת פרטי ההורה
-                    UserParent updatedParent = snapshot.getValue(UserParent.class);
-                    if (updatedParent != null) {
-                        currentParent.setFirstName(updatedParent.getFirstName());
-                        currentParent.setLastName(updatedParent.getLastName());
-                        currentParent.setEmail(updatedParent.getEmail());
-                        currentParent.setPhone(updatedParent.getPhone());
-                        currentParent.setBirthDate(updatedParent.getBirthDate());
-                    }
-
-                    // טעינת רשימת הילדים בנפרד
+                    // טעינת רשימת הילדים בזהירות כדי למנוע את שגיאת ה-List/HashMap
                     DataSnapshot childrenSnapshot = snapshot.child("childrenList");
-                    if (childrenSnapshot.exists()) {
-                        ArrayList<UserChild> children = new ArrayList<>();
-                        for (DataSnapshot childSnapshot : childrenSnapshot.getChildren()) {
-                            UserChild child = childSnapshot.getValue(UserChild.class);
-                            if (child != null) {
-                                children.add(child);
-                            }
+                    childrenList.clear(); // מנקים את הרשימה הנוכחית לפני טעינה
+
+                    for (DataSnapshot childData : childrenSnapshot.getChildren()) {
+                        UserChild child = childData.getValue(UserChild.class);
+                        if (child != null) {
+                            childrenList.add(child);
                         }
-                        currentParent.setChildrenList(children);
-                    } else {
-                        currentParent.setChildrenList(new ArrayList<>());
                     }
 
-                    // עדכון בזיכרון המקומי
+                    // עדכון המודל המקומי וה-SharedPreferences
+                    currentParent.setChildrenList(new ArrayList<>(childrenList));
                     SharedPreferencesUtil.saveUser(SelectChildActivity.this, currentParent);
 
-                    // עדכון הרשימה על המסך
-                    if (currentParent.getChildrenList() != null && !currentParent.getChildrenList().isEmpty()) {
-                        adapter = new ChildAdapter(currentParent.getChildrenList(), child -> {
-                            SharedPreferencesUtil.saveCurrentChild(SelectChildActivity.this, child);
-                            startActivity(new Intent(SelectChildActivity.this, Total.class));
-                        });
-                        rvChildren.setAdapter(adapter);
-                    }
+                    // הודעה לאדפטר שהנתונים השתנו - בלי ליצור אותו מחדש
+                    adapter.notifyDataSetChanged();
                 }
             }
 
             @Override
             public void onCancelled(@NonNull DatabaseError error) {
-                Toast.makeText(SelectChildActivity.this,
-                        "שגיאה בטעינת נתונים: " + error.getMessage(),
-                        Toast.LENGTH_SHORT).show();
+                Toast.makeText(SelectChildActivity.this, "שגיאה: " + error.getMessage(), Toast.LENGTH_SHORT).show();
             }
         });
     }
@@ -125,7 +105,7 @@ public class SelectChildActivity extends AppCompatActivity {
 
         LinearLayout layout = new LinearLayout(this);
         layout.setOrientation(LinearLayout.VERTICAL);
-        layout.setPadding(40, 20, 40, 20);
+        layout.setPadding(50, 20, 50, 10);
 
         final EditText etName = new EditText(this);
         etName.setHint("שם הילד");
@@ -141,7 +121,7 @@ public class SelectChildActivity extends AppCompatActivity {
         layout.addView(tvError);
 
         builder.setView(layout);
-        builder.setPositiveButton("הוסף", null); // נבטל את ההגדרה הראשונית
+        builder.setPositiveButton("הוסף", null);
 
         AlertDialog dialog = builder.create();
         dialog.setOnShowListener(dialogInterface -> {
@@ -149,65 +129,38 @@ public class SelectChildActivity extends AppCompatActivity {
                 String name = etName.getText().toString().trim();
                 String ageStr = etAge.getText().toString().trim();
 
-                // בדיקות קלט
-                if (name.isEmpty()) {
-                    tvError.setText("אנא הזן שם לילד");
-                    return;
-                }
-                if (ageStr.isEmpty()) {
-                    tvError.setText("אנא הזן גיל לילד");
+                if (name.isEmpty() || ageStr.isEmpty()) {
+                    tvError.setText("נא למלא את כל השדות");
                     return;
                 }
 
-                int age;
-                try {
-                    age = Integer.parseInt(ageStr);
-                } catch (NumberFormatException e) {
-                    tvError.setText("גיל חייב להיות מספר");
-                    return;
-                }
-
+                int age = Integer.parseInt(ageStr);
                 if (age < 3 || age > 8) {
-                    tvError.setText("גיל הילד חייב להיות בין 3 ל-8");
+                    tvError.setText("הגיל חייב להיות בין 3 ל-8");
                     return;
                 }
 
-                // יצירת רשימת ילדים אם היא null
-                if (currentParent.getChildrenList() == null) {
-                    currentParent.setChildrenList(new ArrayList<>());
-                }
-
-                // יצירת ילד חדש עם ID ייחודי
-                String childId = String.valueOf(System.currentTimeMillis());
-                UserChild newChild = new UserChild(childId, currentParent.getId(), name, age);
-
-                // הוספה לרשימת הילדים
-                currentParent.getChildrenList().add(newChild);
-
-                // שמירה בענן - בשיטה המתוקנת
-                DatabaseReference mDatabase = FirebaseDatabase.getInstance()
+                // יצירת מפתח ייחודי ב-Firebase (עדיף מ-System.currentTimeMillis)
+                DatabaseReference childrenRef = FirebaseDatabase.getInstance()
                         .getReference("Users")
                         .child(currentParent.getId())
                         .child("childrenList");
 
-                // שמירת הילד החדש ברשימה
-                mDatabase.child(childId).setValue(newChild.toMap())
-                        .addOnSuccessListener(aVoid -> {
-                            // עדכון גם את האובייקט הראשי
-                            SharedPreferencesUtil.saveUser(SelectChildActivity.this, currentParent);
+                String childId = childrenRef.push().getKey();
 
-                            Toast.makeText(SelectChildActivity.this, "הילד נשמר בהצלחה!", Toast.LENGTH_SHORT).show();
-                            adapter.notifyDataSetChanged(); // עדכון הרשימה
-                            dialog.dismiss(); // סגירת הדיאלוג
-                        })
-                        .addOnFailureListener(e -> {
-                            tvError.setText("שגיאה בשמירה בענן: " + e.getMessage());
-                            // הסרת הילד מהרשימה המקומית אם השמירה נכשלה
-                            currentParent.getChildrenList().remove(newChild);
-                        });
+                UserChild newChild = new UserChild(childId, currentParent.getId(), name, age);
+
+                // שמירה ישירות תחת ה-ID של הילד
+                if (childId != null) {
+                    childrenRef.child(childId).setValue(newChild)
+                            .addOnSuccessListener(aVoid -> {
+                                Toast.makeText(SelectChildActivity.this, "הקוסם הקטן נוסף!", Toast.LENGTH_SHORT).show();
+                                dialog.dismiss();
+                            })
+                            .addOnFailureListener(e -> tvError.setText("שגיאה בשמירה: " + e.getMessage()));
+                }
             });
         });
-
         dialog.show();
     }
 }

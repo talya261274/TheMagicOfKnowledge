@@ -67,6 +67,17 @@ public class SelectSubjectActivity extends AppCompatActivity {
 
         // כפתור חזרה
         goBackBtn2.setOnClickListener(v -> finish()); // סוגר את המסך ומחזיר למסך הקודם
+
+        /*
+        cardAnimals.setOnClickListener(v -> {
+            Intent intent = new Intent(this, GameActivity.class);
+            intent.putExtra("SUBJECT", "Animals");
+            intent.putExtra("LEVEL", currentChild.getAgeGroup()); // נשלח את הרמה ששמרנו ב-SelectChild
+            startActivity(intent);
+        });
+
+         */
+
     }
 }
 

@@ -1,5 +1,6 @@
 package com.example.themagicofknowledge.screens;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
@@ -8,12 +9,9 @@ import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import androidx.activity.EdgeToEdge;
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.core.graphics.Insets;
-import androidx.core.view.ViewCompat;
-import androidx.core.view.WindowInsetsCompat;
 
+import com.bumptech.glide.Glide; // ודאי שהוספת Glide ב-build.gradle
 import com.example.themagicofknowledge.R;
 import com.example.themagicofknowledge.models.Question;
 import com.example.themagicofknowledge.models.UserChild;
@@ -28,13 +26,12 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class PlacementTestActivity extends AppCompatActivity {
-    /*
+
     private List<Question> testQuestions = new ArrayList<>();
     private int currentQuestionIndex = 0;
     private int score = 0;
     private UserChild selectedChild;
 
-    // רכיבי ה-UI
     private TextView tvQuestion;
     private ImageView ivQuestionMedia;
     private Button btnAns1, btnAns2, btnAns3, btnAns4;
@@ -43,34 +40,21 @@ public class PlacementTestActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        EdgeToEdge.enable(this);
         setContentView(R.layout.activity_placement_test);
 
-        // הגדרת Padding למערכת (EdgeToEdge)
-        View mainView = findViewById(R.id.main);
-        if (mainView != null) {
-            ViewCompat.setOnApplyWindowInsetsListener(mainView, (v, insets) -> {
-                Insets systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars());
-                v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom);
-                return insets;
-            });
-        }
-
-        // אתחול רכיבי ה-UI
+        // קריאה לפונקציה שמחברת את ה-UI לקוד
         initViews();
 
-        // 1. שליפת הילד שנבחר
         selectedChild = SharedPreferencesUtil.getCurrentChild(this);
 
         if (selectedChild != null) {
-            // 2. טעינת שאלות מה-Firebase לפי קבוצת הגיל שלו
-            loadTestQuestions(selectedChild.getAgeGroup());
+            loadGeneralPlacementQuestions();
         } else {
-            Toast.makeText(this, "שגיאה: לא נבחר ילד", Toast.LENGTH_SHORT).show();
             finish();
         }
     }
 
+    // הפונקציה ששאלת עליה - כאן היא גרה
     private void initViews() {
         tvQuestion = findViewById(R.id.tvQuestion);
         ivQuestionMedia = findViewById(R.id.ivQuestionMedia);
@@ -81,11 +65,8 @@ public class PlacementTestActivity extends AppCompatActivity {
         testProgress = findViewById(R.id.testProgress);
     }
 
-    private void loadTestQuestions(String ageGroup) {
-        // התחברות ל-Firebase לנתיב Tests/Age_X-X
-        DatabaseReference ref = FirebaseDatabase.getInstance().getReference("Tests")
-                .child("Age_" + ageGroup);
-
+    private void loadGeneralPlacementQuestions() {
+        DatabaseReference ref = FirebaseDatabase.getInstance().getReference("PlacementTest");
         ref.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot snapshot) {
@@ -99,38 +80,37 @@ public class PlacementTestActivity extends AppCompatActivity {
                     testProgress.setMax(testQuestions.size());
                     showNextQuestion();
                 } else {
-                    Toast.makeText(PlacementTestActivity.this, "לא נמצאו שאלות לרמה זו", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(PlacementTestActivity.this, "בנק השאלות ריק!", Toast.LENGTH_SHORT).show();
                 }
             }
-
             @Override
-            public void onCancelled(DatabaseError error) {
-                Toast.makeText(PlacementTestActivity.this, "שגיאה בטעינה: " + error.getMessage(), Toast.LENGTH_SHORT).show();
-            }
+            public void onCancelled(DatabaseError error) {}
         });
     }
 
     private void showNextQuestion() {
         Question q = testQuestions.get(currentQuestionIndex);
 
-        // עדכון UI
         tvQuestion.setText(q.questionText);
         testProgress.setProgress(currentQuestionIndex + 1);
 
-        // כאן בהמשך נטען תמונה מה-mediaUrl בעזרת Glide
+        // טעינת תמונה במידה ויש URL בשאלה
+        if (q.mediaUrl != null && !q.mediaUrl.isEmpty()) {
+            Glide.with(this).load(q.mediaUrl).into(ivQuestionMedia);
+        }
 
         btnAns1.setText(q.options.get(0));
         btnAns2.setText(q.options.get(1));
         btnAns3.setText(q.options.get(2));
         btnAns4.setText(q.options.get(3));
 
-        // הגדרת לחיצות
         View.OnClickListener listener = view -> {
             int selectedIdx = -1;
-            if (view.getId() == R.id.btnAns1) selectedIdx = 0;
-            else if (view.getId() == R.id.btnAns2) selectedIdx = 1;
-            else if (view.getId() == R.id.btnAns3) selectedIdx = 2;
-            else if (view.getId() == R.id.btnAns4) selectedIdx = 3;
+            int id = view.getId();
+            if (id == R.id.btnAns1) selectedIdx = 0;
+            else if (id == R.id.btnAns2) selectedIdx = 1;
+            else if (id == R.id.btnAns3) selectedIdx = 2;
+            else if (id == R.id.btnAns4) selectedIdx = 3;
 
             checkAnswer(selectedIdx);
         };
@@ -155,17 +135,33 @@ public class PlacementTestActivity extends AppCompatActivity {
     }
 
     private void finishTest() {
-        double finalGrade = ((double) score / testQuestions.size()) * 100;
+        double percent = ((double) score / testQuestions.size()) * 100;
+        String determinedLevel;
 
-        // עדכון המודל של הילד
-        selectedChild.setGradeAvg(finalGrade);
+        if (percent < 40) determinedLevel = "3-4";
+        else if (percent < 80) determinedLevel = "5-6";
+        else determinedLevel = "7-8";
 
-        // כאן נוסיף בהמשך שמירה ל-Firebase חזרה להורה
+        selectedChild.setAgeGroup(determinedLevel);
+        selectedChild.setGradeAvg(percent);
 
-        Toast.makeText(this, "סיימת! ציון: " + (int)finalGrade, Toast.LENGTH_LONG).show();
-        finish();
+        updateChildLevelInFirebase(determinedLevel, percent);
     }
 
+    private void updateChildLevelInFirebase(String level, double grade) {
+        String parentId = SharedPreferencesUtil.getUser(this).getId();
+        DatabaseReference childRef = FirebaseDatabase.getInstance().getReference("Users")
+                .child(parentId)
+                .child("childrenList")
+                .child(selectedChild.getId());
 
-     */
+        childRef.child("ageGroup").setValue(level);
+        childRef.child("gradeAvg").setValue(grade)
+                .addOnSuccessListener(aVoid -> {
+                    SharedPreferencesUtil.saveCurrentChild(this, selectedChild);
+                    Toast.makeText(this, "הקוסם קבע שאתה ברמה: " + level, Toast.LENGTH_LONG).show();
+                    startActivity(new Intent(this, Total.class));
+                    finish();
+                });
+    }
 }
