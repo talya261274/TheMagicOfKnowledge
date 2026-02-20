@@ -1,5 +1,8 @@
 package com.example.themagicofknowledge.models;
 
+import java.util.HashMap;
+import java.util.Map;
+
 public class UserChild {
 
     String id;
@@ -12,8 +15,8 @@ public class UserChild {
     long totalTimeSeconds;
 
     public UserChild() {
+        // Constructor ריק נדרש ל-Firebase
     }
-
 
     public UserChild(String id, String parentId, String name, int age) {
         this.id = id;
@@ -108,6 +111,20 @@ public class UserChild {
 
     public void addTime(long secondsToAdd) {
         this.totalTimeSeconds += secondsToAdd;
+    }
+
+    // המרה ל-Map עבור Firebase
+    public Map<String, Object> toMap() {
+        HashMap<String, Object> result = new HashMap<>();
+        result.put("id", id);
+        result.put("parentId", parentId);
+        result.put("name", name);
+        result.put("ageGroup", ageGroup);
+        result.put("age", age);
+        result.put("currentLevel", currentLevel);
+        result.put("gradeAvg", gradeAvg);
+        result.put("totalTimeSeconds", totalTimeSeconds);
+        return result;
     }
 
     @Override

@@ -12,6 +12,6 @@
     <string name="SignUp">הירשם</string>
     <string name="SignIn">היכנס</string>
     <string name="Login">התחבר</string>
-    <string name="open_nav">Open Navigation Drawer</string>
-    <string name="close_bar">Close Navigation Drawer</string>
+    <string name="open_drawer">פתח תפריט צד</string>
+    <string name="close_drawer">סגור תפריט צד</string>
 </resources>

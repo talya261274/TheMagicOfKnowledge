@@ -8,6 +8,7 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
@@ -17,12 +18,13 @@ import com.example.themagicofknowledge.models.UserChild;
 import com.example.themagicofknowledge.models.UserParent;
 import com.example.themagicofknowledge.utils.SharedPreferencesUtil;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
 
 import java.util.ArrayList;
-import java.util.LinkedHashMap;
-import java.util.Map;
 
 public class SelectChildActivity extends AppCompatActivity {
 
@@ -54,27 +56,67 @@ public class SelectChildActivity extends AppCompatActivity {
         rvChildren.setAdapter(adapter);
 
         // משיכת נתונים מעודכנים מהענן
-        DatabaseReference mDatabase = FirebaseDatabase.getInstance().getReference("Users").child(currentParent.getId());
-        mDatabase.get().addOnCompleteListener(task -> {
-            if (task.isSuccessful() && task.getResult().exists()) {
-                currentParent = task.getResult().getValue(UserParent.class);
-
-                // עדכון בזיכרון המקומי
-                SharedPreferencesUtil.saveUser(this, currentParent);
-
-                // עדכון הרשימה על המסך
-                if (currentParent.getChildrenList() != null) {
-                    adapter = new ChildAdapter(currentParent.getChildrenList(), child -> {
-                        SharedPreferencesUtil.saveCurrentChild(this, child);
-                        startActivity(new Intent(this, Total.class));
-                    });
-                    rvChildren.setAdapter(adapter);
-                }
-            }
-        });
+        loadChildrenFromFirebase();
 
         FloatingActionButton fabAddChild = findViewById(R.id.fabAddChild);
         fabAddChild.setOnClickListener(v -> showAddChildDialog());
+    }
+
+    private void loadChildrenFromFirebase() {
+        DatabaseReference mDatabase = FirebaseDatabase.getInstance()
+                .getReference("Users")
+                .child(currentParent.getId());
+
+        mDatabase.addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot snapshot) {
+                if (snapshot.exists()) {
+                    // טעינת פרטי ההורה
+                    UserParent updatedParent = snapshot.getValue(UserParent.class);
+                    if (updatedParent != null) {
+                        currentParent.setFirstName(updatedParent.getFirstName());
+                        currentParent.setLastName(updatedParent.getLastName());
+                        currentParent.setEmail(updatedParent.getEmail());
+                        currentParent.setPhone(updatedParent.getPhone());
+                        currentParent.setBirthDate(updatedParent.getBirthDate());
+                    }
+
+                    // טעינת רשימת הילדים בנפרד
+                    DataSnapshot childrenSnapshot = snapshot.child("childrenList");
+                    if (childrenSnapshot.exists()) {
+                        ArrayList<UserChild> children = new ArrayList<>();
+                        for (DataSnapshot childSnapshot : childrenSnapshot.getChildren()) {
+                            UserChild child = childSnapshot.getValue(UserChild.class);
+                            if (child != null) {
+                                children.add(child);
+                            }
+                        }
+                        currentParent.setChildrenList(children);
+                    } else {
+                        currentParent.setChildrenList(new ArrayList<>());
+                    }
+
+                    // עדכון בזיכרון המקומי
+                    SharedPreferencesUtil.saveUser(SelectChildActivity.this, currentParent);
+
+                    // עדכון הרשימה על המסך
+                    if (currentParent.getChildrenList() != null && !currentParent.getChildrenList().isEmpty()) {
+                        adapter = new ChildAdapter(currentParent.getChildrenList(), child -> {
+                            SharedPreferencesUtil.saveCurrentChild(SelectChildActivity.this, child);
+                            startActivity(new Intent(SelectChildActivity.this, Total.class));
+                        });
+                        rvChildren.setAdapter(adapter);
+                    }
+                }
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError error) {
+                Toast.makeText(SelectChildActivity.this,
+                        "שגיאה בטעינת נתונים: " + error.getMessage(),
+                        Toast.LENGTH_SHORT).show();
+            }
+        });
     }
 
     private void showAddChildDialog() {
@@ -142,28 +184,30 @@ public class SelectChildActivity extends AppCompatActivity {
                 // הוספה לרשימת הילדים
                 currentParent.getChildrenList().add(newChild);
 
-                // שמירה בזיכרון המקומי
-                SharedPreferencesUtil.saveUser(this, currentParent);
+                // שמירה בענן - בשיטה המתוקנת
+                DatabaseReference mDatabase = FirebaseDatabase.getInstance()
+                        .getReference("Users")
+                        .child(currentParent.getId())
+                        .child("childrenList");
 
-                // שמירה בענן
-                DatabaseReference mDatabase = FirebaseDatabase.getInstance().getReference("Users");
-                mDatabase.child(currentParent.getId()).setValue(currentParent)
+                // שמירת הילד החדש ברשימה
+                mDatabase.child(childId).setValue(newChild.toMap())
                         .addOnSuccessListener(aVoid -> {
-                            Toast.makeText(this, "הילד נשמר בהצלחה!", Toast.LENGTH_SHORT).show();
+                            // עדכון גם את האובייקט הראשי
+                            SharedPreferencesUtil.saveUser(SelectChildActivity.this, currentParent);
+
+                            Toast.makeText(SelectChildActivity.this, "הילד נשמר בהצלחה!", Toast.LENGTH_SHORT).show();
                             adapter.notifyDataSetChanged(); // עדכון הרשימה
                             dialog.dismiss(); // סגירת הדיאלוג
                         })
                         .addOnFailureListener(e -> {
                             tvError.setText("שגיאה בשמירה בענן: " + e.getMessage());
+                            // הסרת הילד מהרשימה המקומית אם השמירה נכשלה
+                            currentParent.getChildrenList().remove(newChild);
                         });
             });
         });
 
         dialog.show();
     }
-
-
-
-
-
 }
