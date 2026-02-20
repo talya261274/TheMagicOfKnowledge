@@ -132,7 +132,7 @@ public abstract class BaseActivity extends AppCompatActivity
             navigateTo(SelectSubjectActivity.class);
 
         } else if (id == R.id.nav_quiz) {
-            // navigateTo(PlacementTestActivity.class);
+            navigateTo(PlacementTestActivity.class);
 
         } else if (id == R.id.nav_progrees) {
             // navigateTo(ProgressActivity.class);

@@ -2,6 +2,7 @@ package com.example.themagicofknowledge.models;
 
 import java.util.HashMap;
 import java.util.Map;
+import com.google.firebase.database.Exclude;
 
 public class UserChild {
 
@@ -101,11 +102,11 @@ public class UserChild {
         this.ageGroup = ageGroup;
     }
 
+    @Exclude
     public String getFormattedTime() {
         long hours = totalTimeSeconds / 3600;
         long minutes = (totalTimeSeconds % 3600) / 60;
         long seconds = totalTimeSeconds % 60;
-
         return String.format("%02d:%02d:%02d", hours, minutes, seconds);
     }
 

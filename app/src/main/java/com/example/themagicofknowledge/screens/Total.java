@@ -40,6 +40,7 @@ public class Total extends BaseActivity {
             Intent intent = new Intent(Total.this, SelectChildActivity.class);
             startActivity(intent);
         });
+
     }
 
     @Override

@@ -3,6 +3,7 @@ package com.example.themagicofknowledge.screens;
 import android.app.AlertDialog;
 import android.content.Intent;
 import android.os.Bundle;
+import android.util.Log;
 import android.widget.EditText;
 import android.widget.LinearLayout;
 import android.widget.TextView;
@@ -65,7 +66,7 @@ public class SelectChildActivity extends AppCompatActivity {
 
     private void loadChildrenFromFirebase() {
         DatabaseReference mDatabase = FirebaseDatabase.getInstance()
-                .getReference("Users")
+                .getReference("users")
                 .child(currentParent.getId());
 
         mDatabase.addValueEventListener(new ValueEventListener() { // שימוש ב-addValueEventListener לעדכון חי
@@ -126,6 +127,7 @@ public class SelectChildActivity extends AppCompatActivity {
         AlertDialog dialog = builder.create();
         dialog.setOnShowListener(dialogInterface -> {
             dialog.getButton(AlertDialog.BUTTON_POSITIVE).setOnClickListener(v -> {
+
                 String name = etName.getText().toString().trim();
                 String ageStr = etAge.getText().toString().trim();
 
@@ -140,9 +142,8 @@ public class SelectChildActivity extends AppCompatActivity {
                     return;
                 }
 
-                // יצירת מפתח ייחודי ב-Firebase (עדיף מ-System.currentTimeMillis)
                 DatabaseReference childrenRef = FirebaseDatabase.getInstance()
-                        .getReference("Users")
+                        .getReference("users")
                         .child(currentParent.getId())
                         .child("childrenList");
 
@@ -150,17 +151,26 @@ public class SelectChildActivity extends AppCompatActivity {
 
                 UserChild newChild = new UserChild(childId, currentParent.getId(), name, age);
 
-                // שמירה ישירות תחת ה-ID של הילד
+                // 🔥 ה-LOG החשוב
+                Log.d("FIREBASE_DEBUG", "Saving child: " + newChild.toString());
+                Log.d("FIREBASE_DEBUG", "Path: users/" + currentParent.getId() + "/childrenList/" + childId);
+                Log.d("FIREBASE_DEBUG", FirebaseDatabase.getInstance().getReference().toString());
+
                 if (childId != null) {
                     childrenRef.child(childId).setValue(newChild)
                             .addOnSuccessListener(aVoid -> {
+                                Log.d("FIREBASE_DEBUG", "Child saved successfully!");
                                 Toast.makeText(SelectChildActivity.this, "הקוסם הקטן נוסף!", Toast.LENGTH_SHORT).show();
                                 dialog.dismiss();
                             })
-                            .addOnFailureListener(e -> tvError.setText("שגיאה בשמירה: " + e.getMessage()));
+                            .addOnFailureListener(e -> {
+                                Log.e("FIREBASE_DEBUG", "Save failed: " + e.getMessage());
+                                tvError.setText("שגיאה בשמירה: " + e.getMessage());
+                            });
                 }
             });
         });
+
         dialog.show();
     }
 }
