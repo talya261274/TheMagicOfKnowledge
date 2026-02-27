@@ -1,17 +1,15 @@
 package com.example.themagicofknowledge.models;
 
 public class FlashCard {
-    int imageResId;
-    String answer;
-    private int soundResId;
+    private int imageResId;
+    private String answer;
 
     public FlashCard() {
     }
 
-    public FlashCard(int imageResId, String answer, int soundResId) {
+    public FlashCard(int imageResId, String answer) {
         this.imageResId = imageResId;
         this.answer = answer;
-        this.soundResId = soundResId;
     }
 
     public int getImageResId() {
@@ -30,23 +28,11 @@ public class FlashCard {
         this.answer = answer;
     }
 
-    public int getSoundResId() {
-        return soundResId;
-    }
-
-    public void setSoundResId(int soundResId) {
-        this.soundResId = soundResId;
-    }
-
     @Override
     public String toString() {
         return "FlashCard{" +
                 "imageResId=" + imageResId +
                 ", answer='" + answer + '\'' +
-                ", soundResId=" + soundResId +
                 '}';
     }
 }
-
-
-

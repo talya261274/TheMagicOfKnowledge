@@ -134,6 +134,12 @@ public abstract class BaseActivity extends AppCompatActivity
         } else if (id == R.id.nav_quiz) {
             navigateTo(PlacementTestActivity.class);
 
+        } else if (id == R.id.nav_game1) {
+            navigateTo(ImageRecognitionGameActivity.class);
+
+        } else if (id == R.id.nav_game2) {
+            navigateTo(MatchingGameActivity.class);
+
         } else if (id == R.id.nav_progrees) {
             // navigateTo(ProgressActivity.class);
 

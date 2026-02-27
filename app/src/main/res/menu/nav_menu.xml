@@ -27,6 +27,16 @@
             android:title="Quizes"/>
 
         <item
+            android:id="@+id/nav_game1"
+            android:icon="@drawable/nav_game"
+            android:title="Game1"/>
+
+        <item
+            android:id="@+id/nav_game2"
+            android:icon="@drawable/nav_game"
+            android:title="Game2"/>
+
+        <item
             android:id="@+id/nav_progrees"
             android:icon="@drawable/nav_progress"
             android:title="User Progress"/>

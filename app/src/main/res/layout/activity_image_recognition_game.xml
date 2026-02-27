@@ -1,0 +1,118 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/main"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@drawable/main_background"
+    android:padding="20dp"
+    tools:context=".screens.ImageRecognitionGameActivity">
+
+    <ProgressBar
+        android:id="@+id/testProgress"
+        style="?android:attr/progressBarStyleHorizontal"
+        android:layout_width="0dp"
+        android:layout_height="12dp"
+        android:layout_marginTop="16dp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <TextView
+        android:id="@+id/tvQuestion"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="24dp"
+        android:gravity="center"
+        android:text="מה מופיע בתמונה?"
+        android:textColor="#333333"
+        android:textSize="26sp"
+        android:textStyle="bold"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/testProgress" />
+
+    <androidx.cardview.widget.CardView
+        android:id="@+id/cardMedia"
+        android:layout_width="0dp"
+        android:layout_height="220dp"
+        android:layout_marginTop="20dp"
+        app:cardCornerRadius="20dp"
+        app:cardElevation="4dp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/tvQuestion">
+
+        <ImageView
+            android:id="@+id/ivQuestionMedia"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:scaleType="centerInside"
+            android:src="@drawable/wizard_placeholder" />
+    </androidx.cardview.widget.CardView>
+
+    <LinearLayout
+        android:id="@+id/answersContainer"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="20dp"
+        android:orientation="vertical"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/cardMedia">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal">
+
+            <Button
+                android:id="@+id/btnAns1"
+                android:layout_width="0dp"
+                android:layout_height="100dp"
+                android:layout_weight="1"
+                android:layout_margin="8dp"
+                android:backgroundTint="#FF9800"
+                android:text="תשובה 1"
+                app:cornerRadius="15dp" />
+
+            <Button
+                android:id="@+id/btnAns2"
+                android:layout_width="0dp"
+                android:layout_height="100dp"
+                android:layout_weight="1"
+                android:layout_margin="8dp"
+                android:backgroundTint="#4CAF50"
+                android:text="תשובה 2"
+                app:cornerRadius="15dp" />
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal">
+
+            <Button
+                android:id="@+id/btnAns3"
+                android:layout_width="0dp"
+                android:layout_height="100dp"
+                android:layout_weight="1"
+                android:layout_margin="8dp"
+                android:backgroundTint="#2196F3"
+                android:text="תשובה 3"
+                app:cornerRadius="15dp" />
+
+            <Button
+                android:id="@+id/btnAns4"
+                android:layout_width="0dp"
+                android:layout_height="100dp"
+                android:layout_weight="1"
+                android:layout_margin="8dp"
+                android:backgroundTint="#E91E63"
+                android:text="תשובה 4"
+                app:cornerRadius="15dp" />
+        </LinearLayout>
+    </LinearLayout>
+
+</androidx.constraintlayout.widget.ConstraintLayout>
