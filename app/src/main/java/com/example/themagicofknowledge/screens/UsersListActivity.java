@@ -5,15 +5,12 @@ import android.os.Bundle;
 import android.util.Log;
 
 import androidx.activity.EdgeToEdge;
-import androidx.appcompat.widget.Toolbar;
 import androidx.core.graphics.Insets;
 import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
-import android.view.View;
-import android.widget.Button;
 import android.widget.TextView;
 
 import com.example.themagicofknowledge.R;
@@ -46,7 +43,6 @@ public class UsersListActivity extends BaseActivity {
         userAdapter = new UserAdapter(new UserAdapter.OnUserClickListener() {
             @Override
             public void onUserClick(UserParent user) {
-                // Handle user click
                 Log.d(TAG, "User clicked: " + user);
                 Intent intent = new Intent(UsersListActivity.this, UserProfileActivity.class);
                 intent.putExtra("USER_UID", user.getId());
@@ -55,20 +51,10 @@ public class UsersListActivity extends BaseActivity {
 
             @Override
             public void onLongUserClick(UserParent user) {
-                // Handle long user click
                 Log.d(TAG, "User long clicked: " + user);
             }
         });
         usersList.setAdapter(userAdapter);
-
-        Button btnGoBack = findViewById(R.id.goBackBtn2);
-        btnGoBack.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                Intent intent = new Intent(UsersListActivity.this, LandingActivity.class);
-                startActivity(intent);
-            }
-        });
     }
 
     @Override
@@ -93,8 +79,4 @@ public class UsersListActivity extends BaseActivity {
             }
         });
     }
-
-
-
-
 }

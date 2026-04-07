@@ -18,6 +18,8 @@ import com.example.themagicofknowledge.models.UserParent;
 import com.example.themagicofknowledge.services.DatabaseService;
 import com.example.themagicofknowledge.utils.Validator;
 
+import java.util.function.UnaryOperator;
+
 public class ForgotPasswordActivity extends AppCompatActivity implements View.OnClickListener {
 
     private EditText etEmail, etNewPassword;
@@ -92,9 +94,17 @@ public class ForgotPasswordActivity extends AppCompatActivity implements View.On
 
                 // מעדכן סיסמה
                 user.setPassword(newPassword);
-                databaseService.updateUser(user, new DatabaseService.DatabaseCallback<Void>() {
+                databaseService.updateUser(user.id, new UnaryOperator<UserParent>() {
                     @Override
-                    public void onCompleted(Void result) {
+                    public UserParent apply(UserParent userParentServer) {
+                        if (userParentServer != null) {
+                            userParentServer.setPassword(user.password);
+                        }
+                        return userParentServer;
+                    }
+                }, new DatabaseService.DatabaseCallback<UserParent>() {
+                    @Override
+                    public void onCompleted(UserParent userParentServer) {
                         Toast.makeText(ForgotPasswordActivity.this,
                                 "הסיסמה עודכנה בהצלחה!",
                                 Toast.LENGTH_SHORT

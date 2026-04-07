@@ -245,7 +245,7 @@ public class PlacementTestActivity extends AppCompatActivity {
 
         String parentId = parent.getId();
         DatabaseReference childRef = FirebaseDatabase.getInstance()
-                .getReference("Users")
+                .getReference("users")
                 .child(parentId)
                 .child("childrenList")
                 .child(selectedChild.getId());

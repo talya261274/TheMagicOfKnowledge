@@ -5,5 +5,12 @@
         <!-- <item name="colorPrimary">@color/my_light_primary</item> -->
     </style>
 
-    <style name="Theme.TheMagicOfKnowledge" parent="Base.Theme.TheMagicOfKnowledge" />
+    <style name="Theme.SplashActivity" parent="Base.Theme.TheMagicOfKnowledge">
+        <item name="android:windowSplashScreenAnimatedIcon">@color/transparent</item>
+        <item name="android:windowBackground">@color/splash_background</item>
+    </style>
+
+    <style name="Theme.TheMagicOfKnowledge" parent="Base.Theme.TheMagicOfKnowledge">
+        <item name="android:windowBackground">@drawable/main_background</item>
+    </style>
 </resources>

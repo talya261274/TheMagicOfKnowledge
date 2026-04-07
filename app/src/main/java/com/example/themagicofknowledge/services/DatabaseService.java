@@ -24,9 +24,7 @@ public class DatabaseService {
 
     private static final String TAG = "DatabaseService";
 
-    private static final String USERS_PATH = "users",
-            FOODS_PATH = "foods",
-            CARTS_PATH = "carts";
+    private static final String USERS_PATH = "users";
 
     // Singleton instance
     private static DatabaseService instance;
@@ -195,7 +193,6 @@ public class DatabaseService {
         });
     }
 
-    /*** ✅ FIXED: implemented getUserByEmail correctly ***/
     public void getUserByEmail(@NotNull final String email, @NotNull final DatabaseCallback<UserParent> callback) {
         getUserList(new DatabaseCallback<List<UserParent>>() {
             @Override
@@ -216,8 +213,13 @@ public class DatabaseService {
         });
     }
 
-    public void updateUser(@NotNull final UserParent user, @Nullable final DatabaseCallback<Void> callback) {
-        writeData(USERS_PATH + "/" + user.getId(), user, callback);
+    public void updateUser(@NotNull String userId, @NotNull UnaryOperator<UserParent> function, @NotNull final DatabaseCallback<UserParent> callback) {
+        runTransaction(USERS_PATH + "/" + userId, UserParent.class, function, callback);
+    }
+
+
+    public String generateChildId(@NotNull String userId) {
+        return generateNewId(USERS_PATH + "/" + userId);
     }
 
 }

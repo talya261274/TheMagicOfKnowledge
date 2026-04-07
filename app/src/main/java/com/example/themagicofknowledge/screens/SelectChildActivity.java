@@ -3,37 +3,36 @@ package com.example.themagicofknowledge.screens;
 import android.app.AlertDialog;
 import android.content.Intent;
 import android.os.Bundle;
-import android.util.Log;
 import android.widget.EditText;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import androidx.annotation.NonNull;
-import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.themagicofknowledge.R;
 import com.example.themagicofknowledge.models.UserChild;
 import com.example.themagicofknowledge.models.UserParent;
+import com.example.themagicofknowledge.services.DatabaseService;
 import com.example.themagicofknowledge.utils.SharedPreferencesUtil;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
-import com.google.firebase.database.DataSnapshot;
-import com.google.firebase.database.DatabaseError;
-import com.google.firebase.database.DatabaseReference;
-import com.google.firebase.database.FirebaseDatabase;
-import com.google.firebase.database.ValueEventListener;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.function.UnaryOperator;
 
-public class SelectChildActivity extends AppCompatActivity {
+public class SelectChildActivity extends BaseActivity {
 
     private RecyclerView rvChildren;
     private ChildAdapter adapter;
     private UserParent currentParent;
-    private List<UserChild> childrenList; // רשימה שתנהל את הילדים במסך
+    private List<UserChild> childrenList;
+
+    @Override
+    protected boolean hasSideMenu() {
+        return true;
+    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -58,44 +57,29 @@ public class SelectChildActivity extends AppCompatActivity {
         });
         rvChildren.setAdapter(adapter);
 
-        loadChildrenFromFirebase();
+        loadChildrenFromDB();
 
         FloatingActionButton fabAddChild = findViewById(R.id.fabAddChild);
         fabAddChild.setOnClickListener(v -> showAddChildDialog());
     }
 
-    private void loadChildrenFromFirebase() {
-        DatabaseReference mDatabase = FirebaseDatabase.getInstance()
-                .getReference("users")
-                .child(currentParent.getId());
-
-        mDatabase.addValueEventListener(new ValueEventListener() { // שימוש ב-addValueEventListener לעדכון חי
+    private void loadChildrenFromDB() {
+        DatabaseService.getInstance().getUser(currentParent.getId(), new DatabaseService.DatabaseCallback<UserParent>() {
             @Override
-            public void onDataChange(@NonNull DataSnapshot snapshot) {
-                if (snapshot.exists()) {
-                    // טעינת רשימת הילדים בזהירות כדי למנוע את שגיאת ה-List/HashMap
-                    DataSnapshot childrenSnapshot = snapshot.child("childrenList");
-                    childrenList.clear(); // מנקים את הרשימה הנוכחית לפני טעינה
+            public void onCompleted(UserParent userParentServer) {
+                childrenList.clear();
+                childrenList.addAll(userParentServer.childrenList);
 
-                    for (DataSnapshot childData : childrenSnapshot.getChildren()) {
-                        UserChild child = childData.getValue(UserChild.class);
-                        if (child != null) {
-                            childrenList.add(child);
-                        }
-                    }
+                currentParent.setChildrenList(new ArrayList<>(childrenList));
+                SharedPreferencesUtil.saveUser(SelectChildActivity.this, currentParent);
 
-                    // עדכון המודל המקומי וה-SharedPreferences
-                    currentParent.setChildrenList(new ArrayList<>(childrenList));
-                    SharedPreferencesUtil.saveUser(SelectChildActivity.this, currentParent);
-
-                    // הודעה לאדפטר שהנתונים השתנו - בלי ליצור אותו מחדש
-                    adapter.notifyDataSetChanged();
-                }
+                // הודעה לאדפטר שהנתונים השתנו - בלי ליצור אותו מחדש
+                adapter.notifyDataSetChanged();
             }
 
             @Override
-            public void onCancelled(@NonNull DatabaseError error) {
-                Toast.makeText(SelectChildActivity.this, "שגיאה: " + error.getMessage(), Toast.LENGTH_SHORT).show();
+            public void onFailed(Exception e) {
+
             }
         });
     }
@@ -142,32 +126,34 @@ public class SelectChildActivity extends AppCompatActivity {
                     return;
                 }
 
-                DatabaseReference childrenRef = FirebaseDatabase.getInstance()
-                        .getReference("users")
-                        .child(currentParent.getId())
-                        .child("childrenList");
 
-                String childId = childrenRef.push().getKey();
+                String childId = DatabaseService.getInstance().generateChildId(currentParent.id);
 
                 UserChild newChild = new UserChild(childId, currentParent.getId(), name, age);
 
-                // 🔥 ה-LOG החשוב
-                Log.d("FIREBASE_DEBUG", "Saving child: " + newChild.toString());
-                Log.d("FIREBASE_DEBUG", "Path: users/" + currentParent.getId() + "/childrenList/" + childId);
-                Log.d("FIREBASE_DEBUG", FirebaseDatabase.getInstance().getReference().toString());
+                DatabaseService.getInstance().updateUser(currentParent.id, new UnaryOperator<UserParent>() {
+                    @Override
+                    public UserParent apply(UserParent userParentServer) {
+                        if (userParentServer != null) {
+                            userParentServer.childrenList.add(newChild);
+                        }
+                        return userParentServer;
+                    }
+                }, new DatabaseService.DatabaseCallback<UserParent>() {
+                    @Override
+                    public void onCompleted(UserParent userParentServer) {
+                        Toast.makeText(SelectChildActivity.this, "הקוסם הקטן נוסף!", Toast.LENGTH_SHORT).show();
+                        dialog.dismiss();
+                        childrenList.clear();
+                        childrenList.addAll(userParentServer.childrenList);
+                        adapter.notifyDataSetChanged();
+                    }
 
-                if (childId != null) {
-                    childrenRef.child(childId).setValue(newChild)
-                            .addOnSuccessListener(aVoid -> {
-                                Log.d("FIREBASE_DEBUG", "Child saved successfully!");
-                                Toast.makeText(SelectChildActivity.this, "הקוסם הקטן נוסף!", Toast.LENGTH_SHORT).show();
-                                dialog.dismiss();
-                            })
-                            .addOnFailureListener(e -> {
-                                Log.e("FIREBASE_DEBUG", "Save failed: " + e.getMessage());
-                                tvError.setText("שגיאה בשמירה: " + e.getMessage());
-                            });
-                }
+                    @Override
+                    public void onFailed(Exception e) {
+                        tvError.setText("שגיאה בשמירה: " + e.getMessage());
+                    }
+                });
             });
         });
 

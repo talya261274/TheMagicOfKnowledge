@@ -20,6 +20,8 @@ import com.example.themagicofknowledge.services.DatabaseService;
 import com.example.themagicofknowledge.utils.SharedPreferencesUtil;
 import com.example.themagicofknowledge.utils.Validator;
 
+import java.util.function.UnaryOperator;
+
 public class UpdateDetailsActivity extends BaseActivity implements View.OnClickListener {
 
     private static final String TAG = "UserProfileActivity";
@@ -136,9 +138,14 @@ public class UpdateDetailsActivity extends BaseActivity implements View.OnClickL
 
     private void updateUserInDatabase(UserParent user) {
         Log.d(TAG, "Updating user in database: " + user.getId());
-        databaseService.updateUser(user, new DatabaseService.DatabaseCallback<Void>() {
+        databaseService.updateUser(user.id, new UnaryOperator<UserParent>() {
             @Override
-            public void onCompleted(Void result) {
+            public UserParent apply(UserParent userParent) {
+                return user;
+            }
+        }, new DatabaseService.DatabaseCallback<UserParent>() {
+            @Override
+            public void onCompleted(UserParent result) {
                 Log.d(TAG, "User profile updated successfully");
                 Toast.makeText(UpdateDetailsActivity.this, "הפרופיל עודכן בהצלחה", Toast.LENGTH_SHORT).show();
                 showUserProfile(); // Refresh the profile view

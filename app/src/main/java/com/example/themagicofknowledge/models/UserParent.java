@@ -19,6 +19,7 @@ public class UserParent {
     public ArrayList<UserChild> childrenList;
 
     public UserParent() {
+        childrenList = new ArrayList<>();
     }
 
     public UserParent(String id, String firstName, String lastName, String email,
@@ -109,6 +110,9 @@ public class UserParent {
     }
 
     public ArrayList<UserChild> getChildrenList() {
+        if (childrenList == null) {
+            childrenList = new ArrayList<>();
+        }
         return childrenList;
     }
 

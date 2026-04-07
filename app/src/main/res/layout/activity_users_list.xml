@@ -21,19 +21,6 @@
             android:orientation="vertical"
             android:padding="16dp">
 
-            <Button
-                android:id="@+id/goBackBtn2"
-                android:layout_width="81dp"
-                android:layout_height="56dp"
-                android:layout_gravity="right"
-                android:backgroundTint="@android:color/transparent"
-                android:text="➜"
-                android:textColor="@color/white"
-                android:textSize="22dp"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintTop_toTopOf="parent"
-                tools:ignore="MissingConstraints" />
-
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
@@ -46,7 +33,8 @@
                 android:text="ניהול משתמשים"
                 android:textColor="@color/white"
                 android:textSize="40sp"
-                android:textStyle="bold" />
+                android:textStyle="bold"
+                android:layout_marginTop="40dp"/>
 
             <TextView
                 android:id="@+id/tv_user_count"

@@ -9,5 +9,7 @@
     <color name="purple_700">#3700B3</color>
     <color name="teal_200">#03DAC5</color>
     <color name="teal_700">#018786</color>
-    <color name="ic_launcher_background">#03A9F4</color> <!-- תוכל לשנות לצבע שאתה רוצה -->
+    <color name="transparent">#00000000</color>
+    <color name="ic_launcher_background">#03A9F4</color>
+    <color name="splash_background">#FFFFFF</color>
 </resources>

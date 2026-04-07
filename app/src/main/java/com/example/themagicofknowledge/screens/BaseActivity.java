@@ -115,7 +115,7 @@ public abstract class BaseActivity extends AppCompatActivity
             startActivity(intent);
             finish();
         }
-        drawerLayout.closeDrawer(GravityCompat.END);
+        drawerLayout.closeDrawer(GravityCompat.START);
     }
 
     @Override
@@ -144,7 +144,7 @@ public abstract class BaseActivity extends AppCompatActivity
             // navigateTo(ProgressActivity.class);
 
         } else if (id == R.id.nav_logout) {
-            drawerLayout.closeDrawer(GravityCompat.END);
+            drawerLayout.closeDrawer(GravityCompat.START);
             showLogoutDialog();
         }
         return true;
@@ -167,8 +167,8 @@ public abstract class BaseActivity extends AppCompatActivity
 
     @Override
     public void onBackPressed() {
-        if (drawerLayout != null && drawerLayout.isDrawerOpen(GravityCompat.END)) {
-            drawerLayout.closeDrawer(GravityCompat.END);
+        if (drawerLayout != null && drawerLayout.isDrawerOpen(GravityCompat.START)) {
+            drawerLayout.closeDrawer(GravityCompat.START);
         } else {
             super.onBackPressed();
         }
