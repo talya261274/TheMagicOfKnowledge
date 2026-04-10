@@ -183,4 +183,14 @@ public class SharedPreferencesUtil {
     public static void clearSelectedChild(Context context) {
         remove(context, KEY_SELECTED_CHILD);
     }
+
+    public static void saveCurrentChildId(Context context, String childId) {
+        context.getSharedPreferences("MyPrefs", Context.MODE_PRIVATE)
+                .edit().putString("current_child_id", childId).apply();
+    }
+
+    public static String getCurrentChildId(Context context) {
+        return context.getSharedPreferences("MyPrefs", Context.MODE_PRIVATE)
+                .getString("current_child_id", null);
+    }
 }

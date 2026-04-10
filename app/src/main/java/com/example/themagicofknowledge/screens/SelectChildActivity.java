@@ -56,6 +56,7 @@ public class SelectChildActivity extends BaseActivity {
                 child -> {
                     // 1. שמירת הילד הנבחר בזיכרון המקומי
                     SharedPreferencesUtil.saveCurrentChild(this, child);
+                    SharedPreferencesUtil.saveCurrentChildId(this, child.getId());
 
                     // 2. מעבר למסך הראשי (MainActivity)
                     Intent intent = new Intent(this, MainActivity.class);

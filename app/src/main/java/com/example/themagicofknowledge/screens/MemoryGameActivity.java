@@ -15,12 +15,18 @@ import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 
 import com.example.themagicofknowledge.R;
 import com.example.themagicofknowledge.models.UserChild;
 import com.example.themagicofknowledge.utils.SharedPreferencesUtil;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -77,7 +83,7 @@ public class MemoryGameActivity extends AppCompatActivity {
         // הגודל הסופי של כל כרטיס
         cardSize = (screenWidth - totalSpacing) / 3;
 
-        loadCards(); // טען את כל הזוגות
+        loadQuestionsFromFirebase(); // טען את כל הזוגות
         adapter = new CardAdapter();
         gridView.setAdapter(adapter);
 
@@ -99,27 +105,54 @@ public class MemoryGameActivity extends AppCompatActivity {
         });
     }
 
-    // טען את הכרטיסים – תמונות ומילים
-    private void loadCards() {
-        cards = new ArrayList<>();
+    private void loadQuestionsFromFirebase() {
+        String ageGroup = currentChild.getAgeGroup();
+        String path = "level_" + ageGroup.replace("-", "_");
 
-        // רמה 3–4 דוגמא – חיות
-        cards.add(new Card(R.drawable.ss_animals_dog, null, "כלב"));
-        cards.add(new Card(0, "כלב", "כלב"));
-        cards.add(new Card(R.drawable.ss_animals_cat, null, "חתול"));
-        cards.add(new Card(0, "חתול", "חתול"));
-        cards.add(new Card(R.drawable.ss_animals_gir, null, "גירפה"));
-        cards.add(new Card(0, "גירפה", "גירפה"));
+        DatabaseReference ref = FirebaseDatabase.getInstance().getReference("Games")
+                .child("memoryGame")
+                .child(path)
+                .child(subject);
 
-        // רמה 3–4 דוגמא – צבעים
-        cards.add(new Card(R.drawable.ss_colors_red, null, "אדום"));
-        cards.add(new Card(0, "אדום", "אדום"));
-        cards.add(new Card(R.drawable.ss_colors_blue, null, "כחול"));
-        cards.add(new Card(0, "כחול", "כחול"));
-        cards.add(new Card(R.drawable.ss_colors_pink, null, "ורוד"));
-        cards.add(new Card(0, "ורוד", "ורוד"));
+        ref.addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot snapshot) {
+                cards.clear();
+                for (DataSnapshot ds : snapshot.getChildren()) {
+                    String imageName = ds.child("image").getValue(String.class);
+                    String displayName = ds.child("name").getValue(String.class);
 
-        Collections.shuffle(cards); // ערבוב הכרטיסיות
+                    if (imageName != null && displayName != null) {
+                        int resId = getResources().getIdentifier(imageName, "drawable", getPackageName());
+
+                        addPairBasedOnAge(resId, displayName, ageGroup);
+                    }
+                }
+
+                if (cards.isEmpty()) {
+                    Toast.makeText(MemoryGameActivity.this, "לא נמצאו נתונים בנתיב: " + path, Toast.LENGTH_SHORT).show();
+                    finish();
+                } else {
+                    Collections.shuffle(cards);
+                    adapter.notifyDataSetChanged();
+                }
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError error) {}
+        });
+    }
+
+    private void addPairBasedOnAge(int resId, String name, String ageGroup) {
+        if (ageGroup.equals("3-4") || ageGroup.equals("5-6")) {
+            // גילאי 3-6: הילד רואה שתי תמונות זהות. קל ומתאים לגיל.
+            cards.add(new Card(resId, null, name));
+            cards.add(new Card(resId, null, name));
+        } else {
+            // גילאי 7-8: הילד רואה תמונה אחת ומילה אחת. מאתגר ומפתח קריאה.
+            cards.add(new Card(resId, null, name)); // כרטיס עם התמונה
+            cards.add(new Card(0, name, name));    // כרטיס עם הטקסט (resId הוא 0)
+        }
     }
 
     private void checkMatch() {

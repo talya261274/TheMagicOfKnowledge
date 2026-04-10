@@ -10,6 +10,9 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.TheMagicOfKnowledge">
         <activity
+            android:name=".screens.ParentTrackingActivity"
+            android:exported="false" />
+        <activity
             android:name=".screens.SentenceCompletionActivity"
             android:exported="false" />
         <activity

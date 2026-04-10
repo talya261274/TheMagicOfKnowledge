@@ -47,6 +47,8 @@ public class MatchingGameActivity extends AppCompatActivity {
     private int attemptsFromBefore;
     private long timeFromBefore;
 
+    private android.speech.tts.TextToSpeech tts;
+
     private UserChild currentChild;
 
     @Override
@@ -62,45 +64,59 @@ public class MatchingGameActivity extends AppCompatActivity {
 
         attemptsFromBefore = getIntent().getIntExtra("totalAttempts", 0);
         timeFromBefore = getIntent().getLongExtra("totalTime", 0);
-
-        leftColumn = findViewById(R.id.leftColumn);
-        rightColumn = findViewById(R.id.rightColumn);
+        subject = getIntent().getStringExtra("subject");
+        if (subject == null) subject = "animals";
 
         currentChild = SharedPreferencesUtil.getCurrentChild(this);
         if (currentChild != null) {
             ageGroup = currentChild.getAgeGroup();
         } else {
             ageGroup = "3-4";
-            Toast.makeText(this, "לא נמצא פרופיל ילד", Toast.LENGTH_SHORT).show();
         }
 
-        subject = getIntent().getStringExtra("subject");
-        if (subject == null) subject = "general";
+        leftColumn = findViewById(R.id.leftColumn);
+        rightColumn = findViewById(R.id.rightColumn);
 
-        mDatabase = FirebaseDatabase.getInstance().getReference("Games").child("matchingGame");
         loadGameData();
+        startTime = System.currentTimeMillis();
 
-        startTime = System.currentTimeMillis(); // התחלת מדידת זמן
+        tts = new android.speech.tts.TextToSpeech(this, status -> {
+            if (status != android.speech.tts.TextToSpeech.SUCCESS) {
+                Toast.makeText(this, "שגיאה באתחול הדיבור", Toast.LENGTH_SHORT).show();
+            } else {
+                tts.setLanguage(new java.util.Locale("he")); // הגדרת עברית
+            }
+        });
     }
 
     private void loadGameData() {
-        String levelKey = "level_" + ageGroup.replace("-", "_");
+        String path = "level_" + ageGroup.replace("-", "_");
 
-        mDatabase.child(levelKey).child(subject).child("pairs").addListenerForSingleValueEvent(new ValueEventListener() {
+        DatabaseReference ref = FirebaseDatabase.getInstance().getReference("Games")
+                .child("matchingGame")
+                .child(path)
+                .child(subject)
+                .child("pairs");
+
+        ref.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
                 List<Pair> pairsList = new ArrayList<>();
-                for (DataSnapshot postSnapshot : snapshot.getChildren()) {
-                    Pair p = postSnapshot.getValue(Pair.class);
+                for (DataSnapshot ds : snapshot.getChildren()) {
+                    Pair p = ds.getValue(Pair.class);
                     if (p != null) pairsList.add(p);
                 }
-                setupGame(pairsList);
+
+                if (pairsList.isEmpty()) {
+                    Toast.makeText(MatchingGameActivity.this, "אין נתונים בנתיב: " + path, Toast.LENGTH_SHORT).show();
+                    finish();
+                } else {
+                    setupGame(pairsList);
+                }
             }
 
             @Override
-            public void onCancelled(@NonNull DatabaseError error) {
-                Toast.makeText(MatchingGameActivity.this, "שגיאה בטעינה", Toast.LENGTH_SHORT).show();
-            }
+            public void onCancelled(@NonNull DatabaseError error) {}
         });
     }
 
@@ -118,7 +134,7 @@ public class MatchingGameActivity extends AppCompatActivity {
 
     private void addLeftItem(Pair pair) {
         MaterialButton btn = new MaterialButton(this);
-        setupContent(btn, pair.getLeft());
+        setupContent(btn, pair.getLeft(), pair.getId());
         btn.setTag(pair.getId());
         styleButton(btn);
 
@@ -134,7 +150,7 @@ public class MatchingGameActivity extends AppCompatActivity {
 
     private void addRightItem(Pair pair) {
         MaterialButton btn = new MaterialButton(this);
-        setupContent(btn, pair.getRight());
+        setupContent(btn, pair.getRight(), pair.getId());
         btn.setTag(pair.getId());
         styleButton(btn);
 
@@ -177,21 +193,34 @@ public class MatchingGameActivity extends AppCompatActivity {
         rightColumn.addView(btn);
     }
 
-    private void setupContent(MaterialButton btn, String content) {
-        if (content != null && content.startsWith("ss_")) {
+    private void setupContent(MaterialButton btn, String content, String matchId) {
+        if (content == null) return;
+
+        if (content.startsWith("ss_")) {
             int resId = getResources().getIdentifier(content, "drawable", getPackageName());
             btn.setIconResource(resId != 0 ? resId : R.drawable.wizard_placeholder);
             btn.setText("");
-            btn.setIconSize(150);
-            btn.setIconGravity(MaterialButton.ICON_GRAVITY_TEXT_START);
+            btn.setIconSize(180);
             btn.setIconTint(null);
-        } else {
+        }
+        else if (content.equalsIgnoreCase("audio") || content.equalsIgnoreCase("speaker")) {
+            btn.setIconResource(R.drawable.ic_speaker);
+            btn.setText("");
+            btn.setIconSize(150);
+            btn.setIconTint(ColorStateList.valueOf(Color.parseColor("#2196F3")));
+
+            btn.setOnClickListener(v -> {
+                if (tts != null && matchId != null) {
+                    tts.speak(matchId, android.speech.tts.TextToSpeech.QUEUE_FLUSH, null, "tts1");
+                }
+            });
+        }
+        else {
             btn.setText(content);
             btn.setIconResource(0);
-            btn.setTextSize(22);
+            btn.setTextSize(20);
         }
     }
-
     private void styleButton(MaterialButton btn) {
         LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(
                 LinearLayout.LayoutParams.MATCH_PARENT, 220);
@@ -204,7 +233,6 @@ public class MatchingGameActivity extends AppCompatActivity {
         btn.setStrokeColor(ColorStateList.valueOf(Color.LTGRAY));
     }
 
-    // פונקציה חדשה שבודקת אם כל הזוגות נמצאו
     private void checkIfGameFinished() {
         if (matchesFound == totalPairs && totalPairs > 0) {
             finishGame();
@@ -218,15 +246,21 @@ public class MatchingGameActivity extends AppCompatActivity {
         long totalTimeSoFar = timeFromBefore + currentTimeSeconds;
 
         Intent intent = new Intent(this, MemoryGameActivity.class);
-
         intent.putExtra("subject", subject);
-        intent.putExtra("age", currentChild.getAge());
-
         intent.putExtra("totalAttempts", totalAttemptsSoFar);
         intent.putExtra("totalTime", totalTimeSoFar);
         intent.putExtra("gameStep", 3);
 
         startActivity(intent);
         finish();
+    }
+
+    @Override
+    protected void onDestroy() {
+        if (tts != null) {
+            tts.stop();
+            tts.shutdown();
+        }
+        super.onDestroy();
     }
 }

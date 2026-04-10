@@ -31,7 +31,6 @@ public class SplashActivity extends AppCompatActivity {
             return insets;
         });
 
-        // משתמשים ב-Handler במקום Thread
         new Handler(Looper.getMainLooper()).postDelayed(() -> {
             Intent intent;
             if (SharedPreferencesUtil.isUserLoggedIn(this)) {

@@ -64,6 +64,7 @@ public class Question {
         return "Question{" +
                 "questionText='" + questionText + '\'' +
                 ", options=" + options +
+                ", optionLabels=" + optionLabels + // הוסיפי את זה כאן
                 ", correctAnswerIndex=" + correctAnswerIndex +
                 ", mediaUrl='" + mediaUrl + '\'' +
                 '}';

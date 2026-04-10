@@ -7,6 +7,7 @@ import android.view.View;
 import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.ActionBarDrawerToggle;
@@ -203,13 +204,19 @@ public abstract class BaseActivity extends AppCompatActivity
             navigateTo(SentenceCompletionActivity.class);
 
         }
-        /**
-        // ניווט למסך הסטטיסטיקה והתקדמות הילדים
         else if (id == R.id.nav_progrees) {
-            navigateTo(GameProgressActivity.class);
+            String currentChildId = SharedPreferencesUtil.getCurrentChildId(this);
 
+            if (currentChildId != null) {
+                Intent intent = new Intent(this, ParentTrackingActivity.class);
+                intent.putExtra("CHILD_ID", currentChildId);
+                startActivity(intent);
+            } else {
+                // אם משום מה אין ילד נבחר, שלח אותו קודם לבחור ילד
+                Toast.makeText(this, "אנא בחר ילד תחילה", Toast.LENGTH_SHORT).show();
+                startActivity(new Intent(this, SelectChildActivity.class));
+            }
         }
-        **/
 
         // התנתקות מהמערכת
         else if (id == R.id.nav_logout) {

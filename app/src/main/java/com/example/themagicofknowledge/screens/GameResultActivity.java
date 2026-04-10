@@ -26,8 +26,9 @@ public class GameResultActivity extends AppCompatActivity {
         setContentView(R.layout.activity_game_result);
 
         currentChild = SharedPreferencesUtil.getCurrentChild(this);
-        boolean success = getIntent().getBooleanExtra("success", false);
-        attempts = getIntent().getIntExtra("attempts", 0);
+        boolean success = getIntent().getBooleanExtra("success", true);
+        attempts = getIntent().getIntExtra("totalAttempts", 0);
+        long totalTime = getIntent().getLongExtra("totalTime", 0);
         subject = getIntent().getStringExtra("subject");
 
         TextView tvTitle = findViewById(R.id.tvResultTitle);
@@ -36,7 +37,7 @@ public class GameResultActivity extends AppCompatActivity {
 
         if (success) {
             tvTitle.setText("כל הכבוד! סיימת את נושא ה" + translateSubject(subject) + "! 🎉");
-            tvAttempts.setText("סך הכל טעויות בדרך: " + attempts);
+            tvAttempts.setText("סך הכל טעויות בדרך: " + attempts + "\nזמן כולל: " + totalTime + " שניות");
             btnAction.setText("סיום וקבלת כוכב ⭐");
 
             btnAction.setOnClickListener(v -> markSubjectAsCompleted());
@@ -46,10 +47,14 @@ public class GameResultActivity extends AppCompatActivity {
             btnAction.setText("נסה שוב מהתחלה");
 
             btnAction.setOnClickListener(v -> {
-                // חזרה לתחילת המשחקים של אותו נושא
-                Intent intent = new Intent(this, SentenceCompletionActivity.class); // או המשחק הראשון ברצף
+                Intent intent;
+                String age = currentChild.getAgeGroup();
+                if (age.equals("7-8")) {
+                    intent = new Intent(this, ImageRecognitionGameActivity.class);
+                } else {
+                    intent = new Intent(this, AudioRecognitionActivity.class);
+                }
                 intent.putExtra("subject", subject);
-                intent.putExtra("age", currentChild.getAge());
                 startActivity(intent);
                 finish();
             });
@@ -59,23 +64,25 @@ public class GameResultActivity extends AppCompatActivity {
     private void markSubjectAsCompleted() {
         if (currentChild == null || subject == null) return;
 
-        // עדכון ב-Firebase שהנושא הושלם
+        long totalTime = getIntent().getLongExtra("totalTime", 0);
+
         DatabaseReference ref = FirebaseDatabase.getInstance().getReference("Parents")
                 .child(currentChild.getParentId())
                 .child("children")
-                .child(currentChild.getId())
-                .child("completedSubjects")
-                .child(subject);
+                .child(currentChild.getId());
 
-        ref.setValue(true).addOnCompleteListener(task -> {
+        ref.child("completedSubjects").child(subject).setValue(true);
+
+        com.example.themagicofknowledge.models.GameProgress finalStats =
+                new com.example.themagicofknowledge.models.GameProgress(attempts, true, totalTime);
+
+        ref.child("stats").child(subject).setValue(finalStats).addOnCompleteListener(task -> {
             if (task.isSuccessful()) {
-                // חזרה למסך בחירת נושאים
+                Toast.makeText(this, "התקדמות נשמרה! כל הכבוד! ⭐", Toast.LENGTH_SHORT).show();
                 Intent intent = new Intent(this, SelectSubjectActivity.class);
                 intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
                 startActivity(intent);
                 finish();
-            } else {
-                Toast.makeText(this, "שגיאה בשמירת התקדמות", Toast.LENGTH_SHORT).show();
             }
         });
     }

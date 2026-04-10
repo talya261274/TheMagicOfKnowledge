@@ -18,10 +18,8 @@ import androidx.appcompat.app.AppCompatActivity;
 
 import com.example.themagicofknowledge.R;
 import com.example.themagicofknowledge.adapter.KeyboardAdapter;
-import com.example.themagicofknowledge.models.GameProgress;
 import com.example.themagicofknowledge.models.SentenceQuestion;
 import com.example.themagicofknowledge.models.UserChild;
-import com.example.themagicofknowledge.services.DatabaseService;
 import com.example.themagicofknowledge.utils.SharedPreferencesUtil;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
@@ -39,7 +37,7 @@ public class SentenceCompletionActivity extends AppCompatActivity {
     private ImageView ivHint;
     private Button btnCheck;
     private GridView keyboardGrid;
-    private ProgressBar testProgress; //
+    private ProgressBar testProgress;
 
     private int attemptsFromBefore;
     private long timeFromBefore;
@@ -72,14 +70,16 @@ public class SentenceCompletionActivity extends AppCompatActivity {
 
         attemptsFromBefore = getIntent().getIntExtra("totalAttempts", 0);
         timeFromBefore = getIntent().getLongExtra("totalTime", 0);
-
-        currentChild = SharedPreferencesUtil.getCurrentChild(this);
         subject = getIntent().getStringExtra("subject");
         if (subject == null) subject = "animals";
+
+        currentChild = SharedPreferencesUtil.getCurrentChild(this);
+        if (currentChild == null) { finish(); return; }
 
         initViews();
         setupCustomKeyboard();
 
+        testProgress.setMax(3);
         int step = getIntent().getIntExtra("gameStep", 2);
         testProgress.setProgress(step);
 
@@ -94,11 +94,6 @@ public class SentenceCompletionActivity extends AppCompatActivity {
         btnCheck = findViewById(R.id.btnCheck);
         keyboardGrid = findViewById(R.id.keyboardGrid);
         testProgress = findViewById(R.id.testProgress);
-
-        testProgress.setMax(3);
-
-        btnCheck.setOnClickListener(v -> checkAnswer());
-
     }
 
     private void loadQuestions() {
@@ -115,15 +110,12 @@ public class SentenceCompletionActivity extends AppCompatActivity {
                 }
 
                 if (!questions.isEmpty()) {
-                    // תיקון 2: הגדרת המקסימום לפי כמות השאלות שהגיעו
-                    testProgress.setMax(questions.size());
                     showQuestion();
                 } else {
-                    Toast.makeText(SentenceCompletionActivity.this, "לא נמצאו שאלות לנושא זה", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(SentenceCompletionActivity.this, "לא נמצאו שאלות לנושא", Toast.LENGTH_SHORT).show();
                     finish();
                 }
             }
-
             @Override
             public void onCancelled(@NonNull DatabaseError error) {}
         });
@@ -134,9 +126,7 @@ public class SentenceCompletionActivity extends AppCompatActivity {
             SentenceQuestion q = questions.get(currentIndex);
             tvSentence.setText(q.getSentence());
             etAnswer.setText("");
-
-            // עדכון הפס לשלב הנוכחי
-            testProgress.setProgress(currentIndex);
+            etAnswer.setError(null);
 
             int resId = getResources().getIdentifier(q.getHintImage(), "drawable", getPackageName());
             ivHint.setImageResource(resId != 0 ? resId : R.drawable.wizard_placeholder);
@@ -152,24 +142,16 @@ public class SentenceCompletionActivity extends AppCompatActivity {
         String correctAns = questions.get(currentIndex).getCorrectAnswer();
 
         if (userAns.equalsIgnoreCase(correctAns)) {
-            // תשובה נכונה - צביעה לירוק
             etAnswer.setBackgroundTintList(ColorStateList.valueOf(Color.GREEN));
             Toast.makeText(this, "מצוין! ✨", Toast.LENGTH_SHORT).show();
 
             new Handler().postDelayed(() -> {
                 etAnswer.setBackgroundTintList(null);
                 currentIndex++;
-
-                // תיקון 3: שימוש בשם המשתנה testProgress ולא בשם המחלקה
-                if (testProgress != null) {
-                    testProgress.setProgress(currentIndex);
-                }
-
                 showQuestion();
             }, 600);
 
         } else {
-            // תשובה שגויה - צביעה לאדום
             attempts++;
             etAnswer.setBackgroundTintList(ColorStateList.valueOf(Color.RED));
             etAnswer.setError("נסה שוב...");
@@ -181,19 +163,16 @@ public class SentenceCompletionActivity extends AppCompatActivity {
     }
 
     private void finishGame() {
-        long currentTimeSeconds = (System.currentTimeMillis() - startTime) / 1000;
+        long thisGameTime = (System.currentTimeMillis() - startTime) / 1000;
 
         int totalAttemptsSoFar = attemptsFromBefore + attempts;
-        long totalTimeSoFar = timeFromBefore + currentTimeSeconds;
+        long totalTimeSoFar = timeFromBefore + thisGameTime;
 
         Intent intent = new Intent(this, MemoryGameActivity.class);
-
         intent.putExtra("subject", subject);
-        intent.putExtra("age", currentChild.getAge());
-
         intent.putExtra("totalAttempts", totalAttemptsSoFar);
         intent.putExtra("totalTime", totalTimeSoFar);
-        intent.putExtra("gameStep", 3);
+        intent.putExtra("gameStep", 3); // התחנה האחרונה
 
         startActivity(intent);
         finish();
@@ -204,13 +183,11 @@ public class SentenceCompletionActivity extends AppCompatActivity {
             @Override
             public void onKeyClick(String letter) {
                 if (letter.equals("DEL")) {
-                    // לוגיקה של מחיקה
                     String str = etAnswer.getText().toString();
                     if (str.length() > 0) {
                         etAnswer.setText(str.substring(0, str.length() - 1));
                     }
                 } else {
-                    // לוגיקה של הוספת אות
                     etAnswer.append(letter);
                 }
             }
