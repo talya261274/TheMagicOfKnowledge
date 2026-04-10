@@ -37,6 +37,23 @@
             android:title="Game2"/>
 
         <item
+            android:id="@+id/nav_game3"
+            android:icon="@drawable/nav_game"
+            android:title="Game3"/>
+
+        <item
+            android:id="@+id/nav_game4"
+            android:icon="@drawable/nav_game"
+            android:title="Game4"/>
+
+        <item
+            android:id="@+id/nav_game5"
+            android:icon="@drawable/nav_game"
+            android:title="Game5"/>
+
+
+
+        <item
             android:id="@+id/nav_progrees"
             android:icon="@drawable/nav_progress"
             android:title="User Progress"/>

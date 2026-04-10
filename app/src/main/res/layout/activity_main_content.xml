@@ -1,18 +1,45 @@
-<RelativeLayout
-    xmlns:android="http://schemas.android.com/apk/res/android"
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:padding="24dp"
-    android:background="@drawable/main_background">
+    android:orientation="vertical"
+    android:gravity="center"
+    android:background="@drawable/main_background"
+    android:padding="20dp">
+
+    <ImageView
+        android:id="@+id/ivWelcomeAvatar"
+        android:layout_width="150dp"
+        android:layout_height="150dp"
+        android:layout_marginBottom="20dp"
+        android:src="@drawable/wizard_placeholder" />
 
     <TextView
-        android:id="@+id/tvWelcome"
+        android:id="@+id/tvWelcomeChild"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_centerInParent="true"
-        android:text="ברוך הבא!"
+        android:text="שלום, יהלי!"
         android:textSize="32sp"
-        android:textColor="@color/white"
-        android:fontFamily="@font/gan"
-        android:textStyle="bold"/>
-</RelativeLayout>
+        android:textStyle="bold"
+        android:textColor="#4B0082"
+        android:layout_marginBottom="10dp" />
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="איזה כיף שבאת! מוכנים ללמוד?"
+        android:textSize="18sp"
+        android:textColor="#546E7A"
+        android:layout_marginBottom="40dp" />
+
+    <Button
+        android:id="@+id/btnStartJourney"
+        android:layout_width="250dp"
+        android:layout_height="70dp"
+        android:text="בואו נתחיל!"
+        android:textSize="22sp"
+        android:backgroundTint="#3F51B5"
+        android:textColor="@android:color/white"
+        android:elevation="8dp" />
+
+</LinearLayout>

@@ -109,4 +109,18 @@
         android:visibility="gone"
         android:contentDescription="Play Sound"/>
 
+    <com.google.android.material.button.MaterialButton
+        android:id="@+id/btnStartGame"
+        android:layout_width="250dp"
+        android:layout_height="55dp"
+        android:layout_marginTop="10dp"
+        android:text="בואו נשחק! 🎮"
+        android:textSize="22sp"
+        android:textStyle="bold"
+        android:fontFamily="@font/gan"
+        android:textColor="@color/white"
+        android:backgroundTint="#03A9F4"
+        app:cornerRadius="30dp"
+        android:visibility="gone" />
+
 </LinearLayout>

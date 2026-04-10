@@ -26,13 +26,12 @@
             app:popupTheme="@style/ThemeOverlay.AppCompat.Light">
 
             <ImageView
-                android:id="@+id/toolbarLogo"
-                android:layout_width="50dp"
-                android:layout_height="50dp"
+                android:id="@+id/ivToolbarAvatar"
+                android:layout_width="45dp"
+                android:layout_height="45dp"
                 android:layout_gravity="end|center_vertical"
                 android:layout_marginEnd="16dp"
-                android:src="@drawable/logo"/>
-
+                android:src="@drawable/logo" />
         </androidx.appcompat.widget.Toolbar>
 
         <!--  ===== כאן ייכנס התוכן של כל מסך =====  -->

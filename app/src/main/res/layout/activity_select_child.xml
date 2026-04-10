@@ -12,10 +12,11 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_centerHorizontal="true"
-        android:layout_marginTop="20dp"
+        android:layout_marginTop="30dp"
         android:text="מי משחק איתנו היום?"
-        android:textColor="#333333"
-        android:textSize="24sp"
+        android:textColor="@color/white"
+        android:fontFamily="@font/gan"
+        android:textSize="27sp"
         android:textStyle="bold" />
 
     <androidx.recyclerview.widget.RecyclerView
@@ -23,7 +24,10 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:layout_below="@id/tvSelectTitle"
-        android:layout_marginTop="20dp" />
+        android:layout_marginTop="20dp"
+        android:layout_marginBottom="80dp"
+        android:clipToPadding="false"
+        android:padding="10dp" />
 
     <com.google.android.material.floatingactionbutton.FloatingActionButton
         android:id="@+id/fabAddChild"
@@ -32,9 +36,9 @@
         android:layout_alignParentBottom="true"
         android:layout_alignParentEnd="true"
         android:layout_margin="20dp"
+        android:contentDescription="הוספת ילד"
         android:src="@android:drawable/ic_input_add"
-        app:backgroundTint="#FF9800" />
+        app:backgroundTint="#FF9800"
+        app:tint="@color/white" />
 
 </RelativeLayout>
-
-

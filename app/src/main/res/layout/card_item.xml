@@ -1,35 +1,45 @@
 <?xml version="1.0" encoding="utf-8"?>
-<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.cardview.widget.CardView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/cardContainer"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    app:cardCornerRadius="12dp"
+    app:cardElevation="3dp"
+    app:cardUseCompatPadding="true">
+
+    <FrameLayout
     android:id="@+id/cardBackground"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:layout_margin="8dp"
-    android:background="@drawable/ss_card_back"
-    android:elevation="4dp"
-    android:clipToPadding="false"
-    android:clipChildren="false">
+    android:background="#7091AF">
 
-    <!-- תמונה של הכרטיס -->
-    <ImageView
-        android:id="@+id/cardImage"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:scaleType="centerInside"
-        android:visibility="gone"
-        android:padding="8dp"/>
+        <ImageView
+            android:id="@+id/ivCardBack"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:scaleType="centerCrop"
+            android:src="@drawable/ss_card_back" />
 
-    <!-- טקסט של הכרטיס -->
-    <TextView
-        android:id="@+id/cardText"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:textSize="24sp"
-        android:textColor="#000"
-        android:gravity="center"
-        android:visibility="gone"
-        android:padding="8dp"
-        android:background="@android:color/transparent"/>
+        <ImageView
+            android:id="@+id/cardImage"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:padding="12dp"
+            android:scaleType="centerInside"
+            android:visibility="gone" />
 
+        <TextView
+            android:id="@+id/cardText"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:fontFamily="@font/gan"
+            android:gravity="center"
+            android:padding="4dp"
+            android:textColor="#333333"
+            android:textSize="18sp"
+            android:textStyle="bold"
+            android:visibility="gone" />
 
-
-</FrameLayout>
+    </FrameLayout>
+</androidx.cardview.widget.CardView>

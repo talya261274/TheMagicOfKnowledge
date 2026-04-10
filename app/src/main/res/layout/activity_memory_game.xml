@@ -1,0 +1,41 @@
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@drawable/main_background"
+    android:padding="12dp">
+
+    <ProgressBar
+        android:id="@+id/testProgress"
+        style="?android:attr/progressBarStyleHorizontal"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_margin="16dp"
+        android:max="3"
+        android:progress="3"
+        android:progressTint="#4CAF50" />
+
+    <TextView
+        android:id="@+id/tvGameTitle"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_centerHorizontal="true"
+        android:layout_marginTop="70dp"
+        android:fontFamily="@font/gan"
+        android:text="משחק הזיכרון"
+        android:textColor="@color/white"
+        android:textSize="35sp"
+        android:textStyle="bold" />
+
+    <GridView
+        android:id="@+id/gridViewCards"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_below="@id/tvGameTitle"
+        android:layout_marginTop="55dp"
+        android:gravity="center"
+        android:horizontalSpacing="12dp"
+        android:verticalSpacing="12dp"
+        android:numColumns="3"
+        android:stretchMode="columnWidth" />
+
+</RelativeLayout>

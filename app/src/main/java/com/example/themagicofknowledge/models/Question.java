@@ -3,17 +3,18 @@ package com.example.themagicofknowledge.models;
 import java.util.List;
 
 public class Question {
-    public String questionText;
-    public List<String> options;
-    public int correctAnswerIndex;
-    public String mediaUrl;
+    private String questionText;
+    private List<String> options;
+    private List<String> optionLabels;
+    private int correctAnswerIndex;
+    private String mediaUrl;
 
-    public Question() {
-    }
+    public Question() { }
 
-    public Question(String questionText, List<String> options, int correctAnswerIndex, String mediaUrl) {
+    public Question(String questionText, List<String> options, List<String> optionLabels, int correctAnswerIndex, String mediaUrl) {
         this.questionText = questionText;
         this.options = options;
+        this.optionLabels = optionLabels;
         this.correctAnswerIndex = correctAnswerIndex;
         this.mediaUrl = mediaUrl;
     }
@@ -32,6 +33,14 @@ public class Question {
 
     public void setOptions(List<String> options) {
         this.options = options;
+    }
+
+    public List<String> getOptionLabels() {
+        return optionLabels;
+    }
+
+    public void setOptionLabels(List<String> optionLabels) {
+        this.optionLabels = optionLabels;
     }
 
     public int getCorrectAnswerIndex() {

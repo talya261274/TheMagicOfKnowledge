@@ -25,7 +25,9 @@ import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 public class PlacementTestActivity extends AppCompatActivity {
 
@@ -68,7 +70,7 @@ public class PlacementTestActivity extends AppCompatActivity {
         testProgress = findViewById(R.id.testProgress);
     }
 
-    // 🎯 טעינת שאלות לפי הרמה הנוכחית של הילד
+    // טעינת שאלות לפי הרמה הנוכחית של הילד
     private void loadQuestionsForCurrentLevel() {
         String levelPath = "level " + currentLevel; // "level 3-4" למשל
 
@@ -172,18 +174,17 @@ public class PlacementTestActivity extends AppCompatActivity {
         // חישוב אחוזים
         double percent = ((double) score / testQuestions.size()) * 100;
 
-        // החלטה על רמה חדשה
+        // החלטה על רמה חדשה (השלב שבו הילד ישחק)
         String newLevel = determineNewLevel(currentLevel, percent);
 
-        // עדכון הילד
-        selectedChild.setAgeGroup(newLevel);
-        selectedChild.setGradeAvg(percent);
+        // עדכון האובייקט המקומי - אנחנו מעדכנים את ה-currentLevel!
+        selectedChild.setCurrentLevel(newLevel);
 
         // שמירה ב-Firebase
         updateChildLevelInFirebase(newLevel, percent);
     }
 
-    // 🎯 החלטה חכמה על הרמה החדשה
+    //  החלטה חכמה על הרמה החדשה
     private String determineNewLevel(String currentLevel, double percent) {
         String newLevel = currentLevel;
         String message;
@@ -237,29 +238,34 @@ public class PlacementTestActivity extends AppCompatActivity {
     }
 
     private void updateChildLevelInFirebase(String level, double grade) {
-        UserParent parent = SharedPreferencesUtil.getUser(this);
-        if (parent == null) {
-            Toast.makeText(this, "שגיאה: לא נמצא הורה", Toast.LENGTH_SHORT).show();
+        // שליפת ה-ID של ההורה מההורה המחובר
+        String parentId = selectedChild.getParentId();
+
+        if (parentId == null) {
+            Toast.makeText(this, "שגיאה: לא נמצא מזהה הורה", Toast.LENGTH_SHORT).show();
             return;
         }
 
-        String parentId = parent.getId();
         DatabaseReference childRef = FirebaseDatabase.getInstance()
                 .getReference("users")
                 .child(parentId)
                 .child("childrenList")
                 .child(selectedChild.getId());
 
-        // עדכון הרמה והציון
-        childRef.child("ageGroup").setValue(level);
-        childRef.child("gradeAvg").setValue(grade)
+        // יצירת Map לעדכון מרוכז של השדות הרלוונטיים
+        Map<String, Object> updates = new HashMap<>();
+        updates.put("currentLevel", level);
+        // אם את עדיין רוצה לשמור את הציון האחרון של המבחן, אפשר לשמור אותו תחת שדה ספציפי
+        updates.put("lastPlacementScore", grade);
+
+        childRef.updateChildren(updates)
                 .addOnSuccessListener(aVoid -> {
-                    // עדכון בזיכרון המקומי
+                    // עדכון בזיכרון המקומי (SharedPreferences)
                     SharedPreferencesUtil.saveCurrentChild(this, selectedChild);
 
                     Toast.makeText(this, "הרמה עודכנה בהצלחה!", Toast.LENGTH_SHORT).show();
 
-                    // חזרה למסך הראשי
+                    // חזרה למסך הראשי (Total)
                     Intent intent = new Intent(this, Total.class);
                     intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
                     startActivity(intent);

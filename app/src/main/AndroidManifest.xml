@@ -10,6 +10,18 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.TheMagicOfKnowledge">
         <activity
+            android:name=".screens.SentenceCompletionActivity"
+            android:exported="false" />
+        <activity
+            android:name=".screens.MatchingGameActivity"
+            android:exported="false" />
+        <activity
+            android:name=".screens.AudioRecognitionActivity"
+            android:exported="false" />
+        <activity
+            android:name=".screens.AvatarSelectionActivity"
+            android:exported="false" />
+        <activity
             android:name=".screens.GameResultActivity"
             android:exported="false" />
         <activity
@@ -29,7 +41,7 @@
             android:name=".screens.MainActivity"
             android:exported="true" />
         <activity
-            android:name=".screens.MatchingGameActivity"
+            android:name=".screens.MemoryGameActivity"
             android:exported="true" />
         <activity
             android:name=".screens.ImageRecognitionGameActivity"

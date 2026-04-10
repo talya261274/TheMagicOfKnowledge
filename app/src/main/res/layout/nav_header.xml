@@ -9,14 +9,14 @@
     android:fitsSystemWindows="true">
 
     <ImageView
-        android:id="@+id/logoPhoto"
+        android:id="@+id/nav_user_image"
         android:layout_width="80dp"
         android:layout_height="80dp"
         android:layout_marginBottom="16dp"
         android:src="@drawable/logo"/>
 
     <TextView
-        android:id="@+id/usernameText"
+        android:id="@+id/nav_user_name"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="שלום, משתמש"

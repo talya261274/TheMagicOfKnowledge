@@ -22,6 +22,7 @@ import com.example.themagicofknowledge.utils.Validator;
 import com.google.android.material.textfield.TextInputLayout;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 
 /// Activity for registering the user
 /// This activity is used to register the user
@@ -208,7 +209,7 @@ public class RegisterActivity extends BaseActivity implements View.OnClickListen
         String uid = databaseService.generateUserId();
 
         /// create a new user object
-        UserParent user = new UserParent(uid, fName, lName, email, phone, BDate, UName, password, false, new ArrayList<>());
+        UserParent user = new UserParent(uid, fName, lName, email, phone, BDate, UName, password, false, new HashMap<>());
 
         databaseService.checkIfEmailExists(email, new DatabaseService.DatabaseCallback<>() {
             @Override

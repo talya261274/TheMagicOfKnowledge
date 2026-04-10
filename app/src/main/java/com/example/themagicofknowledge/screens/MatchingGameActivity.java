@@ -1,185 +1,232 @@
 package com.example.themagicofknowledge.screens;
 
+import android.content.ClipData;
+import android.content.Intent;
+import android.content.res.ColorStateList;
+import android.graphics.Color;
 import android.os.Bundle;
 import android.os.Handler;
-import android.util.DisplayMetrics;
+import android.os.Looper;
+import android.view.DragEvent;
 import android.view.View;
-import android.view.ViewGroup;
-import android.widget.BaseAdapter;
-import android.widget.FrameLayout;
-import android.widget.GridView;
-import android.widget.ImageView;
-import android.widget.TextView;
+import android.widget.LinearLayout;
+import android.widget.ProgressBar;
 import android.widget.Toast;
-
-import androidx.annotation.Nullable;
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 
 import com.example.themagicofknowledge.R;
-
+import com.example.themagicofknowledge.models.GameProgress;
+import com.example.themagicofknowledge.models.Pair;
+import com.example.themagicofknowledge.models.UserChild;
+import com.example.themagicofknowledge.services.DatabaseService;
+import com.example.themagicofknowledge.utils.GameProgressManager;
+import com.example.themagicofknowledge.utils.SharedPreferencesUtil;
+import com.google.android.material.button.MaterialButton;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.List;
 
 public class MatchingGameActivity extends AppCompatActivity {
 
-    private GridView gridView;
-    private ArrayList<Card> cards;
-    private CardAdapter adapter;
+    private LinearLayout leftColumn, rightColumn;
+    private ProgressBar testProgress;
+    private DatabaseReference mDatabase;
+    private String ageGroup;
+    private int matchesFound = 0;
+    private int totalPairs = 0;
+    private long startTime;
+    private int attempts = 0;
+    private String subject;
 
-    private Card firstSelected = null;
-    private Card secondSelected = null;
-    private boolean isBusy = false;
+    private int attemptsFromBefore;
+    private long timeFromBefore;
 
-    private int cardSize; // גודל דינמי לכרטיסים
+    private UserChild currentChild;
 
     @Override
-    protected void onCreate(@Nullable Bundle savedInstanceState) {
+    protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_matching_game);
 
-        gridView = findViewById(R.id.gridViewCards);
+        testProgress = findViewById(R.id.testProgress);
+        if (testProgress != null) {
+            testProgress.setMax(3);
+            testProgress.setProgress(2);
+        }
 
-        // קבע גודל כרטיסים דינמי לפי רוחב המסך
-        DisplayMetrics metrics = getResources().getDisplayMetrics();
-        int screenWidth = metrics.widthPixels - 64; // margin padding
-        cardSize = screenWidth / 3; // 3 עמודות
+        attemptsFromBefore = getIntent().getIntExtra("totalAttempts", 0);
+        timeFromBefore = getIntent().getLongExtra("totalTime", 0);
 
-        loadCards(); // טען את כל הזוגות
-        adapter = new CardAdapter();
-        gridView.setAdapter(adapter);
+        leftColumn = findViewById(R.id.leftColumn);
+        rightColumn = findViewById(R.id.rightColumn);
 
-        gridView.setOnItemClickListener((parent, view, position, id) -> {
-            if (isBusy) return;
+        currentChild = SharedPreferencesUtil.getCurrentChild(this);
+        if (currentChild != null) {
+            ageGroup = currentChild.getAgeGroup();
+        } else {
+            ageGroup = "3-4";
+            Toast.makeText(this, "לא נמצא פרופיל ילד", Toast.LENGTH_SHORT).show();
+        }
 
-            Card selected = cards.get(position);
-            if (selected.isMatched || selected.isFlipped) return;
+        subject = getIntent().getStringExtra("subject");
+        if (subject == null) subject = "general";
 
-            selected.isFlipped = true;
-            adapter.notifyDataSetChanged();
+        mDatabase = FirebaseDatabase.getInstance().getReference("Games").child("matchingGame");
+        loadGameData();
 
-            if (firstSelected == null) {
-                firstSelected = selected;
-            } else {
-                secondSelected = selected;
-                checkMatch();
+        startTime = System.currentTimeMillis(); // התחלת מדידת זמן
+    }
+
+    private void loadGameData() {
+        String levelKey = "level_" + ageGroup.replace("-", "_");
+
+        mDatabase.child(levelKey).child(subject).child("pairs").addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot snapshot) {
+                List<Pair> pairsList = new ArrayList<>();
+                for (DataSnapshot postSnapshot : snapshot.getChildren()) {
+                    Pair p = postSnapshot.getValue(Pair.class);
+                    if (p != null) pairsList.add(p);
+                }
+                setupGame(pairsList);
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError error) {
+                Toast.makeText(MatchingGameActivity.this, "שגיאה בטעינה", Toast.LENGTH_SHORT).show();
             }
         });
     }
 
-    // טען את הכרטיסים – תמונות ומילים
-    private void loadCards() {
-        cards = new ArrayList<>();
+    private void setupGame(List<Pair> pairs) {
+        totalPairs = pairs.size();
 
-        // רמה 3–4 דוגמא – חיות
-        cards.add(new Card(R.drawable.ss_animals_dog, null, "כלב"));
-        cards.add(new Card(0, "כלב", "כלב"));
-        cards.add(new Card(R.drawable.ss_animals_cat, null, "חתול"));
-        cards.add(new Card(0, "חתול", "חתול"));
-        cards.add(new Card(R.drawable.ss_animals_gir, null, "גירפה"));
-        cards.add(new Card(0, "גירפה", "גירפה"));
+        List<Pair> shuffledRight = new ArrayList<>(pairs);
+        Collections.shuffle(shuffledRight);
 
-        // רמה 3–4 דוגמא – צבעים
-        cards.add(new Card(R.drawable.ss_colors_red, null, "אדום"));
-        cards.add(new Card(0, "אדום", "אדום"));
-        cards.add(new Card(R.drawable.ss_colors_blue, null, "כחול"));
-        cards.add(new Card(0, "כחול", "כחול"));
-        cards.add(new Card(R.drawable.ss_colors_pink, null, "ורוד"));
-        cards.add(new Card(0, "ורוד", "ורוד"));
-
-        Collections.shuffle(cards); // ערבוב הכרטיסיות
-    }
-
-    private void checkMatch() {
-        isBusy = true;
-        new Handler().postDelayed(() -> {
-            if (firstSelected.matchId.equals(secondSelected.matchId)) {
-                firstSelected.isMatched = true;
-                secondSelected.isMatched = true;
-            } else {
-                firstSelected.isFlipped = false;
-                secondSelected.isFlipped = false;
-            }
-            firstSelected = null;
-            secondSelected = null;
-            adapter.notifyDataSetChanged();
-            isBusy = false;
-
-            // בדיקה אם המשחק נגמר
-            boolean allMatched = true;
-            for (Card c : cards) {
-                if (!c.isMatched) {
-                    allMatched = false;
-                    break;
-                }
-            }
-            if (allMatched) {
-                Toast.makeText(MatchingGameActivity.this, "כל הזוגות נמצאו! כל הכבוד!", Toast.LENGTH_LONG).show();
-            }
-        }, 800); // 0.8 שניות, מהיר יותר לילדים
-    }
-
-    // מחלקת כרטיס
-    private class Card {
-        int imageRes;     // אם 0 → כרטיס מילה
-        String text;      // מילה, או null אם כרטיס תמונה
-        String matchId;   // מזהה ייחודי לזוג
-        boolean isFlipped = false;
-        boolean isMatched = false;
-
-        Card(int imageRes, String text, String matchId) {
-            this.imageRes = imageRes;
-            this.text = text;
-            this.matchId = matchId;
+        for (int i = 0; i < pairs.size(); i++) {
+            addLeftItem(pairs.get(i));
+            addRightItem(shuffledRight.get(i));
         }
     }
 
-    // Adapter להצגת הכרטיסים
-    private class CardAdapter extends BaseAdapter {
+    private void addLeftItem(Pair pair) {
+        MaterialButton btn = new MaterialButton(this);
+        setupContent(btn, pair.getLeft());
+        btn.setTag(pair.getId());
+        styleButton(btn);
 
-        @Override
-        public int getCount() {
-            return cards.size();
-        }
+        btn.setOnLongClickListener(v -> {
+            ClipData data = ClipData.newPlainText("pairId", String.valueOf(v.getTag()));
+            v.startDragAndDrop(data, new View.DragShadowBuilder(v), v, 0);
+            v.setVisibility(View.INVISIBLE);
+            return true;
+        });
 
-        @Override
-        public Object getItem(int position) {
-            return cards.get(position);
-        }
+        leftColumn.addView(btn);
+    }
 
-        @Override
-        public long getItemId(int position) {
-            return position;
-        }
+    private void addRightItem(Pair pair) {
+        MaterialButton btn = new MaterialButton(this);
+        setupContent(btn, pair.getRight());
+        btn.setTag(pair.getId());
+        styleButton(btn);
 
-        @Override
-        public View getView(int position, View convertView, ViewGroup parent) {
-            Card card = cards.get(position);
+        btn.setOnDragListener((v, event) -> {
+            switch (event.getAction()) {
+                case DragEvent.ACTION_DRAG_STARTED: return true;
+                case DragEvent.ACTION_DRAG_ENTERED:
+                    v.setBackgroundTintList(ColorStateList.valueOf(Color.parseColor("#FFE082")));
+                    return true;
+                case DragEvent.ACTION_DRAG_EXITED:
+                    v.setBackgroundTintList(ColorStateList.valueOf(Color.WHITE));
+                    return true;
+                case DragEvent.ACTION_DROP:
+                    String droppedId = event.getClipData().getItemAt(0).getText().toString();
 
-            if (convertView == null) {
-                convertView = getLayoutInflater().inflate(R.layout.card_item, parent, false);
+                    if (droppedId.equals(String.valueOf(v.getTag()))) {
+                        // הצלחה בהתאמה
+                        v.setBackgroundTintList(ColorStateList.valueOf(Color.GREEN));
+                        v.setEnabled(false);
+                        ((View) event.getLocalState()).setVisibility(View.GONE);
+                        matchesFound++;
+                        checkIfGameFinished(); // בודקים אם סיימנו הכל
+                    } else {
+                        // טעות בהתאמה
+                        attempts++;
+                        v.setBackgroundTintList(ColorStateList.valueOf(Color.RED));
+                        new Handler(Looper.getMainLooper()).postDelayed(() ->
+                                v.setBackgroundTintList(ColorStateList.valueOf(Color.WHITE)), 500);
+                    }
+                    return true;
+                case DragEvent.ACTION_DRAG_ENDED:
+                    if (!event.getResult()) {
+                        ((View) event.getLocalState()).setVisibility(View.VISIBLE);
+                    }
+                    return true;
             }
+            return false;
+        });
 
-            FrameLayout background = convertView.findViewById(R.id.cardBackground);
-            ViewGroup.LayoutParams params = background.getLayoutParams();
-            params.width = cardSize;
-            params.height = cardSize;
-            background.setLayoutParams(params);
-            ImageView imageView = convertView.findViewById(R.id.cardImage);
-            TextView textView = convertView.findViewById(R.id.cardText);
+        rightColumn.addView(btn);
+    }
 
-            // הצגת כרטיס בהתאם לסוגו
-            if (card.imageRes != 0) {
-                imageView.setVisibility(card.isFlipped || card.isMatched ? View.VISIBLE : View.GONE);
-                imageView.setImageResource(card.imageRes);
-                textView.setVisibility(View.GONE);
-            } else {
-                textView.setVisibility(card.isFlipped || card.isMatched ? View.VISIBLE : View.GONE);
-                textView.setText(card.text);
-                imageView.setVisibility(View.GONE);
-            }
-
-            return convertView;
+    private void setupContent(MaterialButton btn, String content) {
+        if (content != null && content.startsWith("ss_")) {
+            int resId = getResources().getIdentifier(content, "drawable", getPackageName());
+            btn.setIconResource(resId != 0 ? resId : R.drawable.wizard_placeholder);
+            btn.setText("");
+            btn.setIconSize(150);
+            btn.setIconGravity(MaterialButton.ICON_GRAVITY_TEXT_START);
+            btn.setIconTint(null);
+        } else {
+            btn.setText(content);
+            btn.setIconResource(0);
+            btn.setTextSize(22);
         }
+    }
 
+    private void styleButton(MaterialButton btn) {
+        LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(
+                LinearLayout.LayoutParams.MATCH_PARENT, 220);
+        params.setMargins(10, 10, 10, 10);
+        btn.setLayoutParams(params);
+        btn.setBackgroundTintList(ColorStateList.valueOf(Color.WHITE));
+        btn.setTextColor(Color.BLACK);
+        btn.setCornerRadius(20);
+        btn.setStrokeWidth(3);
+        btn.setStrokeColor(ColorStateList.valueOf(Color.LTGRAY));
+    }
+
+    // פונקציה חדשה שבודקת אם כל הזוגות נמצאו
+    private void checkIfGameFinished() {
+        if (matchesFound == totalPairs && totalPairs > 0) {
+            finishGame();
+        }
+    }
+
+    private void finishGame() {
+        long currentTimeSeconds = (System.currentTimeMillis() - startTime) / 1000;
+
+        int totalAttemptsSoFar = attemptsFromBefore + attempts;
+        long totalTimeSoFar = timeFromBefore + currentTimeSeconds;
+
+        Intent intent = new Intent(this, MemoryGameActivity.class);
+
+        intent.putExtra("subject", subject);
+        intent.putExtra("age", currentChild.getAge());
+
+        intent.putExtra("totalAttempts", totalAttemptsSoFar);
+        intent.putExtra("totalTime", totalTimeSoFar);
+        intent.putExtra("gameStep", 3);
+
+        startActivity(intent);
+        finish();
     }
 }

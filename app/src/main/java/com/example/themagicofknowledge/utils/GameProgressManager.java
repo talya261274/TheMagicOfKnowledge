@@ -10,23 +10,31 @@ public class GameProgressManager {
 
     public static void saveProgress(String parentId, String childId,
                                     String level, String subject,
-                                    boolean completed, int attempts,
-                                    long timeSeconds) {
+                                    boolean completed, long timeSeconds) {
+
         DatabaseReference ref = FirebaseDatabase.getInstance()
                 .getReference("users")
                 .child(parentId)
-                .child("children")
+                .child("childrenList")
                 .child(childId)
                 .child("progress")
                 .child(level)
                 .child(subject);
 
-        Map<String, Object> data = new HashMap<>();
-        data.put("completed", completed);
-        data.put("attempts", attempts);
-        data.put("timeSeconds", timeSeconds);
+        ref.get().addOnSuccessListener(snapshot -> {
+            int currentAttempts = 0;
 
-        ref.updateChildren(data);
+            if (snapshot.exists() && snapshot.hasChild("attempts")) {
+                currentAttempts = snapshot.child("attempts").getValue(Integer.class);
+            }
+
+            Map<String, Object> data = new HashMap<>();
+            data.put("completed", completed);
+            data.put("attempts", currentAttempts + 1);
+            data.put("timeSeconds", timeSeconds);
+
+            ref.updateChildren(data);
+        });
     }
 
     public static void getAttempts(String parentId, String childId,
@@ -35,7 +43,7 @@ public class GameProgressManager {
         DatabaseReference ref = FirebaseDatabase.getInstance()
                 .getReference("users")
                 .child(parentId)
-                .child("children")
+                .child("childrenList")
                 .child(childId)
                 .child("progress")
                 .child(level)
@@ -45,6 +53,28 @@ public class GameProgressManager {
         ref.get().addOnSuccessListener(snapshot -> {
             int attempts = snapshot.exists() ? snapshot.getValue(Integer.class) : 0;
             callback.onResult(attempts);
+        });
+    }
+
+    public static void updateTotalTime(String parentId, String childId, long additionalSeconds) {
+        DatabaseReference childRef = FirebaseDatabase.getInstance()
+                .getReference("users")
+                .child(parentId)
+                .child("childrenList")
+                .child(childId);
+
+        childRef.child("totalTimeSeconds").get().addOnSuccessListener(snapshot -> {
+            long currentTime = 0;
+            if (snapshot.exists()) {
+                Object value = snapshot.getValue();
+                if (value instanceof Long) {
+                    currentTime = (Long) value;
+                } else if (value instanceof Integer) {
+                    currentTime = ((Integer) value).longValue();
+                }
+            }
+
+            childRef.child("totalTimeSeconds").setValue(currentTime + additionalSeconds);
         });
     }
 

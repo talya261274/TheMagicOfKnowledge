@@ -12,8 +12,10 @@ import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 
 import com.example.themagicofknowledge.R;
+import com.example.themagicofknowledge.models.GameProgress;
 import com.example.themagicofknowledge.models.Question;
 import com.example.themagicofknowledge.models.UserChild;
+import com.example.themagicofknowledge.services.DatabaseService;
 import com.example.themagicofknowledge.utils.GameProgressManager;
 import com.example.themagicofknowledge.utils.SharedPreferencesUtil;
 import com.google.firebase.database.*;
@@ -31,6 +33,7 @@ public class ImageRecognitionGameActivity extends AppCompatActivity {
 
     private TextView tvQuestion;
     private ImageView ivQuestionMedia;
+    private ImageView ivGameAvatar;
     private Button btnAns1, btnAns2, btnAns3, btnAns4;
     private ProgressBar testProgress;
 
@@ -54,6 +57,9 @@ public class ImageRecognitionGameActivity extends AppCompatActivity {
         }
 
         startTime = System.currentTimeMillis();
+        int step = getIntent().getIntExtra("gameStep", 1);
+        testProgress.setProgress(step);
+        attempts = 0;
         loadAttempts();
     }
 
@@ -64,7 +70,7 @@ public class ImageRecognitionGameActivity extends AppCompatActivity {
                 currentChild.getAgeGroup(),
                 subject,
                 result -> {
-                    attempts = result;
+                    attempts = result + 1 ;
                     loadQuestions();
                 }
         );
@@ -78,6 +84,9 @@ public class ImageRecognitionGameActivity extends AppCompatActivity {
         btnAns3 = findViewById(R.id.btnAns3);
         btnAns4 = findViewById(R.id.btnAns4);
         testProgress = findViewById(R.id.testProgress);
+
+        testProgress.setMax(3);
+
     }
 
     private void loadQuestions() {
@@ -87,8 +96,7 @@ public class ImageRecognitionGameActivity extends AppCompatActivity {
         DatabaseReference ref = FirebaseDatabase.getInstance()
                 .getReference("Games")
                 .child("imageRecognition")
-                .child(path)
-                .child(subject);
+                .child(path);
 
         ref.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
@@ -148,56 +156,59 @@ public class ImageRecognitionGameActivity extends AppCompatActivity {
 
     private void checkAnswer(int selectedIndex) {
         Question q = questions.get(currentIndex);
-
-        btnAns1.setEnabled(false);
-        btnAns2.setEnabled(false);
-        btnAns3.setEnabled(false);
-        btnAns4.setEnabled(false);
+        Button[] buttons = {btnAns1, btnAns2, btnAns3, btnAns4};
+        Button selectedButton = buttons[selectedIndex];
 
         if (selectedIndex == q.getCorrectAnswerIndex()) {
-            Toast.makeText(this, "נכון! ✅", Toast.LENGTH_SHORT).show();
+            // תשובה נכונה - צובעים בירוק
+            selectedButton.setBackgroundTintList(android.content.res.ColorStateList.valueOf(android.graphics.Color.GREEN));
+            Toast.makeText(this, "כל הכבוד! 🌟", Toast.LENGTH_SHORT).show();
+
             currentIndex++;
             new android.os.Handler().postDelayed(() -> {
-                btnAns1.setEnabled(true);
-                btnAns2.setEnabled(true);
-                btnAns3.setEnabled(true);
-                btnAns4.setEnabled(true);
+                resetButtons();
                 showQuestion();
             }, 1000);
         } else {
-            Toast.makeText(this, "לא נכון ❌ מתחילים מחדש!", Toast.LENGTH_SHORT).show();
+            // תשובה שגויה - צובעים באדום ומרעידים
+            selectedButton.setBackgroundTintList(android.content.res.ColorStateList.valueOf(android.graphics.Color.RED));
+
+            // אנימציית רעד קלה (Shake)
+            selectedButton.animate().translationX(20).setDuration(50).withEndAction(() ->
+                    selectedButton.animate().translationX(-20).setDuration(50).withEndAction(() ->
+                            selectedButton.animate().translationX(0).setDuration(50).start()
+                    ).start()
+            ).start();
+
+            Toast.makeText(this, "לא נורא, ננסה שוב! 💪", Toast.LENGTH_SHORT).show();
+
             new android.os.Handler().postDelayed(() -> {
-                btnAns1.setEnabled(true);
-                btnAns2.setEnabled(true);
-                btnAns3.setEnabled(true);
-                btnAns4.setEnabled(true);
-                // מתחיל מחדש
-                currentIndex = 0;
+                resetButtons();
+                currentIndex = 0; // מתחיל מחדש לפי הלוגיקה שלך
                 attempts++;
                 showQuestion();
             }, 1500);
         }
     }
 
+    // פונקציית עזר להחזרת הצבעים המקוריים
+    private void resetButtons() {
+        btnAns1.setBackgroundTintList(android.content.res.ColorStateList.valueOf(android.graphics.Color.parseColor("#FF9800")));
+        btnAns2.setBackgroundTintList(android.content.res.ColorStateList.valueOf(android.graphics.Color.parseColor("#4CAF50")));
+        btnAns3.setBackgroundTintList(android.content.res.ColorStateList.valueOf(android.graphics.Color.parseColor("#2196F3")));
+        btnAns4.setBackgroundTintList(android.content.res.ColorStateList.valueOf(android.graphics.Color.parseColor("#E91E63")));
+    }
+
     private void finishGame(boolean success) {
-        long timeSeconds = (System.currentTimeMillis() - startTime) / 1000;
-        attempts++;
+        long currentTimeSeconds = (System.currentTimeMillis() - startTime) / 1000;
 
-        GameProgressManager.saveProgress(
-                currentChild.getParentId(),
-                currentChild.getId(),
-                currentChild.getAgeGroup(),
-                subject,
-                success,
-                attempts,
-                timeSeconds
-        );
+        Intent intent = new Intent(this, SentenceCompletionActivity.class);
 
-        // מעבר למסך סיום
-        Intent intent = new Intent(this, GameResultActivity.class);
-        intent.putExtra("success", success);
-        intent.putExtra("attempts", attempts);
         intent.putExtra("subject", subject);
+        intent.putExtra("age", currentChild.getAge());
+        intent.putExtra("totalAttempts", attempts);
+        intent.putExtra("totalTime", currentTimeSeconds);
+        intent.putExtra("gameStep", 2);
         startActivity(intent);
         finish();
     }

@@ -1,8 +1,10 @@
 package com.example.themagicofknowledge.screens;
 
 import android.annotation.SuppressLint;
+import android.content.Intent;
 import android.os.Bundle;
 import android.speech.tts.TextToSpeech;
+import android.view.View;
 import android.widget.Button;
 import android.widget.ImageButton;
 import android.widget.ImageView;
@@ -14,6 +16,8 @@ import androidx.cardview.widget.CardView;
 
 import com.example.themagicofknowledge.R;
 import com.example.themagicofknowledge.models.FlashCard;
+import com.example.themagicofknowledge.models.UserChild;
+import com.example.themagicofknowledge.utils.SharedPreferencesUtil;
 
 import java.util.ArrayList;
 import java.util.Locale;
@@ -23,7 +27,11 @@ public class FlashCardMain extends AppCompatActivity {
     private TextView tvTitle, tvCardText;
     private ImageView imgCard;
     private CardView card;
+    private Button btnStartGame;
     private ImageButton btnNext, btnPrev, btnPlaySound;
+
+    private UserChild currentChild;
+    private String subject;
 
     private ArrayList<FlashCard> cards;
     private int currentIndex = 0;
@@ -38,6 +46,15 @@ public class FlashCardMain extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_flash_card_main);
 
+        currentChild = SharedPreferencesUtil.getCurrentChild(this);
+
+        subject = getIntent().getStringExtra("subject");
+
+        if (currentChild == null) {
+            finish();
+            return;
+        }
+
         tvTitle = findViewById(R.id.tvTitle);
         tvCardText = findViewById(R.id.tvCardText);
         imgCard = findViewById(R.id.imgCard);
@@ -45,6 +62,7 @@ public class FlashCardMain extends AppCompatActivity {
         btnNext = findViewById(R.id.btnNext);
         btnPrev = findViewById(R.id.btnPrev);
         btnPlaySound = findViewById(R.id.btnPlaySound);
+        btnStartGame = findViewById(R.id.btnStartGame);
 
         initializeTTS();
 
@@ -55,7 +73,14 @@ public class FlashCardMain extends AppCompatActivity {
         card.setOnClickListener(v -> flipCard());
 
         btnNext.setOnClickListener(v -> {
+            // דפדוף רגיל
             currentIndex = (currentIndex + 1) % cards.size();
+
+            // אם הילד הגיע לכרטיס האחרון - נחשוף את כפתור המשחק
+            if (currentIndex == cards.size() - 1) {
+                btnStartGame.setVisibility(View.VISIBLE);
+            }
+
             showingImage = true;
             showImage();
         });
@@ -64,6 +89,30 @@ public class FlashCardMain extends AppCompatActivity {
             currentIndex = (currentIndex - 1 + cards.size()) % cards.size();
             showingImage = true;
             showImage();
+        });
+
+        btnStartGame.setOnClickListener(v -> {
+            int age = currentChild.getAge();
+            Intent intent;
+
+            if (age <= 4) {
+                // מסלול גיל 3-4
+                intent = new Intent(this, AudioRecognitionActivity.class);
+            } else if (age <= 6) {
+                // מסלול גיל 5-6
+                intent = new Intent(this, AudioRecognitionActivity.class);
+            } else {
+                // מסלול גיל 7-8
+                intent = new Intent(this, ImageRecognitionGameActivity.class);
+            }
+
+            intent.putExtra("subject", subject);
+            intent.putExtra("age", age);
+            intent.putExtra("gameStep", 1);
+            intent.putExtra("totalAttempts", 0);
+            intent.putExtra("totalTime", 0L);
+            startActivity(intent);
+            finish();
         });
 
         btnPlaySound.setOnClickListener(v -> speakWord(cards.get(currentIndex).getAnswer()));

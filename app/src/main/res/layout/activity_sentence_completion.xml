@@ -1,0 +1,93 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:orientation="vertical"
+    android:gravity="center_horizontal"
+    android:padding="20dp"
+    android:background="@drawable/main_background">
+
+    <ProgressBar
+        android:id="@+id/testProgress"
+        style="?android:attr/progressBarStyleHorizontal"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_margin="16dp"
+        android:max="3"
+        android:progress="2"
+        android:progressTint="#4CAF50" />
+
+    <TextView
+        android:id="@+id/tvSentenceTitle"
+        android:layout_width="wrap_content"
+        android:layout_height="40dp"
+        android:layout_marginTop="30dp"
+        android:fontFamily="@font/gan"
+        android:text="השלם את המשפט:"
+        android:textSize="35sp"
+        android:textStyle="bold"
+        android:textColor="@color/white"
+     />
+
+    <ImageView
+        android:id="@+id/ivHint"
+        android:layout_width="200dp"
+        android:layout_height="150dp"
+        android:layout_margin="20dp"
+        android:layout_marginTop="30dp"
+        android:scaleType="fitCenter"
+        app:srcCompat="@drawable/wizard_placeholder" />
+
+    <TextView
+        android:id="@+id/tvSentence"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="כאן יופיע המשפט..."
+        android:textSize="25sp"
+        android:gravity="center"
+        android:textColor="#000000"
+        android:layout_marginBottom="30dp" />
+
+    <EditText
+        android:id="@+id/etAnswer"
+        android:layout_width="match_parent"
+        android:layout_height="50dp"
+        android:hint="הקלד תשובה"
+        android:textSize="22sp"
+        android:fontFamily="@font/gveretlevin"
+        android:gravity="center"
+        android:focusable="false"
+        android:clickable="true"
+        android:background="@drawable/keyboard_key_selector"
+        android:layout_marginBottom="10dp" />
+
+    <GridView
+        android:id="@+id/keyboardGrid"
+        android:layout_width="match_parent"
+        android:layout_height="250dp"
+        android:layout_marginTop="20dp"
+        android:numColumns="7"
+        android:verticalSpacing="8dp"
+        android:horizontalSpacing="8dp"
+        android:padding="8dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent" />
+
+    <Button
+        android:id="@+id/btnCheck"
+        android:layout_width="match_parent"
+        android:layout_height="55dp"
+        android:textSize="18dp"
+        android:layout_marginHorizontal="32dp"
+        android:layout_marginTop="30dp"
+        android:text="בדוק תשובה"
+        android:textStyle="bold"
+        android:backgroundTint="#FF9800"
+        android:textColor="#FFFFFF"
+        app:layout_constraintBottom_toTopOf="@+id/keyboardGrid"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent" />
+
+</LinearLayout>

@@ -36,7 +36,7 @@ public class SplashActivity extends AppCompatActivity {
             Intent intent;
             if (SharedPreferencesUtil.isUserLoggedIn(this)) {
                 Log.d(TAG, "User signed in, redirecting to MainActivity");
-                intent = new Intent(SplashActivity.this, Total.class);
+                intent = new Intent(SplashActivity.this, SelectChildActivity.class);
             } else {
                 Log.d(TAG, "User not signed in, redirecting to LandingActivity");
                 intent = new Intent(SplashActivity.this, LandingActivity.class);

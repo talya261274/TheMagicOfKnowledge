@@ -217,9 +217,34 @@ public class DatabaseService {
         runTransaction(USERS_PATH + "/" + userId, UserParent.class, function, callback);
     }
 
-
     public String generateChildId(@NotNull String userId) {
         return generateNewId(USERS_PATH + "/" + userId);
     }
 
+    public void deleteChild(String parentId, String childId, DatabaseCallback<Void> callback) {
+        if (parentId == null || childId == null) {
+            if (callback != null) callback.onFailed(new Exception("Parent ID or Child ID is null"));
+            return;
+        }
+
+        databaseReference.child("users")
+                .child(parentId)
+                .child("childrenList")
+                .child(childId)
+                .removeValue()
+                .addOnSuccessListener(aVoid -> {
+                    if (callback != null) callback.onCompleted(null);
+                })
+                .addOnFailureListener(e -> {
+                    if (callback != null) callback.onFailed(e);
+                });
+    }
+
+    public void updateChildGameProgress(@NotNull String parentId, @NotNull String childId,
+                                        @NotNull String category, @NotNull String level,
+                                        @NotNull Object progressData, @Nullable final DatabaseCallback<Void> callback) {
+
+        String path = USERS_PATH + "/" + parentId + "/childrenList/" + childId + "/progress/" + category + "/" + level;
+        writeData(path, progressData, callback);
+    }
 }

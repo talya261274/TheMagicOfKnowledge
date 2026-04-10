@@ -3,11 +3,13 @@ package com.example.themagicofknowledge.screens;
 import android.app.AlertDialog;
 import android.content.Intent;
 import android.os.Bundle;
+import android.util.Log;
 import android.widget.EditText;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import androidx.recyclerview.widget.GridLayoutManager;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
@@ -45,16 +47,26 @@ public class SelectChildActivity extends BaseActivity {
         // אתחול הרשימה
         childrenList = new ArrayList<>();
         if (currentParent.getChildrenList() != null) {
-            childrenList.addAll(currentParent.getChildrenList());
+            childrenList.addAll(currentParent.getChildrenListAsList());
         }
 
         // הגדרת RecyclerView פעם אחת בלבד
-        rvChildren.setLayoutManager(new LinearLayoutManager(this));
-        adapter = new ChildAdapter(childrenList, child -> {
-            SharedPreferencesUtil.saveCurrentChild(this, child);
-            // שימי לב: שיניתי ל-Total.class כפי שמופיע אצלך, וודאי שזה ה-Activity הנכון
-            startActivity(new Intent(this, Total.class));
-        });
+        rvChildren.setLayoutManager(new GridLayoutManager(this, 2));
+        adapter = new ChildAdapter(childrenList,
+                child -> {
+                    // 1. שמירת הילד הנבחר בזיכרון המקומי
+                    SharedPreferencesUtil.saveCurrentChild(this, child);
+
+                    // 2. מעבר למסך הראשי (MainActivity)
+                    Intent intent = new Intent(this, MainActivity.class);
+                    // השורה הזו מוודא שלא יהיה אפשר לחזור אחורה לבחירת ילד עם כפתור ה-Back
+                    intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+                    startActivity(intent);
+                },
+                child -> {
+                    showDeleteConfirmationDialog(child);
+                }
+        );
         rvChildren.setAdapter(adapter);
 
         loadChildrenFromDB();
@@ -67,19 +79,22 @@ public class SelectChildActivity extends BaseActivity {
         DatabaseService.getInstance().getUser(currentParent.getId(), new DatabaseService.DatabaseCallback<UserParent>() {
             @Override
             public void onCompleted(UserParent userParentServer) {
-                childrenList.clear();
-                childrenList.addAll(userParentServer.childrenList);
+                if (userParentServer != null) {
+                    childrenList.clear();
+                    // הופכים את המפה לרשימה עבור האדפטר
+                    childrenList.addAll(userParentServer.getChildrenListAsList());
 
-                currentParent.setChildrenList(new ArrayList<>(childrenList));
-                SharedPreferencesUtil.saveUser(SelectChildActivity.this, currentParent);
+                    // עדכון האובייקט המקומי וה-SharedPreferences
+                    currentParent.setChildrenList(userParentServer.getChildrenList());
+                    SharedPreferencesUtil.saveUser(SelectChildActivity.this, currentParent);
 
-                // הודעה לאדפטר שהנתונים השתנו - בלי ליצור אותו מחדש
-                adapter.notifyDataSetChanged();
+                    adapter.notifyDataSetChanged();
+                }
             }
 
             @Override
             public void onFailed(Exception e) {
-
+                Toast.makeText(SelectChildActivity.this, "שגיאה בטעינה", Toast.LENGTH_SHORT).show();
             }
         });
     }
@@ -135,18 +150,25 @@ public class SelectChildActivity extends BaseActivity {
                     @Override
                     public UserParent apply(UserParent userParentServer) {
                         if (userParentServer != null) {
-                            userParentServer.childrenList.add(newChild);
+                            // ב-Map משתמשים ב-put. המפתח הוא ה-ID והערך הוא אובייקט הילד
+                            userParentServer.getChildrenList().put(newChild.getId(), newChild);
                         }
                         return userParentServer;
                     }
                 }, new DatabaseService.DatabaseCallback<UserParent>() {
                     @Override
                     public void onCompleted(UserParent userParentServer) {
-                        Toast.makeText(SelectChildActivity.this, "הקוסם הקטן נוסף!", Toast.LENGTH_SHORT).show();
+                        //  סגירת הדיאלוג של ההורה
                         dialog.dismiss();
-                        childrenList.clear();
-                        childrenList.addAll(userParentServer.childrenList);
-                        adapter.notifyDataSetChanged();
+
+                        //  עדכון המשתמש המקומי (חשוב כדי שה-ID יהיה מסונכרן)
+                        SharedPreferencesUtil.saveUser(SelectChildActivity.this, userParentServer);
+
+                        //  מעבר למסך בחירת האוואטר עבור הילד החדש
+                        Intent intent = new Intent(SelectChildActivity.this, AvatarSelectionActivity.class);
+                        intent.putExtra("childId", newChild.getId()); // אנחנו שולחים את ה-ID של הילד החדש שיצרנו הרגע
+                        startActivity(intent);
+
                     }
 
                     @Override
@@ -158,5 +180,55 @@ public class SelectChildActivity extends BaseActivity {
         });
 
         dialog.show();
+    }
+    private void deleteChild(UserChild child) {
+        new AlertDialog.Builder(this)
+                .setTitle("מחיקת ילד/ה")
+                .setMessage("האם את בטוחה שברצונך למחוק את " + child.getName() + "? כל ההתקדמות שלו תימחק.")
+                .setPositiveButton("מחק", (dialog, which) -> {
+                    DatabaseService.getInstance().deleteChild(currentParent.getId(), child.getId(), new DatabaseService.DatabaseCallback<Void>() {
+                        @Override
+                        public void onCompleted(Void object) {
+                            Toast.makeText(SelectChildActivity.this, "הילד/ה נמחק/ה בהצלחה", Toast.LENGTH_SHORT).show();
+                            // עדכון הרשימה המקומית
+                            loadChildrenFromDB();
+                        }
+
+                        @Override
+                        public void onFailed(Exception e) {
+                            Toast.makeText(SelectChildActivity.this, "שגיאה במחיקה: " + e.getMessage(), Toast.LENGTH_SHORT).show();
+                        }
+                    });
+                })
+                .setNegativeButton("ביטול", null)
+                .show();
+    }
+
+    private void showDeleteConfirmationDialog(UserChild child) {
+
+        Log.d("DeleteCheck", "Child Name: " + child.getName() + ", Child ID: " + child.getId());
+
+        new AlertDialog.Builder(this)
+                .setTitle("מחיקת ילד")
+                .setMessage("האם את בטוחה שברצונך למחוק את " + child.getName() + "?")
+                .setPositiveButton("מחק", (dialog, which) -> {
+                    String pId = currentParent.getId();
+                    String cId = child.getId();
+
+                    DatabaseService.getInstance().deleteChild(pId, cId, new DatabaseService.DatabaseCallback<Void>() {
+                        @Override
+                        public void onCompleted(Void object) {
+                            Toast.makeText(SelectChildActivity.this, "הילד נמחק", Toast.LENGTH_SHORT).show();
+                            loadChildrenFromDB(); // רענון הרשימה מהשרת
+                        }
+
+                        @Override
+                        public void onFailed(Exception e) {
+                            Toast.makeText(SelectChildActivity.this, "שגיאה במחיקה", Toast.LENGTH_SHORT).show();
+                        }
+                    });
+                })
+                .setNegativeButton("ביטול", null)
+                .show();
     }
 }
