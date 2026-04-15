@@ -44,7 +44,7 @@ public class Validator {
     /// @param name name to validate
     /// @return true if the name is valid, false otherwise
     public static boolean isNameValid(@Nullable String name) {
-        return name != null && name.length() >= 3;
+        return name != null && name.length() >= 2;
     }
 
     public static boolean isUserNameValid(String uName) {

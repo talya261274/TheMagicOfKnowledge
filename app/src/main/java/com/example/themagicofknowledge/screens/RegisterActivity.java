@@ -152,16 +152,16 @@ public class RegisterActivity extends BaseActivity implements View.OnClickListen
                                String UName, String password, String CPassword) {
 
          if (!Validator.isNameValid(fName)) {
-            etFName.setError("שם פרטי חייב להכיל לפחות 3 אותיות");
+            etFName.setError("שם פרטי חייב להכיל לפחות 2 אותיות");
             etFName.requestFocus();
-            Log.i(TAG, "שם פרטי חייב להכיל לפחות 3 אותיות");
+            Log.i(TAG, "שם פרטי חייב להכיל לפחות 2 אותיות");
             return false;
         }
 
         if (!Validator.isNameValid(lName)) {
-            etLName.setError("שם משפחה חייב להכיל לפחות 3 אותיות");
+            etLName.setError("שם משפחה חייב להכיל לפחות 2 אותיות");
             etLName.requestFocus();
-            Log.i(TAG, "שם משפחה חייב להכיל לפחות 3 אותיות");
+            Log.i(TAG, "שם משפחה חייב להכיל לפחות 2 אותיות");
             return false;
         }
 
@@ -252,7 +252,7 @@ public class RegisterActivity extends BaseActivity implements View.OnClickListen
                 SharedPreferencesUtil.saveUser(RegisterActivity.this, user);
                 Log.d(TAG, "createUserInDatabase: Redirecting to MainActivity");
                 /// Redirect to MainActivity and clear back stack to prevent user from going back to register screen
-                Intent mainIntent = new Intent(RegisterActivity.this, Total.class);
+                Intent mainIntent = new Intent(RegisterActivity.this, SelectChildActivity.class);
                 /// clear the back stack (clear history) and start the MainActivity
                 mainIntent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
                 startActivity(mainIntent);
