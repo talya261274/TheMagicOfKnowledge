@@ -15,6 +15,7 @@
         android:layout_width="0dp"
         android:layout_height="12dp"
         android:layout_marginTop="16dp"
+        android:progressTint="#4CAF50"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
@@ -25,67 +26,92 @@
         android:layout_height="wrap_content"
         android:layout_marginTop="24dp"
         android:gravity="center"
-        android:text="מה מופיע בתמונה?"
-        android:textColor="#333333"
-        android:textSize="26sp"
+        android:textColor="@color/white"
+        android:textSize="28sp"
         android:textStyle="bold"
+        android:fontFamily="@font/gan"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/testProgress" />
+        app:layout_constraintTop_toBottomOf="@+id/testProgress"
+        tools:text="מה מופיע בתמונה?" />
 
-    <androidx.cardview.widget.CardView
-        android:id="@+id/cardMedia"
+    <FrameLayout
+        android:id="@+id/mediaContainer"
         android:layout_width="0dp"
-        android:layout_height="220dp"
+        android:layout_height="200dp"
         android:layout_marginTop="20dp"
-        app:cardCornerRadius="20dp"
-        app:cardElevation="4dp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/tvQuestion">
 
-        <ImageView
-            android:id="@+id/ivQuestionMedia"
+        <androidx.cardview.widget.CardView
+            android:id="@+id/cardMedia"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:scaleType="centerInside"
-            android:src="@drawable/wizard_placeholder" />
-    </androidx.cardview.widget.CardView>
+            app:cardCornerRadius="20dp"
+            app:cardElevation="4dp">
+
+            <ImageView
+                android:id="@+id/ivQuestionMedia"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:scaleType="centerInside"
+                android:src="@drawable/wizard_placeholder" />
+        </androidx.cardview.widget.CardView>
+
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/btnPlayAudio"
+            android:layout_width="120dp"
+            android:layout_height="120dp"
+            android:layout_gravity="center"
+            android:visibility="gone"
+            app:backgroundTint="#FF9800"
+            app:cornerRadius="60dp"
+            app:icon="@drawable/ic_volume_up"
+            app:iconGravity="textStart"
+            app:iconSize="60dp" />
+    </FrameLayout>
 
     <LinearLayout
         android:id="@+id/answersContainer"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:layout_marginTop="20dp"
+        android:layout_marginTop="24dp"
         android:orientation="vertical"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/cardMedia">
+        app:layout_constraintTop_toBottomOf="@+id/mediaContainer">
 
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="horizontal">
 
-            <Button
+            <com.google.android.material.button.MaterialButton
                 android:id="@+id/btnAns1"
                 android:layout_width="0dp"
-                android:layout_height="100dp"
+                android:layout_height="110dp"
                 android:layout_weight="1"
-                android:layout_margin="8dp"
-                android:backgroundTint="#FF9800"
-                android:text="תשובה 1"
-                app:cornerRadius="15dp" />
+                android:layout_margin="6dp"
+                android:textColor="#333333"
+                android:textSize="20sp"
+                app:backgroundTint="#FFFFFF"
+                app:cornerRadius="20dp"
+                app:strokeColor="#FF9800"
+                app:strokeWidth="2dp" />
 
-            <Button
+            <com.google.android.material.button.MaterialButton
                 android:id="@+id/btnAns2"
                 android:layout_width="0dp"
-                android:layout_height="100dp"
+                android:layout_height="110dp"
                 android:layout_weight="1"
-                android:layout_margin="8dp"
-                android:backgroundTint="#4CAF50"
-                android:text="תשובה 2"
-                app:cornerRadius="15dp" />
+                android:layout_margin="6dp"
+                android:textColor="#333333"
+                android:textSize="20sp"
+                app:backgroundTint="#FFFFFF"
+                app:cornerRadius="20dp"
+                app:strokeColor="#4CAF50"
+                app:strokeWidth="2dp" />
         </LinearLayout>
 
         <LinearLayout
@@ -93,26 +119,71 @@
             android:layout_height="wrap_content"
             android:orientation="horizontal">
 
-            <Button
+            <com.google.android.material.button.MaterialButton
                 android:id="@+id/btnAns3"
                 android:layout_width="0dp"
-                android:layout_height="100dp"
+                android:layout_height="110dp"
                 android:layout_weight="1"
-                android:layout_margin="8dp"
-                android:backgroundTint="#2196F3"
-                android:text="תשובה 3"
-                app:cornerRadius="15dp" />
+                android:layout_margin="6dp"
+                android:textColor="#333333"
+                android:textSize="20sp"
+                app:backgroundTint="#FFFFFF"
+                app:cornerRadius="20dp"
+                app:strokeColor="#2196F3"
+                app:strokeWidth="2dp" />
 
-            <Button
+            <com.google.android.material.button.MaterialButton
                 android:id="@+id/btnAns4"
                 android:layout_width="0dp"
-                android:layout_height="100dp"
+                android:layout_height="110dp"
                 android:layout_weight="1"
-                android:layout_margin="8dp"
-                android:backgroundTint="#E91E63"
-                android:text="תשובה 4"
-                app:cornerRadius="15dp" />
+                android:layout_margin="6dp"
+                android:textColor="#333333"
+                android:textSize="20sp"
+                app:backgroundTint="#FFFFFF"
+                app:cornerRadius="20dp"
+                app:strokeColor="#E91E63"
+                app:strokeWidth="2dp" />
         </LinearLayout>
+    </LinearLayout>
+
+    <LinearLayout
+        android:id="@+id/containerKeyboard"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:visibility="gone"
+        app:layout_constraintTop_toBottomOf="@id/tvQuestion">
+
+        <EditText
+            android:id="@+id/etPlacementAnswer"
+            android:layout_width="match_parent"
+            android:layout_height="50dp"
+            android:layout_marginHorizontal="20dp"
+            android:background="@drawable/keyboard_key_selector"
+            android:focusable="false"
+            android:gravity="center"
+            android:textColor="@color/white"
+            android:textSize="22sp" />
+
+        <GridView
+            android:id="@+id/placementKeyboard"
+            android:layout_width="match_parent"
+            android:layout_height="200dp"
+            android:layout_marginTop="10dp"
+            android:numColumns="7"
+            android:horizontalSpacing="5dp"
+            android:verticalSpacing="5dp" />
+
+        <Button
+            android:id="@+id/btnSubmitPlacement"
+            android:layout_width="match_parent"
+            android:layout_height="55dp"
+            android:layout_marginHorizontal="40dp"
+            android:layout_marginTop="10dp"
+            android:text="בדוק מילה"
+            android:backgroundTint="#4CAF50"
+            android:textStyle="bold" />
     </LinearLayout>
 
 </androidx.constraintlayout.widget.ConstraintLayout>

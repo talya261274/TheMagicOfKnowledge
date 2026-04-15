@@ -2,12 +2,10 @@ package com.example.themagicofknowledge.screens;
 
 import android.os.Bundle;
 import android.util.Log;
-import android.view.View;
-import android.widget.AdapterView;
-import android.widget.ArrayAdapter;
-import android.widget.Spinner;
+import android.view.Gravity;
+import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.TextView;
-
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.LinearLayoutManager;
@@ -17,7 +15,8 @@ import com.example.themagicofknowledge.R;
 import com.example.themagicofknowledge.adapter.SubjectProgressAdapter;
 import com.example.themagicofknowledge.models.SubjectStat;
 import com.example.themagicofknowledge.models.UserChild;
-import com.google.firebase.auth.FirebaseAuth;
+import com.example.themagicofknowledge.models.UserParent;
+import com.example.themagicofknowledge.utils.SharedPreferencesUtil;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
@@ -29,116 +28,139 @@ import java.util.List;
 
 public class ParentTrackingActivity extends AppCompatActivity {
 
-    private Spinner spinnerChildren;
+    private ImageView ivSelectedChildAvatar;
+    private TextView tvSelectedChildName, tvSelectedChildAge, tvCompletedCount;
+    private LinearLayout containerChildrenSelector;
     private RecyclerView rvSubjects;
-    private TextView tvCompletedCount;
-    private List<UserChild> childrenList = new ArrayList<>();
+
     private List<SubjectStat> subjectsStats = new ArrayList<>();
     private SubjectProgressAdapter adapter;
+    private UserParent currentParent;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_parent_tracking);
-        String childId = getIntent().getStringExtra("CHILD_ID");
 
-        if (childId == null) {
-            Log.e("Error", "childId is missing!");
-            finish();
-            return;
+        initViews();
+
+        currentParent = SharedPreferencesUtil.getUser(this);
+
+        // שליפת ה-ID שנשלח מהפרופיל
+        String selectedChildId = getIntent().getStringExtra("SELECTED_CHILD_ID");
+
+        if (currentParent != null && currentParent.getChildrenList() != null) {
+            setupChildrenSelector();
+
+            // אם לא הגיע ID, נבחר את הילד הראשון כברירת מחדל
+            if (selectedChildId == null || selectedChildId.isEmpty()) {
+                selectedChildId = new ArrayList<>(currentParent.getChildrenList().keySet()).get(0);
+            }
+
+            loadStatsForChild(selectedChildId);
         }
+    }
 
-        spinnerChildren = findViewById(R.id.spinnerChildren);
-        rvSubjects = findViewById(R.id.rvSubjectsProgress);
+    private void initViews() {
+        ivSelectedChildAvatar = findViewById(R.id.iv_selected_child_avatar);
+        tvSelectedChildName = findViewById(R.id.tv_selected_child_name);
+        tvSelectedChildAge = findViewById(R.id.tv_selected_child_age);
         tvCompletedCount = findViewById(R.id.tvCompletedCount);
+        containerChildrenSelector = findViewById(R.id.container_children_selector);
+        rvSubjects = findViewById(R.id.rvSubjectsProgress);
 
         rvSubjects.setLayoutManager(new LinearLayoutManager(this));
         adapter = new SubjectProgressAdapter(subjectsStats);
         rvSubjects.setAdapter(adapter);
 
-        loadChildren();
-
-        spinnerChildren.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
-            @Override
-            public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
-                if (childrenList != null && !childrenList.isEmpty()) {
-                    loadStatsForChild(childrenList.get(position).getId());
-                }
-            }
-            @Override
-            public void onNothingSelected(AdapterView<?> parent) {}
-        });
+        // כפתור חזרה (רק אם הוספת אותו ב-XML)
+        if (findViewById(R.id.goBackBtnTracking) != null) {
+            findViewById(R.id.goBackBtnTracking).setOnClickListener(v -> finish());
+        }
     }
 
-    private void loadChildren() {
-        String parentId = FirebaseAuth.getInstance().getUid();
+    private void setupChildrenSelector() {
+        containerChildrenSelector.removeAllViews();
+        for (UserChild child : currentParent.getChildrenList().values()) {
+            LinearLayout itemLayout = new LinearLayout(this);
+            itemLayout.setOrientation(LinearLayout.VERTICAL);
+            itemLayout.setPadding(25, 10, 25, 10);
+            itemLayout.setGravity(Gravity.CENTER);
 
-        if (parentId == null) {
-            Log.e("ParentTracking", "User is not logged in!");
-            return;
+            ImageView avatar = new ImageView(this);
+            avatar.setLayoutParams(new LinearLayout.LayoutParams(130, 130));
+
+            int resId = getResources().getIdentifier(child.getAvatar(), "drawable", getPackageName());
+            avatar.setImageResource(resId != 0 ? resId : R.drawable.logo);
+
+            TextView name = new TextView(this);
+            name.setText(child.getName());
+            name.setGravity(Gravity.CENTER);
+
+            itemLayout.addView(avatar);
+            itemLayout.addView(name);
+            itemLayout.setOnClickListener(v -> loadStatsForChild(child.getId()));
+
+            containerChildrenSelector.addView(itemLayout);
         }
-
-        DatabaseReference ref = FirebaseDatabase.getInstance().getReference("Parents")
-                .child(parentId).child("children");
-
-        ref.addListenerForSingleValueEvent(new ValueEventListener() {
-            @Override
-            public void onDataChange(@NonNull DataSnapshot snapshot) {
-
-                subjectsStats.clear();
-                if (!snapshot.exists()) {
-                    // הילד עדיין לא שיחק באף משחק
-                    tvCompletedCount.setText("0");
-                    adapter.notifyDataSetChanged();
-                    return;
-                }
-
-                childrenList.clear();
-                List<String> names = new ArrayList<>();
-                for (DataSnapshot ds : snapshot.getChildren()) {
-                    UserChild child = ds.getValue(UserChild.class);
-                    if (child != null) {
-                        childrenList.add(child);
-                        names.add(child.getName());
-                    }
-                }
-                ArrayAdapter<String> spinnerAdapter = new ArrayAdapter<>(ParentTrackingActivity.this,
-                        android.R.layout.simple_spinner_dropdown_item, names);
-                spinnerChildren.setAdapter(spinnerAdapter);
-            }
-            @Override
-            public void onCancelled(@NonNull DatabaseError error) {}
-        });
     }
 
     private void loadStatsForChild(String childId) {
-        String parentId = FirebaseAuth.getInstance().getUid();
-
-        if (parentId == null || childId == null) {
-            Log.e("ParentTracking", "parentId or childId is null");
-            return;
+        UserChild selectedChild = currentParent.getChildrenList().get(childId);
+        if (selectedChild != null) {
+            tvSelectedChildName.setText(selectedChild.getName());
+            tvSelectedChildAge.setText("גיל: " + selectedChild.getAge());
+            int resId = getResources().getIdentifier(selectedChild.getAvatar(), "drawable", getPackageName());
+            ivSelectedChildAvatar.setImageResource(resId != 0 ? resId : R.drawable.logo);
         }
 
-        DatabaseReference ref = FirebaseDatabase.getInstance().getReference("Parents")
-                .child(parentId).child("children").child(childId).child("stats");
+        DatabaseReference childRef = FirebaseDatabase.getInstance().getReference("users")
+                .child(currentParent.getId()).child("childrenList").child(childId);
 
-        ref.addValueEventListener(new ValueEventListener() {
+        childRef.addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
                 subjectsStats.clear();
-                for (DataSnapshot ds : snapshot.getChildren()) {
-                    Integer attemptsObj = ds.child("attempts").getValue(Integer.class);
-                    int attempts = (attemptsObj != null) ? attemptsObj : 0;
+                List<String> finishedSubjects = new ArrayList<>();
 
-                    Long timeObj = ds.child("timeInSeconds").getValue(Long.class);
-                    long time = (timeObj != null) ? timeObj : 0L;
-                    subjectsStats.add(new SubjectStat(ds.getKey(), attempts, time));
+                DataSnapshot completedSnapshot = snapshot.child("completedSubjects");
+                for (DataSnapshot ds : completedSnapshot.getChildren()) {
+                    if (Boolean.TRUE.equals(ds.getValue(Boolean.class))) finishedSubjects.add(ds.getKey());
                 }
-                tvCompletedCount.setText(String.valueOf(subjectsStats.size()));
+
+                DataSnapshot progressSnapshot = snapshot.child("progress");
+                if (progressSnapshot.exists()) {
+                    for (DataSnapshot ageGroup : progressSnapshot.getChildren()) {
+                        for (DataSnapshot ds : ageGroup.getChildren()) {
+                            String rawName = ds.getKey();
+                            subjectsStats.add(new SubjectStat(
+                                    translateSubject(rawName),
+                                    ds.child("attempts").getValue(Integer.class) != null ? ds.child("attempts").getValue(Integer.class) : 0,
+                                    ds.child("timeSeconds").getValue(Long.class) != null ? ds.child("timeSeconds").getValue(Long.class) : 0,
+                                    finishedSubjects.contains(rawName),
+                                    ds.child("progressPercent").getValue(Integer.class) != null ? ds.child("progressPercent").getValue(Integer.class) : 0
+                            ));
+                        }
+                    }
+                }
+                tvCompletedCount.setText(String.valueOf(finishedSubjects.size()));
                 adapter.notifyDataSetChanged();
             }
             @Override
-            public void onCancelled(@NonNull DatabaseError error) {}
+            public void onCancelled(@NonNull DatabaseError error) { Log.e("ParentTracking", error.getMessage()); }
         });
+    }
+
+    private String translateSubject(String sub) {
+        if (sub == null) return "";
+        switch (sub.toLowerCase()) {
+            case "animals": return "חיות";
+            case "numbers": return "מספרים";
+            case "colors": return "צבעים";
+            case "letters": return "אותיות";
+            case "shapes": return "צורות";
+            case "bodyparts": return "חלקי גוף";
+            default: return sub;
+        }
     }
 }

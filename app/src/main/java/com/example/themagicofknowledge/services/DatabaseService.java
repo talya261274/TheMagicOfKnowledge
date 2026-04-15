@@ -12,11 +12,14 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.MutableData;
 import com.google.firebase.database.Transaction;
+import com.google.firebase.database.ValueEventListener;
 
 import org.jetbrains.annotations.NotNull;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
 import java.util.function.UnaryOperator;
 
@@ -194,23 +197,21 @@ public class DatabaseService {
     }
 
     public void getUserByEmail(@NotNull final String email, @NotNull final DatabaseCallback<UserParent> callback) {
-        getUserList(new DatabaseCallback<List<UserParent>>() {
-            @Override
-            public void onCompleted(List<UserParent> users) {
-                for (UserParent user : users) {
-                    if (Objects.equals(user.getEmail(), email)) {
-                        callback.onCompleted(user); // מחזיר את המשתמש עם ה-ID שלו
-                        return;
+        // במקום למשוך הכל, אנחנו מבצעים שאילתה ממוקדת
+        databaseReference.child(USERS_PATH)
+                .orderByChild("email")
+                .equalTo(email)
+                .get()
+                .addOnCompleteListener(task -> {
+                    if (task.isSuccessful() && task.getResult().hasChildren()) {
+                        // Firebase מחזיר רשימה גם אם יש רק תוצאה אחת
+                        DataSnapshot snapshot = task.getResult().getChildren().iterator().next();
+                        UserParent user = snapshot.getValue(UserParent.class);
+                        callback.onCompleted(user);
+                    } else {
+                        callback.onCompleted(null);
                     }
-                }
-                callback.onCompleted(null); // אם לא נמצא משתמש
-            }
-
-            @Override
-            public void onFailed(Exception e) {
-                callback.onFailed(e);
-            }
-        });
+                });
     }
 
     public void updateUser(@NotNull String userId, @NotNull UnaryOperator<UserParent> function, @NotNull final DatabaseCallback<UserParent> callback) {
@@ -240,11 +241,65 @@ public class DatabaseService {
                 });
     }
 
-    public void updateChildGameProgress(@NotNull String parentId, @NotNull String childId,
-                                        @NotNull String category, @NotNull String level,
-                                        @NotNull Object progressData, @Nullable final DatabaseCallback<Void> callback) {
+    public void updateDetailedProgress(String parentId, String childId, String ageGroup, String subject,
+                                       int extraAttempts, long extraTime, int progressPercent, int lastIdx) {
 
-        String path = USERS_PATH + "/" + parentId + "/childrenList/" + childId + "/progress/" + category + "/" + level;
-        writeData(path, progressData, callback);
+        DatabaseReference ref = FirebaseDatabase.getInstance().getReference("users")
+                .child(parentId)
+                .child("childrenList")
+                .child(childId)
+                .child("progress")
+                .child(ageGroup)
+                .child(subject);
+
+        ref.addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot snapshot) {
+                long currentAttempts = 0;
+                long currentTime = 0;
+
+                if (snapshot.exists()) {
+                    Long att = snapshot.child("attempts").getValue(Long.class);
+                    Long time = snapshot.child("timeSeconds").getValue(Long.class);
+                    if (att != null) currentAttempts = att;
+                    if (time != null) currentTime = time;
+                }
+
+                Map<String, Object> updates = new HashMap<>();
+                updates.put("attempts", currentAttempts + extraAttempts);
+                updates.put("timeSeconds", currentTime + extraTime);
+                updates.put("progressPercent", progressPercent);
+                updates.put("lastQuestionIndex", lastIdx); // חשוב למנוע המעורבב
+
+                // אם הגיע ל-100%, נסמן כהושלם
+                if (progressPercent >= 100) {
+                    updates.put("completed", true);
+                } else {
+                    updates.put("completed", false);
+                }
+
+                ref.updateChildren(updates).addOnFailureListener(e ->
+                        Log.e(TAG, "Failed to update progress", e)
+                );
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError error) {
+                Log.e(TAG, "Database error: " + error.getMessage());
+            }
+        });
+    }
+
+    public void resetGameIndex(String parentId, String childId, String ageGroup, String subject) {
+        FirebaseDatabase.getInstance().getReference("users")
+                .child(parentId)
+                .child("childrenList")
+                .child(childId)
+                .child("progress")
+                .child(ageGroup)
+                .child(subject)
+                .child("lastQuestionIndex")
+                .setValue(0);
+
     }
 }

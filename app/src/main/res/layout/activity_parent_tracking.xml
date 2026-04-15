@@ -1,10 +1,12 @@
 <?xml version="1.0" encoding="utf-8"?>
-<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.core.widget.NestedScrollView xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="#FDEEF4"
-    android:layoutDirection="rtl">
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layoutDirection="rtl"
+    android:background="@drawable/main_background"
+    android:fillViewport="true">
 
     <LinearLayout
         android:layout_width="match_parent"
@@ -12,37 +14,105 @@
         android:orientation="vertical"
         android:padding="20dp">
 
+        <Button
+            android:id="@+id/goBackBtnTracking"
+            android:layout_width="70dp"
+            android:layout_height="56dp"
+            android:layout_marginTop="10dp"
+            android:layout_gravity="right"
+            android:backgroundTint="@android:color/transparent"
+            android:text="➜"
+            android:textColor="@color/white"
+            android:textSize="22dp"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            tools:ignore="MissingConstraints" />
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_gravity="center"
+            android:fontFamily="@font/gan"
+            android:shadowColor="@android:color/holo_blue_light"
+            android:shadowDx="5"
+            android:shadowDy="5"
+            android:shadowRadius="10"
             android:text="מעקב הורים"
-            android:textColor="#1A237E"
-            android:textSize="32sp"
-            android:textStyle="bold"
-            android:layout_marginBottom="16dp"/>
+            android:textColor="@color/white"
+            android:textSize="45sp"
+            android:textStyle="bold" />
 
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="בחר ילד לצפייה:"
-            android:textStyle="bold"
-            android:layout_marginBottom="8dp"/>
+            android:layout_marginTop="16dp"
+            android:fontFamily="@font/gveretlevin"
+            android:text="החלף ילד:"
+            android:textColor="#000000"
+            android:textSize="20sp" />
 
-        <Spinner
-            android:id="@+id/spinnerChildren"
+        <HorizontalScrollView
             android:layout_width="match_parent"
-            android:layout_height="55dp"
-            android:background="@android:drawable/btn_dropdown"
-            android:layout_marginBottom="24dp"/>
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
+            android:scrollbars="none">
+            <LinearLayout
+                android:id="@+id/container_children_selector"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:gravity="center"
+                android:orientation="horizontal" />
+        </HorizontalScrollView>
+
+        <com.google.android.material.card.MaterialCardView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="30dp"
+            app:cardBackgroundColor="#80E0E9E9"
+            app:cardCornerRadius="20dp"
+            app:cardElevation="0dp">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:gravity="center"
+                android:layout_marginTop="15dp"
+                android:layout_marginBottom="15dp"
+                android:orientation="vertical"
+                android:padding="16dp">
+
+                <ImageView
+                    android:id="@+id/iv_selected_child_avatar"
+                    android:layout_width="100dp"
+                    android:layout_height="100dp"
+                    android:src="@drawable/logo" />
+
+                <TextView
+                    android:id="@+id/tv_selected_child_name"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:fontFamily="@font/gan"
+                    android:layout_marginTop="10dp"
+                    android:text="שם הילד"
+                    android:textColor="#000000"
+                    android:textSize="24sp"
+                    android:textStyle="bold" />
+
+                <TextView
+                    android:id="@+id/tv_selected_child_age"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="גיל: 5"
+                    android:textColor="#333333"
+                    android:textSize="16sp" />
+            </LinearLayout>
+        </com.google.android.material.card.MaterialCardView>
 
         <androidx.cardview.widget.CardView
             android:layout_width="match_parent"
             android:layout_height="120dp"
-            app:cardCornerRadius="25dp"
+            android:layout_marginTop="20dp"
             app:cardBackgroundColor="#A2C9FF"
-            app:cardElevation="4dp">
-
+            app:cardCornerRadius="25dp">
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
@@ -69,18 +139,19 @@
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginTop="24dp"
+            android:layout_marginTop="30dp"
             android:text="פירוט ביצועים לפי נושאים:"
-            android:textSize="18sp"
-            android:textStyle="bold"
-            android:textColor="#333333"/>
+            android:fontFamily="@font/gveretlevin"
+            android:textColor="#000000"
+            android:textSize="20sp"
+            android:textStyle="bold" />
 
         <androidx.recyclerview.widget.RecyclerView
             android:id="@+id/rvSubjectsProgress"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="12dp"
-            android:nestedScrollingEnabled="false" />
+            android:layout_marginBottom="20dp" />
 
     </LinearLayout>
-</ScrollView>
+</androidx.core.widget.NestedScrollView>

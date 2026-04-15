@@ -1,4 +1,4 @@
-package com.example.themagicofknowledge.adapters;
+package com.example.themagicofknowledge.adapter;
 
 import android.view.LayoutInflater;
 import android.view.View;

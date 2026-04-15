@@ -14,7 +14,7 @@ import androidx.recyclerview.widget.RecyclerView;
 import android.widget.TextView;
 
 import com.example.themagicofknowledge.R;
-import com.example.themagicofknowledge.adapters.UserAdapter;
+import com.example.themagicofknowledge.adapter.UserAdapter;
 import com.example.themagicofknowledge.models.UserParent;
 import com.example.themagicofknowledge.services.DatabaseService;
 

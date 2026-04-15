@@ -2,18 +2,20 @@ package com.example.themagicofknowledge.screens;
 
 import android.app.AlertDialog;
 import android.content.Intent;
+import android.graphics.Color;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.View;
+import android.widget.Button;
 import android.widget.EditText;
-import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.recyclerview.widget.GridLayoutManager;
-import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.themagicofknowledge.R;
+import com.example.themagicofknowledge.adapter.ChildAdapter;
 import com.example.themagicofknowledge.models.UserChild;
 import com.example.themagicofknowledge.models.UserParent;
 import com.example.themagicofknowledge.services.DatabaseService;
@@ -22,7 +24,6 @@ import com.google.android.material.floatingactionbutton.FloatingActionButton;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.function.UnaryOperator;
 
 public class SelectChildActivity extends BaseActivity {
 
@@ -101,82 +102,64 @@ public class SelectChildActivity extends BaseActivity {
     }
 
     private void showAddChildDialog() {
-        AlertDialog.Builder builder = new AlertDialog.Builder(this);
-        builder.setTitle("הוספת ילד חדש");
+        final android.app.Dialog dialog = new android.app.Dialog(this);
+        dialog.setContentView(R.layout.dialog_add_child_custom);
 
-        LinearLayout layout = new LinearLayout(this);
-        layout.setOrientation(LinearLayout.VERTICAL);
-        layout.setPadding(50, 20, 50, 10);
+        if (dialog.getWindow() != null) {
+            dialog.getWindow().setBackgroundDrawableResource(android.R.color.transparent);
+        }
 
-        final EditText etName = new EditText(this);
-        etName.setHint("שם הילד");
-        layout.addView(etName);
+        // חיבור רכיבים מה-XML
+        EditText etName = dialog.findViewById(R.id.etDialogChildName);
+        EditText etAge = dialog.findViewById(R.id.etDialogChildAge);
+        TextView tvError = dialog.findViewById(R.id.tvDialogError);
+        Button btnAdd = dialog.findViewById(R.id.btnDialogAdd);
 
-        final EditText etAge = new EditText(this);
-        etAge.setHint("גיל (3–8)");
-        etAge.setInputType(android.text.InputType.TYPE_CLASS_NUMBER);
-        layout.addView(etAge);
+        btnAdd.setOnClickListener(v -> {
+            String name = etName.getText().toString().trim();
+            String ageStr = etAge.getText().toString().trim();
 
-        final TextView tvError = new TextView(this);
-        tvError.setTextColor(getResources().getColor(android.R.color.holo_red_dark));
-        layout.addView(tvError);
+            // וולידציה
+            if (name.isEmpty() || ageStr.isEmpty()) {
+                tvError.setText("נא למלא את כל השדות");
+                tvError.setVisibility(View.VISIBLE);
+                return;
+            }
 
-        builder.setView(layout);
-        builder.setPositiveButton("הוסף", null);
+            int age = Integer.parseInt(ageStr);
+            if (age < 3 || age > 8) {
+                tvError.setText("הגיל חייב להיות בין 3 ל-8");
+                tvError.setVisibility(View.VISIBLE);
+                return;
+            }
 
-        AlertDialog dialog = builder.create();
-        dialog.setOnShowListener(dialogInterface -> {
-            dialog.getButton(AlertDialog.BUTTON_POSITIVE).setOnClickListener(v -> {
+            // לוגיקת Firebase הקיימת שלך (נשארה כמעט אותו דבר)
+            String childId = DatabaseService.getInstance().generateChildId(currentParent.id);
+            UserChild newChild = new UserChild(childId, currentParent.getId(), name, age);
 
-                String name = etName.getText().toString().trim();
-                String ageStr = etAge.getText().toString().trim();
+            DatabaseService.getInstance().updateUser(currentParent.id, userParentServer -> {
+                if (userParentServer != null) {
+                    userParentServer.getChildrenList().put(newChild.getId(), newChild);
+                }
+                return userParentServer;
+            }, new DatabaseService.DatabaseCallback<UserParent>() {
+                @Override
+                public void onCompleted(UserParent userParentServer) {
+                    dialog.dismiss(); // סגירת הדיאלוג המעוצב
 
-                if (name.isEmpty() || ageStr.isEmpty()) {
-                    tvError.setText("נא למלא את כל השדות");
-                    return;
+                    SharedPreferencesUtil.saveUser(SelectChildActivity.this, userParentServer);
+
+                    // מעבר למסך בחירת האוואטר
+                    Intent intent = new Intent(SelectChildActivity.this, AvatarSelectionActivity.class);
+                    intent.putExtra("childId", newChild.getId());
+                    startActivity(intent);
                 }
 
-                int age = Integer.parseInt(ageStr);
-                if (age < 3 || age > 8) {
-                    tvError.setText("הגיל חייב להיות בין 3 ל-8");
-                    return;
+                @Override
+                public void onFailed(Exception e) {
+                    tvError.setText("שגיאה בשמירה: " + e.getMessage());
+                    tvError.setVisibility(View.VISIBLE);
                 }
-
-
-                String childId = DatabaseService.getInstance().generateChildId(currentParent.id);
-
-                UserChild newChild = new UserChild(childId, currentParent.getId(), name, age);
-
-                DatabaseService.getInstance().updateUser(currentParent.id, new UnaryOperator<UserParent>() {
-                    @Override
-                    public UserParent apply(UserParent userParentServer) {
-                        if (userParentServer != null) {
-                            // ב-Map משתמשים ב-put. המפתח הוא ה-ID והערך הוא אובייקט הילד
-                            userParentServer.getChildrenList().put(newChild.getId(), newChild);
-                        }
-                        return userParentServer;
-                    }
-                }, new DatabaseService.DatabaseCallback<UserParent>() {
-                    @Override
-                    public void onCompleted(UserParent userParentServer) {
-                        //  סגירת הדיאלוג של ההורה
-                        dialog.dismiss();
-
-                        //  עדכון המשתמש המקומי (חשוב כדי שה-ID יהיה מסונכרן)
-                        SharedPreferencesUtil.saveUser(SelectChildActivity.this, userParentServer);
-
-                        //  מעבר למסך בחירת האוואטר עבור הילד החדש
-                        Intent intent = new Intent(SelectChildActivity.this, AvatarSelectionActivity.class);
-                        intent.putExtra("childId", newChild.getId()); // אנחנו שולחים את ה-ID של הילד החדש שיצרנו הרגע
-                        startActivity(intent);
-
-                    }
-
-                    @Override
-                    public void onFailed(Exception e) {
-                        tvError.setText("שגיאה בשמירה: " + e.getMessage());
-                    }
-                });
             });
         });
 
@@ -206,13 +189,12 @@ public class SelectChildActivity extends BaseActivity {
     }
 
     private void showDeleteConfirmationDialog(UserChild child) {
-
-        Log.d("DeleteCheck", "Child Name: " + child.getName() + ", Child ID: " + child.getId());
-
-        new AlertDialog.Builder(this)
-                .setTitle("מחיקת ילד")
-                .setMessage("האם את בטוחה שברצונך למחוק את " + child.getName() + "?")
-                .setPositiveButton("מחק", (dialog, which) -> {
+        showCustomDialog(
+                "מחיקת קוסם",
+                "האם את בטוחה שברצונך למחוק את " + child.getName() + "? כל ההתקדמות תימחק.",
+                "מחק לצמיתות",
+                Color.parseColor("#FF5252"), // אדום להתראה
+                () -> {
                     String pId = currentParent.getId();
                     String cId = child.getId();
 
@@ -220,16 +202,14 @@ public class SelectChildActivity extends BaseActivity {
                         @Override
                         public void onCompleted(Void object) {
                             Toast.makeText(SelectChildActivity.this, "הילד נמחק", Toast.LENGTH_SHORT).show();
-                            loadChildrenFromDB(); // רענון הרשימה מהשרת
+                            loadChildrenFromDB();
                         }
-
                         @Override
                         public void onFailed(Exception e) {
                             Toast.makeText(SelectChildActivity.this, "שגיאה במחיקה", Toast.LENGTH_SHORT).show();
                         }
                     });
-                })
-                .setNegativeButton("ביטול", null)
-                .show();
+                }
+        );
     }
 }

@@ -37,6 +37,16 @@ public class RegisterActivity extends BaseActivity implements View.OnClickListen
     private Button btnRegister;
 
     @Override
+    protected boolean showToolbar() {
+        return false;
+    }
+
+    @Override
+    protected boolean hasSideMenu() {
+        return false;
+    }
+
+    @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         EdgeToEdge.enable(this);

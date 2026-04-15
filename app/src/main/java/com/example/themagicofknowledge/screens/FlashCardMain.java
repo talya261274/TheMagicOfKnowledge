@@ -17,6 +17,7 @@ import androidx.cardview.widget.CardView;
 import com.example.themagicofknowledge.R;
 import com.example.themagicofknowledge.models.FlashCard;
 import com.example.themagicofknowledge.models.UserChild;
+import com.example.themagicofknowledge.services.DatabaseService; // הוספתי
 import com.example.themagicofknowledge.utils.SharedPreferencesUtil;
 
 import java.util.ArrayList;
@@ -40,6 +41,8 @@ public class FlashCardMain extends AppCompatActivity {
     private TextToSpeech tts;
     private boolean ttsReady = false;
 
+    private long startTime;
+
     @SuppressLint("MissingInflatedId")
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -47,40 +50,28 @@ public class FlashCardMain extends AppCompatActivity {
         setContentView(R.layout.activity_flash_card_main);
 
         currentChild = SharedPreferencesUtil.getCurrentChild(this);
-
         subject = getIntent().getStringExtra("subject");
 
-        if (currentChild == null) {
+        if (currentChild == null || subject == null) {
             finish();
             return;
         }
 
-        tvTitle = findViewById(R.id.tvTitle);
-        tvCardText = findViewById(R.id.tvCardText);
-        imgCard = findViewById(R.id.imgCard);
-        card = findViewById(R.id.card);
-        btnNext = findViewById(R.id.btnNext);
-        btnPrev = findViewById(R.id.btnPrev);
-        btnPlaySound = findViewById(R.id.btnPlaySound);
-        btnStartGame = findViewById(R.id.btnStartGame);
+        startTime = System.currentTimeMillis(); // התחלת מדידת זמן
 
+        initViews();
         initializeTTS();
-
-        String subject = getIntent().getStringExtra("subject");
         createCards(subject);
         showImage();
 
         card.setOnClickListener(v -> flipCard());
 
         btnNext.setOnClickListener(v -> {
-            // דפדוף רגיל
             currentIndex = (currentIndex + 1) % cards.size();
-
-            // אם הילד הגיע לכרטיס האחרון - נחשוף את כפתור המשחק
+            // אם הגיע לכרטיס האחרון - חשיפת כפתור המשחק
             if (currentIndex == cards.size() - 1) {
                 btnStartGame.setVisibility(View.VISIBLE);
             }
-
             showingImage = true;
             showImage();
         });
@@ -91,41 +82,48 @@ public class FlashCardMain extends AppCompatActivity {
             showImage();
         });
 
-        btnStartGame.setOnClickListener(v -> {
-            int age = currentChild.getAge();
-            Intent intent;
-
-            if (age <= 4) {
-                // מסלול גיל 3-4
-                intent = new Intent(this, AudioRecognitionActivity.class);
-            } else if (age <= 6) {
-                // מסלול גיל 5-6
-                intent = new Intent(this, AudioRecognitionActivity.class);
-            } else {
-                // מסלול גיל 7-8
-                intent = new Intent(this, ImageRecognitionGameActivity.class);
-            }
-
-            intent.putExtra("subject", subject);
-            intent.putExtra("age", age);
-            intent.putExtra("gameStep", 1);
-            intent.putExtra("totalAttempts", 0);
-            intent.putExtra("totalTime", 0L);
-            startActivity(intent);
-            finish();
-        });
+        btnStartGame.setOnClickListener(v -> handleStartGame());
 
         btnPlaySound.setOnClickListener(v -> speakWord(cards.get(currentIndex).getAnswer()));
     }
+
+    private void initViews() {
+        tvTitle = findViewById(R.id.tvTitle);
+        tvCardText = findViewById(R.id.tvCardText);
+        imgCard = findViewById(R.id.imgCard);
+        card = findViewById(R.id.card);
+        btnNext = findViewById(R.id.btnNext);
+        btnPrev = findViewById(R.id.btnPrev);
+        btnPlaySound = findViewById(R.id.btnPlaySound);
+        btnStartGame = findViewById(R.id.btnStartGame);
+    }
+
+    private void handleStartGame() {
+        long timeSpent = (System.currentTimeMillis() - startTime) / 1000;
+        String parentId = SharedPreferencesUtil.getUser(this).getId();
+
+        DatabaseService.getInstance().updateDetailedProgress(
+                parentId,
+                currentChild.getId(),
+                currentChild.getAgeGroup(),
+                subject,
+                0,
+                timeSpent,
+                15,
+                0
+        );
+        Intent intent = new Intent(this, MixedGameActivity.class);
+        intent.putExtra("subject", subject);
+        startActivity(intent);
+        finish();
+    }
+
 
     private void initializeTTS() {
         tts = new TextToSpeech(this, status -> {
             if (status == TextToSpeech.SUCCESS) {
                 int result = tts.setLanguage(new Locale("he", "IL"));
                 ttsReady = (result != TextToSpeech.LANG_MISSING_DATA && result != TextToSpeech.LANG_NOT_SUPPORTED);
-                if (!ttsReady) {
-                    Toast.makeText(this, "Text-to-Speech לא זמין לעברית", Toast.LENGTH_LONG).show();
-                }
             }
         });
     }
@@ -299,11 +297,8 @@ public class FlashCardMain extends AppCompatActivity {
     }
 
     private void flipCard() {
-        if (showingImage) {
-            showText();
-        } else {
-            showImage();
-        }
+        if (showingImage) showText();
+        else showImage();
         showingImage = !showingImage;
     }
 

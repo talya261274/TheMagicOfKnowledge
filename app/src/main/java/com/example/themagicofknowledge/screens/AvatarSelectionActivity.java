@@ -14,6 +14,7 @@ import com.example.themagicofknowledge.models.UserChild;
 import com.example.themagicofknowledge.models.UserParent;
 import com.example.themagicofknowledge.services.DatabaseService;
 import com.example.themagicofknowledge.utils.SharedPreferencesUtil;
+import com.google.firebase.database.FirebaseDatabase;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -68,43 +69,40 @@ public class AvatarSelectionActivity extends BaseActivity {
     }
 
     private void updateChildAvatarInFirebase(String avatarName) {
-        DatabaseService.getInstance().updateUser(currentParent.getId(), userParentServer -> {
-            if (userParentServer != null && userParentServer.getChildrenList() != null) {
-                UserChild child = userParentServer.getChildrenList().get(childId);
-                if (child != null) {
-                    child.setAvatar(avatarName);
-                }
-            }
-            return userParentServer;
-        }, new DatabaseService.DatabaseCallback<UserParent>() {
-            @Override
-            public void onCompleted(UserParent userParentServer) {
-                // 1. שמירת המשתמש המעודכן בזיכרון המקומי (SharedPreferences)
-                SharedPreferencesUtil.saveUser(AvatarSelectionActivity.this, userParentServer);
+        // נתיב ישיר לשדה האוואטר של הילד הספציפי ב-Firebase
+        String path = "users/" + currentParent.getId() + "/childrenList/" + childId + "/avatar";
 
-                // 2. הגדרת הילד הזה כ"ילד הנוכחי" שנכנס לאפליקציה
-                UserChild updatedChild = userParentServer.getChildrenList().get(childId);
-                if (updatedChild != null) {
-                    SharedPreferencesUtil.saveCurrentChild(AvatarSelectionActivity.this, updatedChild);
-                }
+        // שימוש ב-FirebaseDatabase ישירות כדי לעדכן רק את השדה הזה
+        FirebaseDatabase.getInstance().getReference(path).setValue(avatarName)
+                .addOnSuccessListener(aVoid -> {
+                    // 1. קודם כל, מעדכנים את אובייקט ההורה בזיכרון (זה כבר עשית וזה מצוין)
+                    UserParent parent = SharedPreferencesUtil.getUser(AvatarSelectionActivity.this);
+                    if (parent != null && parent.getChildrenList() != null) {
+                        UserChild childInParent = parent.getChildrenList().get(childId);
 
-                // 3. מעבר ישיר למסך הראשי (MainActivity)
-                Intent intent = new Intent(AvatarSelectionActivity.this, MainActivity.class);
+                        if (childInParent != null) {
+                            // מעדכנים לו את האוואטר
+                            childInParent.setAvatar(avatarName);
 
-                // דואג שהמשתמש לא יוכל לחזור אחורה למסך בחירת האוואטר
-                intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+                            // שומרים את ההורה המעודכן
+                            SharedPreferencesUtil.saveUser(AvatarSelectionActivity.this, parent);
 
-                startActivity(intent);
-                finish();
+                            // *** השורה הקריטית: הופכים את הילד החדש לילד הפעיל! ***
+                            SharedPreferencesUtil.saveCurrentChild(AvatarSelectionActivity.this, childInParent);
+                        }
+                    }
 
-                Toast.makeText(AvatarSelectionActivity.this, ",בחירה נהדרת! בואו נתחיל", Toast.LENGTH_SHORT).show();
-            }
+                    // 2. מעבר למסך הראשי
+                    Intent intent = new Intent(AvatarSelectionActivity.this, MainActivity.class);
+                    intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+                    startActivity(intent);
+                    finish();
 
-            @Override
-            public void onFailed(Exception e) {
-                Toast.makeText(AvatarSelectionActivity.this, "שגיאה בשמירה: " + e.getMessage(), Toast.LENGTH_SHORT).show();
-            }
-        });
+                    Toast.makeText(AvatarSelectionActivity.this, "בחירה נהדרת! בואו נתחיל", Toast.LENGTH_SHORT).show();
+                })
+                .addOnFailureListener(e -> {
+                    Toast.makeText(AvatarSelectionActivity.this, "שגיאה בשמירה: " + e.getMessage(), Toast.LENGTH_SHORT).show();
+                });
     }
 
     // אדפטר פנימי להצגת האוואטרים ב-GridView

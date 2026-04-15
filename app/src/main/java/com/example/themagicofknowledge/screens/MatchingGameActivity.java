@@ -204,7 +204,7 @@ public class MatchingGameActivity extends AppCompatActivity {
             btn.setIconTint(null);
         }
         else if (content.equalsIgnoreCase("audio") || content.equalsIgnoreCase("speaker")) {
-            btn.setIconResource(R.drawable.ic_speaker);
+            btn.setIconResource(R.drawable.ic_volume_up);
             btn.setText("");
             btn.setIconSize(150);
             btn.setIconTint(ColorStateList.valueOf(Color.parseColor("#2196F3")));

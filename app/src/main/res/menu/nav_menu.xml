@@ -1,6 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<menu
-    xmlns:android="http://schemas.android.com/apk/res/android"
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     tools:showIn="navigation_view">
 
@@ -9,63 +8,80 @@
         <item
             android:id="@+id/nav_home"
             android:icon="@drawable/nav_home"
-            android:title="Home"/>
+            android:title="דף הבית"/>
+
+        <item
+            android:id="@+id/nav_subjects"
+            android:icon="@drawable/nav_game"
+            android:title="עולם המשחקים"/>
 
         <item
             android:id="@+id/nav_profile"
             android:icon="@drawable/nav_profile"
-            android:title="User Profile"/>
+            android:title="פרופיל הורה"/>
 
         <item
-            android:id="@+id/nav_cards"
-            android:icon="@drawable/nav_cards"
-            android:title="Flash Cards"/>
-
-        <item
-            android:id="@+id/nav_quiz"
-            android:icon="@drawable/nav_quiz"
-            android:title="Quizes"/>
-
-        <item
-            android:id="@+id/nav_game1"
-            android:icon="@drawable/nav_game"
-            android:title="Game1"/>
-
-        <item
-            android:id="@+id/nav_game2"
-            android:icon="@drawable/nav_game"
-            android:title="Game2"/>
-
-        <item
-            android:id="@+id/nav_game3"
-            android:icon="@drawable/nav_game"
-            android:title="Game3"/>
-
-        <item
-            android:id="@+id/nav_game4"
-            android:icon="@drawable/nav_game"
-            android:title="Game4"/>
-
-        <item
-            android:id="@+id/nav_game5"
-            android:icon="@drawable/nav_game"
-            android:title="Game5"/>
-
-
-
-        <item
-            android:id="@+id/nav_progrees"
+            android:id="@+id/nav_progress"
             android:icon="@drawable/nav_progress"
-            android:title="User Progress"/>
+            android:title="מעקב התקדמות"/>
+
+        <item
+            android:id="@+id/nav_change_child"
+            android:icon="@drawable/nav_profile"
+            android:title="החלפת ילד"/>
 
     </group>
-    <item
-        android:title="">
+
+    <item android:title="משחקים">
+        <menu>
+            <item
+                android:id="@+id/nav_game1"
+                android:icon="@drawable/nav_game"
+                android:title="משחק בחירה מרובה"/>
+
+            <item
+                android:id="@+id/nav_game2"
+                android:icon="@drawable/nav_game"
+                android:title="משחק הזיכרון"/>
+
+            <item
+                android:id="@+id/nav_game3"
+                android:icon="@drawable/nav_game"
+                android:title="משחק זיהוי קול"/>
+
+            <item
+                android:id="@+id/nav_game4"
+                android:icon="@drawable/nav_game"
+                android:title="משחק התאמת זוגות - גרירה"/>
+
+            <item
+                android:id="@+id/nav_game5"
+                android:icon="@drawable/nav_game"
+                android:title="משחק השלמת משפט"/>
+
+            <item
+                android:id="@+id/nav_mix"
+                android:icon="@drawable/nav_game"
+                android:title="עולם משחקים"/>
+
+        </menu>
+    </item>
+
+    <item android:title="ניהול">
+        <menu>
+            <item
+                android:id="@+id/nav_admin_users"
+                android:icon="@drawable/nav_cards"
+                android:title="רשימת משתמשים"/>
+        </menu>
+    </item>
+
+    <item android:title="">
         <menu>
             <item
                 android:id="@+id/nav_logout"
                 android:icon="@drawable/nav_logout"
-                android:title="Logout"/>
+                android:title="התנתקות"/>
         </menu>
     </item>
 </menu>

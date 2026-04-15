@@ -111,7 +111,7 @@ public class ForgotPasswordActivity extends AppCompatActivity implements View.On
                         ).show();
 
                         // מעבר לעמוד עדכון פרטים
-                        Intent intent = new Intent(ForgotPasswordActivity.this, UpdateDetailsActivity.class);
+                        Intent intent = new Intent(ForgotPasswordActivity.this, UserProfileActivity.class);
                         intent.putExtra("USER_ID", user.getId()); // מעביר את ה-ID של המשתמש
                         startActivity(intent);
                         finish();

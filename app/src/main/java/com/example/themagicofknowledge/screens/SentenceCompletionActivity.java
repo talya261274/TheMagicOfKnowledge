@@ -88,12 +88,12 @@ public class SentenceCompletionActivity extends AppCompatActivity {
     }
 
     private void initViews() {
-        tvSentence = findViewById(R.id.tvSentence);
-        etAnswer = findViewById(R.id.etAnswer);
-        ivHint = findViewById(R.id.ivHint);
+        tvSentence = findViewById(R.id.tvMixedSentenceText);
+        etAnswer = findViewById(R.id.etMixedAnswer);
+        ivHint = findViewById(R.id.ivMixedSentenceHint);
         btnCheck = findViewById(R.id.btnCheck);
-        keyboardGrid = findViewById(R.id.keyboardGrid);
-        testProgress = findViewById(R.id.testProgress);
+        keyboardGrid = findViewById(R.id.mixedKeyboard);
+        testProgress = findViewById(R.id.globalProgress);
     }
 
     private void loadQuestions() {

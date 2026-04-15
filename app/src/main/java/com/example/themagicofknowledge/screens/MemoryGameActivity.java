@@ -21,6 +21,7 @@ import androidx.appcompat.app.AppCompatActivity;
 
 import com.example.themagicofknowledge.R;
 import com.example.themagicofknowledge.models.UserChild;
+import com.example.themagicofknowledge.services.DatabaseService;
 import com.example.themagicofknowledge.utils.SharedPreferencesUtil;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
@@ -37,6 +38,8 @@ public class MemoryGameActivity extends AppCompatActivity {
     private ArrayList<Card> cards;
     private CardAdapter adapter;
     private ProgressBar testProgress;
+
+    private int attempts;
 
     private Card firstSelected = null;
     private Card secondSelected = null;
@@ -197,16 +200,22 @@ public class MemoryGameActivity extends AppCompatActivity {
         com.example.themagicofknowledge.models.GameProgress finalProgress =
                 new com.example.themagicofknowledge.models.GameProgress(finalTotalAttempts, true, finalTotalTime);
 
-        com.example.themagicofknowledge.services.DatabaseService.getInstance().updateChildGameProgress(
-                currentChild.getParentId(),
+        long timeSeconds = (System.currentTimeMillis() - startTime) / 1000;
+        String parentId = SharedPreferencesUtil.getUser(this).getId();
+
+        DatabaseService.getInstance().updateDetailedProgress(
+                parentId,
                 currentChild.getId(),
                 currentChild.getAgeGroup(),
                 subject,
-                finalProgress,
-                null
+                attempts,
+                timeSeconds,
+                40,
+                0
         );
 
-        Intent intent = new Intent(this, GameResultActivity.class);
+        /**
+         Intent intent = new Intent(this, GameResultActivity.class);
         intent.putExtra("success", true);
         intent.putExtra("subject", subject);
         intent.putExtra("totalAttempts", finalTotalAttempts);
@@ -214,6 +223,7 @@ public class MemoryGameActivity extends AppCompatActivity {
 
         startActivity(intent);
         finish();
+        **/
     }
 
     // מחלקת כרטיס

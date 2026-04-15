@@ -3,13 +3,9 @@
     <color name="black">#FF000000</color>
     <color name="white">#FFFFFFFF</color>
     <color name="button_text_color">#FFFFFF</color>
-    <color name="primary_color">#6200EE</color>
     <color name="hint_text_color">#666666</color>
-    <color name="purple_500">#6200EE</color>
-    <color name="purple_700">#3700B3</color>
-    <color name="teal_200">#03DAC5</color>
-    <color name="teal_700">#018786</color>
     <color name="transparent">#00000000</color>
     <color name="ic_launcher_background">#03A9F4</color>
     <color name="splash_background">#FFFFFF</color>
+    <color name="update">#4493E0</color>
 </resources>

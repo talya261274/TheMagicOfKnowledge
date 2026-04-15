@@ -12,9 +12,8 @@ public class UserChild {
     private String avatar;
     private String ageGroup;
     private int age;
-    private String currentLevel; //
+    private String currentLevel;
     private long totalTimeSeconds;
-
     private Map<String, Object> progress = new HashMap<>();
 
     public UserChild() {
@@ -30,81 +29,57 @@ public class UserChild {
         if (age >= 3 && age <= 4) this.ageGroup = "3-4";
         else if (age >= 5 && age <= 6) this.ageGroup = "5-6";
         else if (age >= 7 && age <= 8) this.ageGroup = "7-8";
+        else this.ageGroup = "general"; // ברירת מחדל
 
         this.currentLevel = this.ageGroup;
+
+        initializeDefaultProgress();
     }
 
-    public String getId() {
-        return id;
+    private void initializeDefaultProgress() {
+        Map<String, Object> subjects = new HashMap<>();
+        String[] subjectNames = {"animals", "numbers", "colors", "letters", "shapes", "bodyparts"};
+
+        for (String subject : subjectNames) {
+            Map<String, Object> stats = new HashMap<>();
+            stats.put("attempts", 0);
+            stats.put("completed", false);
+            stats.put("progressPercent", 0);
+            stats.put("timeSeconds", 0);
+
+            subjects.put(subject, stats);
+        }
+
+        this.progress.put(this.ageGroup, subjects);
     }
 
-    public void setId(String id) {
-        this.id = id;
-    }
 
-    public String getParentId() {
-        return parentId;
-    }
+    public String getId() { return id; }
+    public void setId(String id) { this.id = id; }
 
-    public void setParentId(String parentId) {
-        this.parentId = parentId;
-    }
+    public String getParentId() { return parentId; }
+    public void setParentId(String parentId) { this.parentId = parentId; }
 
-    public String getName() {
-        return name;
-    }
+    public String getName() { return name; }
+    public void setName(String name) { this.name = name; }
 
-    public void setName(String name) {
-        this.name = name;
-    }
+    public String getAvatar() { return avatar; }
+    public void setAvatar(String avatar) { this.avatar = avatar; }
 
-    public String getAvatar() {
-        return avatar;
-    }
+    public String getAgeGroup() { return ageGroup; }
+    public void setAgeGroup(String ageGroup) { this.ageGroup = ageGroup; }
 
-    public void setAvatar(String avatar) {
-        this.avatar = avatar;
-    }
+    public int getAge() { return age; }
+    public void setAge(int age) { this.age = age; }
 
-    public String getAgeGroup() {
-        return ageGroup;
-    }
+    public String getCurrentLevel() { return currentLevel; }
+    public void setCurrentLevel(String currentLevel) { this.currentLevel = currentLevel; }
 
-    public void setAgeGroup(String ageGroup) {
-        this.ageGroup = ageGroup;
-    }
+    public long getTotalTimeSeconds() { return totalTimeSeconds; }
+    public void setTotalTimeSeconds(long totalTimeSeconds) { this.totalTimeSeconds = totalTimeSeconds; }
 
-    public int getAge() {
-        return age;
-    }
-
-    public void setAge(int age) {
-        this.age = age;
-    }
-
-    public String getCurrentLevel() {
-        return currentLevel;
-    }
-
-    public void setCurrentLevel(String currentLevel) {
-        this.currentLevel = currentLevel;
-    }
-
-    public long getTotalTimeSeconds() {
-        return totalTimeSeconds;
-    }
-
-    public void setTotalTimeSeconds(long totalTimeSeconds) {
-        this.totalTimeSeconds = totalTimeSeconds;
-    }
-
-    public Map<String, Object> getProgress() {
-        return progress;
-    }
-
-    public void setProgress(Map<String, Object> progress) {
-        this.progress = progress;
-    }
+    public Map<String, Object> getProgress() { return progress; }
+    public void setProgress(Map<String, Object> progress) { this.progress = progress; }
 
     @Exclude
     public String getFormattedTime() {
@@ -119,6 +94,7 @@ public class UserChild {
         result.put("id", id);
         result.put("parentId", parentId);
         result.put("name", name);
+        result.put("avatar", avatar);
         result.put("ageGroup", ageGroup);
         result.put("age", age);
         result.put("currentLevel", currentLevel);

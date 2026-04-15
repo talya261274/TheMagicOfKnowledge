@@ -35,41 +35,44 @@ public class SubjectProgressAdapter extends RecyclerView.Adapter<SubjectProgress
     public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
         SubjectStat stat = statsList.get(position);
 
-        holder.tvName.setText("נושא: " + translateSubject(stat.getSubjectName()));
+        // השם כבר מגיע מתורגם מה-Activity, אז פשוט מציגים אותו
+        holder.tvName.setText("נושא: " + stat.getSubjectName());
 
         holder.tvAttempts.setText("טעויות: " + stat.getAttempts());
 
+        // פורמט זמן
         long totalSeconds = stat.getTimeInSeconds();
         long minutes = totalSeconds / 60;
         long seconds = totalSeconds % 60;
         String timeFormatted = String.format(Locale.getDefault(), "%02d:%02d", minutes, seconds);
-
         holder.tvTime.setText("זמן: " + timeFormatted);
 
-        int iconRes;
-        switch (stat.getSubjectName()) {
-            case "animals":
-                iconRes = R.drawable.ic_animals;
-                break;
-            case "numbers":
-                iconRes = R.drawable.ic_numbers;
-                break;
-            case "colors":
-                iconRes = R.drawable.ic_colors;
-                break;
-            case "letters":
-                iconRes = R.drawable.ic_letters;
-                break;
-            case "shapes":
-                iconRes = R.drawable.ic_shapes;
-                break;
-            case "bodyparts":
-                iconRes = R.drawable.ic_bodyparts;
-                break;
-            default:
-                iconRes = R.drawable.ic_subject_placeholder;
-                break;
+        // עדכון הפרוגרס בר
+        int progress = stat.getProgressPercent();
+        holder.pbProgress.setProgress(progress);
+        holder.tvProgressPercent.setText(progress + "%");
+
+        // שינוי צבע הפרוגרס בר לירוק אם הנושא הושלם
+        if (stat.isCompleted()) {
+            holder.pbProgress.setIndicatorColor(android.graphics.Color.parseColor("#4CAF50")); // ירוק
+            holder.tvProgressPercent.setText("הושלם! ✓");
+            holder.tvProgressPercent.setTextColor(android.graphics.Color.parseColor("#4CAF50"));
+        } else {
+            holder.pbProgress.setIndicatorColor(android.graphics.Color.parseColor("#2196F3")); // כחול רגיל
+            holder.tvProgressPercent.setTextColor(android.graphics.Color.GRAY);
         }
+
+        // בחירת אייקון - שימי לב: השתמשי בשמות בעברית כי זה מה שנשלח מה-Activity
+        int iconRes;
+        String name = stat.getSubjectName();
+        if (name.equals("חיות")) iconRes = R.drawable.ic_animals;
+        else if (name.equals("מספרים")) iconRes = R.drawable.ic_numbers;
+        else if (name.equals("צבעים")) iconRes = R.drawable.ic_colors;
+        else if (name.equals("אותיות")) iconRes = R.drawable.ic_letters;
+        else if (name.equals("צורות")) iconRes = R.drawable.ic_shapes;
+        else if (name.equals("חלקי גוף")) iconRes = R.drawable.ic_bodyparts;
+        else iconRes = R.drawable.ic_subject_placeholder;
+
         holder.ivIcon.setImageResource(iconRes);
     }
 
@@ -79,15 +82,18 @@ public class SubjectProgressAdapter extends RecyclerView.Adapter<SubjectProgress
     }
 
     public static class ViewHolder extends RecyclerView.ViewHolder {
-        TextView tvName, tvAttempts, tvTime;
+        TextView tvName, tvAttempts, tvTime, tvProgressPercent;
         ImageView ivIcon;
+        com.google.android.material.progressindicator.LinearProgressIndicator pbProgress;
 
         public ViewHolder(@NonNull View itemView) {
             super(itemView);
             tvName = itemView.findViewById(R.id.tvSubjectName);
             tvAttempts = itemView.findViewById(R.id.tvAttempts);
             tvTime = itemView.findViewById(R.id.tvTime);
-            ivIcon = itemView.findViewById(R.id.ivSubjectIcon); // חיבור האייקון
+            tvProgressPercent = itemView.findViewById(R.id.tvProgressPercent);
+            pbProgress = itemView.findViewById(R.id.pbSubjectProgress);
+            ivIcon = itemView.findViewById(R.id.ivSubjectIcon);
         }
     }
 

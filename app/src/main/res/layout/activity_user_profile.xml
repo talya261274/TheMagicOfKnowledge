@@ -8,7 +8,6 @@
     android:background="@drawable/main_background"
     tools:context=".screens.UserProfileActivity">
 
-
     <androidx.core.widget.NestedScrollView
         android:layout_width="match_parent"
         android:layout_height="match_parent"
@@ -20,24 +19,12 @@
             android:orientation="vertical"
             android:padding="24dp">
 
-            <Button
-                android:id="@+id/goBackBtn2"
-                android:layout_width="81dp"
-                android:layout_height="56dp"
-                android:layout_gravity="right"
-                android:backgroundTint="@android:color/transparent"
-                android:text="➜"
-                android:textColor="@color/white"
-                android:textSize="22dp"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintTop_toTopOf="parent"
-                tools:ignore="MissingConstraints" />
-
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:fontFamily="@font/gan"
                 android:layout_gravity="center"
+                android:layout_marginTop="20dp"
                 android:shadowColor="@android:color/holo_blue_light"
                 android:shadowDx="5"
                 android:shadowDy="5"
@@ -139,64 +126,64 @@
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:orientation="vertical"
                     android:gravity="right"
+                    android:orientation="vertical"
                     android:padding="24dp">
 
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="פרטים אישיים:"
+                        android:layout_marginBottom="20dp"
                         android:fontFamily="@font/gveretlevin"
+                        android:text="פרטים אישיים:"
                         android:textColor="@color/black"
-                        android:textSize="20sp"
-                        android:layout_marginBottom="20dp" />
+                        android:textSize="20sp" />
 
                     <LinearLayout
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:orientation="horizontal"
+                        android:layout_marginBottom="16dp"
                         android:gravity="right"
-                        android:layout_marginBottom="16dp">
+                        android:orientation="horizontal">
 
                         <com.google.android.material.textfield.TextInputLayout
+                            style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
                             android:layout_width="0dp"
                             android:layout_height="wrap_content"
-                            android:layout_weight="1"
                             android:layout_marginEnd="8dp"
-                            style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
-                            app:boxCornerRadiusTopStart="12dp"
-                            app:boxCornerRadiusTopEnd="12dp"
+                            android:layout_weight="1"
+                            app:boxCornerRadiusBottomEnd="12dp"
                             app:boxCornerRadiusBottomStart="12dp"
-                            app:boxCornerRadiusBottomEnd="12dp">
+                            app:boxCornerRadiusTopEnd="12dp"
+                            app:boxCornerRadiusTopStart="12dp">
 
                             <com.google.android.material.textfield.TextInputEditText
                                 android:id="@+id/et_user_first_name"
                                 android:layout_width="match_parent"
                                 android:layout_height="wrap_content"
-                                android:hint="שם פרטי"
                                 android:enabled="false"
+                                android:hint="שם פרטי"
                                 android:inputType="textPersonName" />
 
                         </com.google.android.material.textfield.TextInputLayout>
 
                         <com.google.android.material.textfield.TextInputLayout
+                            style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
                             android:layout_width="0dp"
                             android:layout_height="wrap_content"
-                            android:layout_weight="1"
                             android:layout_marginStart="8dp"
-                            style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
-                            app:boxCornerRadiusTopStart="12dp"
-                            app:boxCornerRadiusTopEnd="12dp"
+                            android:layout_weight="1"
+                            app:boxCornerRadiusBottomEnd="12dp"
                             app:boxCornerRadiusBottomStart="12dp"
-                            app:boxCornerRadiusBottomEnd="12dp">
+                            app:boxCornerRadiusTopEnd="12dp"
+                            app:boxCornerRadiusTopStart="12dp">
 
                             <com.google.android.material.textfield.TextInputEditText
                                 android:id="@+id/et_user_last_name"
                                 android:layout_width="match_parent"
                                 android:layout_height="wrap_content"
-                                android:hint="שם משפחה"
                                 android:enabled="false"
+                                android:hint="שם משפחה"
                                 android:inputType="textPersonName" />
 
                         </com.google.android.material.textfield.TextInputLayout>
@@ -204,89 +191,138 @@
                     </LinearLayout>
 
                     <com.google.android.material.textfield.TextInputLayout
+                        style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:layout_marginBottom="16dp"
-                        style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
-                        app:boxCornerRadiusTopStart="12dp"
-                        app:boxCornerRadiusTopEnd="12dp"
-                        app:boxCornerRadiusBottomStart="12dp"
                         app:boxCornerRadiusBottomEnd="12dp"
+                        app:boxCornerRadiusBottomStart="12dp"
+                        app:boxCornerRadiusTopEnd="12dp"
+                        app:boxCornerRadiusTopStart="12dp"
                         app:startIconDrawable="@android:drawable/ic_dialog_email">
 
                         <com.google.android.material.textfield.TextInputEditText
                             android:id="@+id/et_user_email"
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
-                            android:hint="אימייל"
                             android:enabled="false"
+                            android:hint="אימייל"
                             android:inputType="textEmailAddress" />
 
                     </com.google.android.material.textfield.TextInputLayout>
 
                     <com.google.android.material.textfield.TextInputLayout
+                        style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:layout_marginBottom="16dp"
-                        style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
-                        app:boxCornerRadiusTopStart="12dp"
-                        app:boxCornerRadiusTopEnd="12dp"
-                        app:boxCornerRadiusBottomStart="12dp"
                         app:boxCornerRadiusBottomEnd="12dp"
+                        app:boxCornerRadiusBottomStart="12dp"
+                        app:boxCornerRadiusTopEnd="12dp"
+                        app:boxCornerRadiusTopStart="12dp"
                         app:startIconDrawable="@android:drawable/sym_action_call">
 
                         <com.google.android.material.textfield.TextInputEditText
                             android:id="@+id/et_user_phone"
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
-                            android:hint="מספר טלפון"
                             android:enabled="false"
+                            android:hint="מספר טלפון"
                             android:inputType="phone" />
 
                     </com.google.android.material.textfield.TextInputLayout>
 
                     <com.google.android.material.textfield.TextInputLayout
+                        style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:layout_marginBottom="16dp"
-                        style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
-                        app:startIconDrawable="@drawable/ic_calendar"
-                        app:boxCornerRadiusTopStart="12dp"
-                        app:boxCornerRadiusTopEnd="12dp"
+                        app:boxCornerRadiusBottomEnd="12dp"
                         app:boxCornerRadiusBottomStart="12dp"
-                        app:boxCornerRadiusBottomEnd="12dp">
+                        app:boxCornerRadiusTopEnd="12dp"
+                        app:boxCornerRadiusTopStart="12dp"
+                        app:startIconDrawable="@drawable/ic_calendar">
 
                         <com.google.android.material.textfield.TextInputEditText
                             android:id="@+id/et_user_birth_date"
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
-                            android:hint="תאריך לידה"
                             android:enabled="false"
+                            android:hint="תאריך לידה"
                             android:inputType="datetime" />
+                    </com.google.android.material.textfield.TextInputLayout>
 
+                    <com.google.android.material.textfield.TextInputLayout
+                        style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginBottom="16dp"
+                        app:boxCornerRadiusBottomEnd="12dp"
+                        app:boxCornerRadiusBottomStart="12dp"
+                        app:boxCornerRadiusTopEnd="12dp"
+                        app:boxCornerRadiusTopStart="12dp"
+                        app:startIconDrawable="@drawable/ic_password">
+
+                        <com.google.android.material.textfield.TextInputEditText
+                            android:id="@+id/et_user_password"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:enabled="false"
+                            android:hint="סיסמא"
+                            android:inputType="datetime" />
                     </com.google.android.material.textfield.TextInputLayout>
 
                     <TextView
                         android:id="@+id/et_update"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="עדכון פרטים"
-                        android:textSize="20sp"
-                        android:textColor="#4493E0"
-                        android:fontFamily="@font/gan"
                         android:layout_gravity="center"
                         android:layout_marginTop="15dp"
-                        android:drawableEnd="@drawable/ic_edit_square1"
-                        android:drawablePadding="8dp"/>
+                        android:drawableEnd="@drawable/ic_edit_square"
+                        android:drawablePadding="8dp"
+                        android:fontFamily="@font/gan"
+                        android:text="עדכון פרטים"
+                        android:textColor="#4493E0"
+                        android:textSize="20sp" />
 
 
                 </LinearLayout>
 
             </com.google.android.material.card.MaterialCardView>
 
-            <View
+            <com.google.android.material.card.MaterialCardView
                 android:layout_width="match_parent"
-                android:layout_height="24dp" />
+                android:layout_height="wrap_content"
+                app:cardElevation="0dp"
+                app:cardBackgroundColor="#80E0E9E9"
+                android:layout_marginTop="15dp"
+                app:cardCornerRadius="16dp">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical"
+                    android:padding="24dp">
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="מעקב ילדים:"
+                        android:fontFamily="@font/gveretlevin"
+                        android:textColor="@color/black"
+                        android:textSize="20sp"
+                        android:layout_marginBottom="12dp"
+                        android:layout_gravity="right" />
+
+                    <LinearLayout
+                        android:id="@+id/container_children_links"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="vertical"
+                        android:gravity="center" />
+
+                </LinearLayout>
+            </com.google.android.material.card.MaterialCardView>
 
             <com.google.android.material.button.MaterialButton
                 android:id="@+id/btn_sign_out"
@@ -294,6 +330,7 @@
                 android:layout_height="56dp"
                 android:text="התנתקות"
                 android:textAllCaps="false"
+                android:layout_marginTop="20dp"
                 app:cornerRadius="26dp"
                 style="@style/Widget.MaterialComponents.Button.OutlinedButton"
                 app:strokeColor="#4493E0"

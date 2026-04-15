@@ -16,6 +16,17 @@
         android:padding="24dp"
         android:id="@+id/main">
 
+        <Button
+            android:id="@+id/goBackBtn2"
+            android:layout_width="81dp"
+            android:layout_height="56dp"
+            android:backgroundTint="@android:color/transparent"
+            android:text="➜"
+            android:textColor="@color/white"
+            android:textSize="22dp"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+
         <!-- כותרת -->
         <TextView
             android:id="@+id/tvTitleRegister"
@@ -141,7 +152,7 @@
             android:hint="תאריך לידה"
             app:boxBackgroundColor="#66FFFFFF"
             app:boxBackgroundMode="outline"
-            app:endIconDrawable="@drawable/ic_calendar2"
+            app:endIconDrawable="@drawable/ic_calendar"
             app:endIconMode="custom"
             app:hintTextColor="#5C6166"
             app:layout_constraintEnd_toEndOf="parent"
@@ -254,19 +265,6 @@
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@id/et_register_confirm_password" />
-
-        <Button
-            android:id="@+id/goBackBtn2"
-            android:layout_width="81dp"
-            android:layout_height="56dp"
-            android:backgroundTint="@android:color/transparent"
-            android:gravity="right"
-            android:text="➜"
-            android:textColor="@color/white"
-            android:textSize="22dp"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintTop_toTopOf="parent"
-            tools:ignore="MissingConstraints" />
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 </ScrollView>

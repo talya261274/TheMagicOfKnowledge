@@ -32,6 +32,16 @@ public class LoginActivity extends BaseActivity implements View.OnClickListener 
     private Button btnLogin;
 
     @Override
+    protected boolean showToolbar() {
+        return false;
+    }
+
+    @Override
+    protected boolean hasSideMenu() {
+        return false;
+    }
+
+    @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         EdgeToEdge.enable(this);

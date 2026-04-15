@@ -24,6 +24,7 @@
         android:layout_height="wrap_content"
         android:layout_marginTop="30dp"
         android:text="הקסם שבידע"
+        android:fontFamily="@font/gan"
         android:textSize="36sp"
         android:textStyle="bold"
         app:layout_constraintBottom_toBottomOf="parent"

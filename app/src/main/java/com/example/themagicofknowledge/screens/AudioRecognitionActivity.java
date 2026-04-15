@@ -16,6 +16,7 @@ import androidx.appcompat.app.AppCompatActivity;
 import com.example.themagicofknowledge.R;
 import com.example.themagicofknowledge.models.Question;
 import com.example.themagicofknowledge.models.UserChild;
+import com.example.themagicofknowledge.services.DatabaseService; // הוספתי
 import com.example.themagicofknowledge.utils.SharedPreferencesUtil;
 import com.google.android.material.button.MaterialButton;
 import com.google.firebase.database.DataSnapshot;
@@ -58,7 +59,7 @@ public class AudioRecognitionActivity extends AppCompatActivity {
         }
 
         initViews();
-        startTime = System.currentTimeMillis();
+        startTime = System.currentTimeMillis(); // התחלת מדידת זמן המשחק
 
         tts = new TextToSpeech(this, status -> {
             if (status == TextToSpeech.SUCCESS) {
@@ -89,7 +90,7 @@ public class AudioRecognitionActivity extends AppCompatActivity {
     }
 
     private void loadQuestions() {
-        String level = currentChild.getAgeGroup(); // "3-4" או "5-6"
+        String level = currentChild.getAgeGroup();
         String path = "level_" + level.replace("-", "_");
 
         DatabaseReference ref = FirebaseDatabase.getInstance()
@@ -129,7 +130,6 @@ public class AudioRecognitionActivity extends AppCompatActivity {
         Question q = questions.get(currentIndex);
         playQuestionAudio(q.getQuestionText());
 
-        String ageGroup = currentChild.getAgeGroup();
         MaterialButton[] buttons = {btnAns1, btnAns2, btnAns3, btnAns4};
         List<String> options = q.getOptions();
 
@@ -138,16 +138,11 @@ public class AudioRecognitionActivity extends AppCompatActivity {
         for (int i = 0; i < buttons.length; i++) {
             final int index = i;
             String item = options.get(i);
-
             buttons[index].setIconTint(null);
-
             int resId = getResources().getIdentifier(item, "drawable", getPackageName());
             buttons[index].setIconResource(resId != 0 ? resId : R.drawable.wizard_placeholder);
-
             buttons[index].setText("");
             buttons[index].setIconSize(220);
-            buttons[index].setIconGravity(MaterialButton.ICON_GRAVITY_TEXT_START);
-
             buttons[index].setOnClickListener(v -> checkAnswer(index));
         }
     }
@@ -166,7 +161,7 @@ public class AudioRecognitionActivity extends AppCompatActivity {
             }, 1000);
         } else {
             selectedButton.setBackgroundTintList(ColorStateList.valueOf(Color.RED));
-            attempts++;
+            attempts++; // ספירת טעויות
             new Handler().postDelayed(this::resetButtons, 1000);
         }
     }
@@ -180,14 +175,21 @@ public class AudioRecognitionActivity extends AppCompatActivity {
 
     private void finishGame() {
         long timeSeconds = (System.currentTimeMillis() - startTime) / 1000;
+        String parentId = SharedPreferencesUtil.getUser(this).getId();
+
+        DatabaseService.getInstance().updateDetailedProgress(
+                parentId,
+                currentChild.getId(),
+                currentChild.getAgeGroup(),
+                subject,
+                attempts,
+                timeSeconds,
+                40,
+                0
+        );
 
         Intent intent = new Intent(this, MatchingGameActivity.class);
-
         intent.putExtra("subject", subject);
-        intent.putExtra("totalAttempts", attempts);
-        intent.putExtra("totalTime", timeSeconds);
-        intent.putExtra("gameStep", 2);
-
         startActivity(intent);
         finish();
     }

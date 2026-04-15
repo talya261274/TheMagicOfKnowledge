@@ -1,8 +1,14 @@
 package com.example.themagicofknowledge.screens;
 
 import android.content.Intent;
+import android.graphics.Color;
+import android.graphics.Typeface;
 import android.os.Bundle;
+import android.text.Spannable;
+import android.text.SpannableString;
+import android.view.Menu;
 import android.view.MenuItem;
+import android.view.SubMenu;
 import android.view.View;
 import android.widget.FrameLayout;
 import android.widget.ImageView;
@@ -13,6 +19,7 @@ import androidx.annotation.NonNull;
 import androidx.appcompat.app.ActionBarDrawerToggle;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
+import androidx.core.content.res.ResourcesCompat;
 import androidx.core.view.GravityCompat;
 import androidx.drawerlayout.widget.DrawerLayout;
 
@@ -22,6 +29,10 @@ import com.example.themagicofknowledge.models.UserParent;
 import com.example.themagicofknowledge.services.DatabaseService;
 import com.example.themagicofknowledge.utils.SharedPreferencesUtil;
 import com.google.android.material.navigation.NavigationView;
+import android.app.Dialog;
+import android.graphics.drawable.ColorDrawable;
+import android.content.res.ColorStateList;
+import android.text.style.AbsoluteSizeSpan;
 
 public abstract class BaseActivity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener {
@@ -33,6 +44,9 @@ public abstract class BaseActivity extends AppCompatActivity
     protected ImageView ivToolbarAvatar; // הוספנו משתנה לאוואטר ב-Toolbar
 
     protected boolean hasSideMenu() {
+        return true;
+    }
+    protected boolean showToolbar() {
         return true;
     }
 
@@ -54,10 +68,21 @@ public abstract class BaseActivity extends AppCompatActivity
         navigationView = findViewById(R.id.nav_view);
         navigationView.setNavigationItemSelectedListener(this);
 
+        navigationView.setBackgroundColor(Color.parseColor("#E0F7FA"));
+        navigationView.setItemTextAppearance(R.style.NavMenuItemStyle);
+
         if (hasSideMenu()) {
             setupDrawer();
         } else {
             lockDrawer();
+        }
+
+        if (toolbar != null) {
+            if (showToolbar()) {
+                toolbar.setVisibility(View.VISIBLE);
+            } else {
+                toolbar.setVisibility(View.GONE);
+            }
         }
     }
 
@@ -169,15 +194,26 @@ public abstract class BaseActivity extends AppCompatActivity
 
         }
         // ניווט לפרופיל הורה/משתמש
+        else if (id == R.id.nav_subjects) {
+            navigateTo(SelectSubjectActivity.class);
+
+        }
+        // ניווט לבחירת נושאים (הקלפים)
         else if (id == R.id.nav_profile) {
             navigateTo(UserProfileActivity.class);
 
         }
-        // ניווט לבחירת נושאים (הקלפים)
-        else if (id == R.id.nav_cards) {
-            navigateTo(SelectSubjectActivity.class);
+
+        else if (id == R.id.nav_progress) {
+            navigateTo(ParentTrackingActivity.class);
 
         }
+
+        else if (id == R.id.nav_change_child) {
+            navigateTo(SelectChildActivity.class);
+
+        }
+
         // משחק בחירה מרובה
         else if (id == R.id.nav_game1) {
             navigateTo(ImageRecognitionGameActivity.class);
@@ -204,18 +240,15 @@ public abstract class BaseActivity extends AppCompatActivity
             navigateTo(SentenceCompletionActivity.class);
 
         }
-        else if (id == R.id.nav_progrees) {
-            String currentChildId = SharedPreferencesUtil.getCurrentChildId(this);
 
-            if (currentChildId != null) {
-                Intent intent = new Intent(this, ParentTrackingActivity.class);
-                intent.putExtra("CHILD_ID", currentChildId);
-                startActivity(intent);
-            } else {
-                // אם משום מה אין ילד נבחר, שלח אותו קודם לבחור ילד
-                Toast.makeText(this, "אנא בחר ילד תחילה", Toast.LENGTH_SHORT).show();
-                startActivity(new Intent(this, SelectChildActivity.class));
-            }
+        else if (id == R.id.nav_mix) {
+            navigateTo(MixedGameActivity.class);
+
+        }
+
+        else if (id == R.id.nav_admin_users) {
+            navigateTo(UsersListActivity.class);
+
         }
 
         // התנתקות מהמערכת
@@ -232,26 +265,46 @@ public abstract class BaseActivity extends AppCompatActivity
         return true;
     }
 
+    public void showCustomDialog(String title, String message, String confirmText, int confirmColor, Runnable onConfirm) {
+        Dialog dialog = new Dialog(this);
+        dialog.setContentView(R.layout.custom_action_dialog);
+
+        if (dialog.getWindow() != null) {
+            dialog.getWindow().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
+        }
+
+        TextView tvTitle = dialog.findViewById(R.id.tvDialogTitle);
+        TextView tvMessage = dialog.findViewById(R.id.tvDialogMessage);
+        com.google.android.material.button.MaterialButton btnConfirm = dialog.findViewById(R.id.btnConfirm);
+        TextView btnCancel = dialog.findViewById(R.id.btnCancel);
+
+        tvTitle.setText(title);
+        tvMessage.setText(message);
+        btnConfirm.setText(confirmText);
+        btnConfirm.setBackgroundTintList(ColorStateList.valueOf(confirmColor));
+
+        btnConfirm.setOnClickListener(v -> {
+            onConfirm.run();
+            dialog.dismiss();
+        });
+
+        btnCancel.setOnClickListener(v -> dialog.dismiss());
+        dialog.show();
+    }
+
+    // עדכון פונקציית ההתנתקות שתשתמש בדיאלוג החדש
     private void showLogoutDialog() {
-        new androidx.appcompat.app.AlertDialog.Builder(this)
-                .setTitle("התנתקות")
-                .setMessage("האם אתה בטוח שברצונך להתנתק?")
-                .setPositiveButton("כן", (dialog, which) -> {
+        showCustomDialog(
+                "התנתקות",
+                "האם אתה בטוח שברצונך לצאת?",
+                "התנתק",
+                Color.parseColor("#FF5252"),
+                () -> {
                     SharedPreferencesUtil.signOutUser(this);
                     Intent intent = new Intent(this, LandingActivity.class);
                     intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
                     startActivity(intent);
-                })
-                .setNegativeButton("לא", null)
-                .show();
-    }
-
-    @Override
-    public void onBackPressed() {
-        if (drawerLayout != null && drawerLayout.isDrawerOpen(GravityCompat.START)) {
-            drawerLayout.closeDrawer(GravityCompat.START);
-        } else {
-            super.onBackPressed();
-        }
+                }
+        );
     }
 }

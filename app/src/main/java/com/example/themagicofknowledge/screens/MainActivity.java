@@ -16,7 +16,7 @@ public class MainActivity extends BaseActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_main_content);
+        setContentView(R.layout.activity_main);
 
         // 1. מציאת הרכיבים במסך
         TextView tvWelcomeChild = findViewById(R.id.tvWelcomeChild);

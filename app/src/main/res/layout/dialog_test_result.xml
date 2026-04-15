@@ -1,0 +1,79 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.cardview.widget.CardView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="320dp"
+    android:layout_height="wrap_content"
+    android:layout_gravity="center"
+    app:cardCornerRadius="24dp"
+    app:cardElevation="8dp">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="@color/white"
+        android:gravity="center"
+        android:orientation="vertical"
+        android:padding="24dp">
+
+        <ImageView
+            android:id="@+id/ivStatusIcon"
+            android:layout_width="120dp"
+            android:layout_height="120dp"
+            android:src="@drawable/ic_trophy"
+            android:layout_marginBottom="16dp" />
+
+        <TextView
+            android:id="@+id/tvDialogTitle"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="כל הכבוד!"
+            android:textColor="#FFFFFF"
+            android:textSize="26sp"
+            android:textStyle="bold"
+            android:fontFamily="@font/gan" />
+
+        <TextView
+            android:id="@+id/tvDialogMessage"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
+            android:gravity="center"
+            android:text="סיימת את המבדק בהצלחה!"
+            android:textColor="#FFFFFF"
+            android:textSize="18sp" />
+
+        <RatingBar
+            android:id="@+id/dialogRatingBar"
+            style="?android:attr/ratingBarStyleIndicator"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="16dp"
+            android:numStars="5"
+            android:stepSize="1.0"
+            android:progressTint="#FFD700" />
+
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/btnDialogAction"
+            android:layout_width="match_parent"
+            android:layout_height="60dp"
+            android:layout_marginTop="24dp"
+            android:text="התחל לשחק!"
+            android:textSize="18sp"
+            android:textStyle="bold"
+            app:backgroundTint="#4CAF50"
+            app:cornerRadius="30dp" />
+
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/btnStayAtCurrentLevel"
+            android:layout_width="match_parent"
+            android:layout_height="50dp"
+            android:layout_marginTop="12dp"
+            android:text="אני רוצה להישאר ברמה שלי"
+            android:textSize="16sp"
+            android:textColor="#4CAF50"
+            style="@style/Widget.MaterialComponents.Button.OutlinedButton"
+            app:strokeColor="#4CAF50"
+            app:cornerRadius="30dp" />
+
+    </LinearLayout>
+</androidx.cardview.widget.CardView>

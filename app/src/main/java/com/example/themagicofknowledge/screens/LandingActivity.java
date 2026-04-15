@@ -40,10 +40,6 @@ public class LandingActivity extends AppCompatActivity {
             return;
         }
 
-//        ImageView wandImage = findViewById(R.id.wand);
-//        AnimatedVectorDrawable wandAnimation = (AnimatedVectorDrawable) wandImage.getDrawable();
-//        wandAnimation.start();
-
         Button button = findViewById(R.id.btn_Main_toLogin);
         button.setOnClickListener(view -> {
             Intent intent = new Intent(LandingActivity.this, LoginActivity.class);

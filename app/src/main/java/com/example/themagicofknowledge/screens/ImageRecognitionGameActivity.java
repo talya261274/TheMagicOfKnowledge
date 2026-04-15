@@ -17,6 +17,7 @@ import androidx.appcompat.app.AppCompatActivity;
 import com.example.themagicofknowledge.R;
 import com.example.themagicofknowledge.models.Question;
 import com.example.themagicofknowledge.models.UserChild;
+import com.example.themagicofknowledge.services.DatabaseService; // הוספתי
 import com.example.themagicofknowledge.utils.SharedPreferencesUtil;
 import com.google.firebase.database.*;
 
@@ -144,7 +145,6 @@ public class ImageRecognitionGameActivity extends AppCompatActivity {
             selectedButton.setBackgroundTintList(ColorStateList.valueOf(Color.RED));
             attempts++;
 
-            // אנימציית רעד
             selectedButton.animate().translationX(20).setDuration(50).withEndAction(() ->
                     selectedButton.animate().translationX(-20).setDuration(50).withEndAction(() ->
                             selectedButton.animate().translationX(0).setDuration(50).start()
@@ -164,13 +164,21 @@ public class ImageRecognitionGameActivity extends AppCompatActivity {
 
     private void finishGame() {
         long timeSeconds = (System.currentTimeMillis() - startTime) / 1000;
+        String parentId = SharedPreferencesUtil.getUser(this).getId();
+
+        DatabaseService.getInstance().updateDetailedProgress(
+                parentId,
+                currentChild.getId(),
+                currentChild.getAgeGroup(),
+                subject,
+                attempts,
+                timeSeconds,
+                40,
+                0
+        );
 
         Intent intent = new Intent(this, SentenceCompletionActivity.class);
         intent.putExtra("subject", subject);
-        intent.putExtra("totalAttempts", attempts);
-        intent.putExtra("totalTime", timeSeconds);
-        intent.putExtra("gameStep", 2); // עדכון לשלב 2 במד
-
         startActivity(intent);
         finish();
     }
