@@ -108,7 +108,7 @@ public class MatchingGameActivity extends AppCompatActivity {
                 }
 
                 if (pairsList.isEmpty()) {
-                    Toast.makeText(MatchingGameActivity.this, "אין נתונים בנתיב: " + path, Toast.LENGTH_SHORT).show();
+                    Toast.makeText(MatchingGameActivity.this, "לא נמצאו נתונים בנתיב" + path, Toast.LENGTH_SHORT).show();
                     finish();
                 } else {
                     setupGame(pairsList);

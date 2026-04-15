@@ -109,7 +109,7 @@ public class AudioRecognitionActivity extends AppCompatActivity {
                 }
 
                 if (questions.isEmpty()) {
-                    Toast.makeText(AudioRecognitionActivity.this, "לא נמצאו שאלות לנושא זה", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(AudioRecognitionActivity.this, "לא נמצאו שאלות", Toast.LENGTH_SHORT).show();
                     finish();
                     return;
                 }

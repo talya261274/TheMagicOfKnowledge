@@ -218,7 +218,7 @@ public class PlacementTestActivity extends AppCompatActivity {
                 checkAnswer(999); // קוד מעבר להצלחה במקלדת
             } else {
                 isFirstAttempt = false;
-                Toast.makeText(this, "נסה שוב!", Toast.LENGTH_SHORT).show();
+                Toast.makeText(this, "תשובה שגויה, נסה שוב", Toast.LENGTH_SHORT).show();
                 etAnswer.setText("");
             }
         });
@@ -365,7 +365,7 @@ public class PlacementTestActivity extends AppCompatActivity {
                     showResultDialog(grade, level, "כל הכבוד! סיימת את המבחן בהצלחה.");                })
                 .addOnFailureListener(e -> {
                     // טיפול במקרה של שגיאת תקשורת
-                    Toast.makeText(this, "שגיאה בשמירת הנתונים: " + e.getMessage(), Toast.LENGTH_LONG).show();
+                    Toast.makeText(this, "שגיאה בשמירת הנתונים" + e.getMessage(), Toast.LENGTH_LONG).show();
                 });
     }
 

@@ -94,7 +94,7 @@ public class ImageRecognitionGameActivity extends AppCompatActivity {
                 }
 
                 if (questions.isEmpty()) {
-                    Toast.makeText(ImageRecognitionGameActivity.this, "אין שאלות לנושא זה", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(ImageRecognitionGameActivity.this, "לא נמצאו שאלות", Toast.LENGTH_SHORT).show();
                     finish();
                     return;
                 }

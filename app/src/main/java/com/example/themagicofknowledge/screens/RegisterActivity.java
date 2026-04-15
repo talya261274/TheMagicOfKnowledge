@@ -227,7 +227,7 @@ public class RegisterActivity extends BaseActivity implements View.OnClickListen
                 if (exists) {
                     Log.e(TAG, "onCompleted: Email already exists");
                     /// show error message to user
-                    Toast.makeText(RegisterActivity.this, "Email already exists", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(RegisterActivity.this, "אימייל כבר קיים", Toast.LENGTH_SHORT).show();
                 } else {
                     /// proceed to create the user
                     createUserInDatabase(user);
@@ -238,7 +238,7 @@ public class RegisterActivity extends BaseActivity implements View.OnClickListen
             public void onFailed(Exception e) {
                 Log.e(TAG, "onFailed: Failed to check if email exists", e);
                 /// show error message to user
-                Toast.makeText(RegisterActivity.this, "Failed to register user", Toast.LENGTH_SHORT).show();
+                Toast.makeText(RegisterActivity.this, "רישום המשתמש נכשל", Toast.LENGTH_SHORT).show();
             }
         });
     }
@@ -262,7 +262,7 @@ public class RegisterActivity extends BaseActivity implements View.OnClickListen
             public void onFailed(Exception e) {
                 Log.e(TAG, "createUserInDatabase: Failed to create user", e);
                 /// show error message to user
-                Toast.makeText(RegisterActivity.this, "Failed to register user", Toast.LENGTH_SHORT).show();
+                Toast.makeText(RegisterActivity.this, "רישום המשתמש נכשל", Toast.LENGTH_SHORT).show();
                 /// sign out the user if failed to register
                 SharedPreferencesUtil.signOutUser(RegisterActivity.this);
             }

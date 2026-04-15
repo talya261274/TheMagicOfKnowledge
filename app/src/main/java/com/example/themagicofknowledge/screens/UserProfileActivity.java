@@ -143,7 +143,7 @@ public class UserProfileActivity extends BaseActivity{
                     Toast.makeText(this, "הפרופיל עודכן בהצלחה!", Toast.LENGTH_SHORT).show();
                 })
                 .addOnFailureListener(e -> {
-                    Toast.makeText(this, "שגיאה בעדכון: " + e.getMessage(), Toast.LENGTH_SHORT).show();
+                    Toast.makeText(this, "שגיאה בעדכון" + e.getMessage(), Toast.LENGTH_SHORT).show();
                 });
     }
 

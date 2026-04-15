@@ -116,7 +116,7 @@ public class LoginActivity extends BaseActivity implements View.OnClickListener 
         if (!Validator.isUserNameValid(UName)) {
             Log.e(TAG, "checkInput: Invalid user name");
             /// show error message to user
-            etUName.setError("Invalid user name");
+            etUName.setError("שם משתמש לא חוקי");
             /// set focus to user name field
             etUName.requestFocus();
             return false;
@@ -125,7 +125,7 @@ public class LoginActivity extends BaseActivity implements View.OnClickListener 
         if (!Validator.isPasswordValid(password)) {
             Log.e(TAG, "checkInput: Invalid password");
             /// show error message to user
-            etPassword.setError("Password must be at least 6 characters long");
+            etPassword.setError("הסיסמה חייבת להיות באורך של לפחות 6 תווים");
             /// set focus to password field
             etPassword.requestFocus();
             return false;
@@ -142,7 +142,7 @@ public class LoginActivity extends BaseActivity implements View.OnClickListener 
             public void onCompleted(UserParent user) {
                 if (user == null) {
                     /// Show error message to user
-                    etPassword.setError("Invalid user name or password");
+                    etPassword.setError("שם משתמש או סיסמה לא חוקיים");
                     etPassword.requestFocus();
                     return;
                 }
@@ -160,7 +160,7 @@ public class LoginActivity extends BaseActivity implements View.OnClickListener 
             public void onFailed(Exception e) {
                 Log.e(TAG, "onFailed: Failed to retrieve user data", e);
                 /// Show error message to user
-                etPassword.setError("Invalid user name or password");
+                etPassword.setError("שם משתמש או סיסמה לא חוקיים");
                 etPassword.requestFocus();
                 /// Sign out the user if failed to retrieve user data
                 /// This is to prevent the user from being logged in again

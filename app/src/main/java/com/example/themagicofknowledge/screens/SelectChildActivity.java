@@ -180,7 +180,7 @@ public class SelectChildActivity extends BaseActivity {
 
                         @Override
                         public void onFailed(Exception e) {
-                            Toast.makeText(SelectChildActivity.this, "שגיאה במחיקה: " + e.getMessage(), Toast.LENGTH_SHORT).show();
+                            Toast.makeText(SelectChildActivity.this, "שגיאה במחיקה" + e.getMessage(), Toast.LENGTH_SHORT).show();
                         }
                     });
                 })
@@ -201,7 +201,7 @@ public class SelectChildActivity extends BaseActivity {
                     DatabaseService.getInstance().deleteChild(pId, cId, new DatabaseService.DatabaseCallback<Void>() {
                         @Override
                         public void onCompleted(Void object) {
-                            Toast.makeText(SelectChildActivity.this, "הילד נמחק", Toast.LENGTH_SHORT).show();
+                            Toast.makeText(SelectChildActivity.this, "הילד/ה נמחק/ה בהצלחה", Toast.LENGTH_SHORT).show();
                             loadChildrenFromDB();
                         }
                         @Override

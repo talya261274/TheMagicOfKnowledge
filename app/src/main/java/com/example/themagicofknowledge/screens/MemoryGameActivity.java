@@ -133,7 +133,7 @@ public class MemoryGameActivity extends AppCompatActivity {
                 }
 
                 if (cards.isEmpty()) {
-                    Toast.makeText(MemoryGameActivity.this, "לא נמצאו נתונים בנתיב: " + path, Toast.LENGTH_SHORT).show();
+                    Toast.makeText(MemoryGameActivity.this, "לא נמצאו נתונים בנתיב " + path, Toast.LENGTH_SHORT).show();
                     finish();
                 } else {
                     Collections.shuffle(cards);
