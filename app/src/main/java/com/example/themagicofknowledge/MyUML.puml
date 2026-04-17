@@ -1,0 +1,262 @@
+@startuml TheMagicOfKnowledge
+
+' ==================== הגדרות עיצוב ====================
+skinparam backgroundColor #FFFFFF
+skinparam classBackgroundColor #E3F2FD
+skinparam classBorderColor #1976D2
+skinparam classFontSize 12
+skinparam classFontName Arial
+skinparam arrowColor #1976D2
+skinparam classAttributeIconSize 10
+skinparam shadowing true
+skinparam roundCorner 10
+
+title The Magic of Knowledge - Class Diagram
+
+' ==================== Models (מודלים) ====================
+package "Models" #FFF3E0 {
+
+    class UserParent {
+        - id: String
+        - firstName: String
+        - lastName: String
+        - email: String
+        - phone: String
+        - birthDate: String
+        - userName: String
+        - password: String
+        - isAdmin: boolean
+        - childrenList: Map<String, UserChild>
+        --
+        + getChildrenListAsList(): List<UserChild>
+        + toString(): String
+    }
+
+    class UserChild {
+        - id: String
+        - parentId: String
+        - name: String
+        - avatar: String
+        - ageGroup: String
+        - age: int
+        - currentLevel: String
+        - totalTimeSeconds: long
+        - progress: Map<String, Object>
+        --
+        + initializeDefaultProgress(): void
+        + getFormattedTime(): String
+        + toMap(): Map<String, Object>
+    }
+
+    class Question {
+        - questionText: String
+        - options: List<String>
+        - correctAnswerIndex: int
+        - mediaUrl: String
+    }
+
+    class Pair {
+        - left: String
+        - right: String
+        - id: String
+    }
+
+    class SentenceQuestion {
+        - sentence: String
+        - correctAnswer: String
+        - hintImage: String
+    }
+
+    class MemoryCard {
+        + imageRes: int
+        + text: String
+        + matchId: String
+        + isFlipped: boolean
+        + isMatched: boolean
+    }
+
+    class FlashCard {
+        - imageResId: int
+        - answer: String
+    }
+
+    class UnifiedQuestion {
+        - type: Type
+        - data: Object
+        --
+        + getType(): Type
+        + getData(): Object
+    }
+
+    enum Type {
+        AUDIO
+        IMAGE
+        MATCHING
+        SENTENCE
+        MEMORY
+    }
+
+    class SubjectStat {
+        - subjectName: String
+        - attempts: int
+        - timeInSeconds: long
+        - completed: boolean
+        - progressPercent: int
+    }
+}
+
+' ==================== Services ====================
+package "Services" #E8F5E9 {
+    class DatabaseService {
+        - {static} instance: DatabaseService
+        - databaseReference: DatabaseReference
+        --
+        + {static} getInstance(): DatabaseService
+        + createNewUser(user, callback): void
+        + getUser(uid, callback): void
+        + getUserList(callback): void
+        + updateUser(userId, function, callback): void
+        + deleteChild(parentId, childId, callback): void
+        + updateDetailedProgress(...): void
+    }
+
+    interface "DatabaseCallback<T>" as DBCallback {
+        + onCompleted(T object): void
+        + onFailed(Exception e): void
+    }
+}
+
+' ==================== Utils ====================
+package "Utils" #FCE4EC {
+    class Validator {
+        + {static} isEmailValid(email): boolean
+        + {static} isPasswordValid(password): boolean
+        + {static} isPhoneValid(phone): boolean
+        + {static} isNameValid(name): boolean
+        + {static} isUserNameValid(uName): boolean
+        + {static} isParentBirthDateValid(date): boolean
+    }
+
+    class SharedPreferencesUtil {
+        + {static} saveUser(context, user): void
+        + {static} getUser(context): UserParent
+        + {static} signOutUser(context): void
+        + {static} saveCurrentChild(context, child): void
+        + {static} getCurrentChild(context): UserChild
+    }
+}
+
+' ==================== Adapters ====================
+package "Adapters" #F3E5F5 {
+    class ChildAdapter {
+        - children: List<UserChild>
+        - listener: OnChildClickListener
+        --
+        + onBindViewHolder(holder, position): void
+    }
+
+    class MemoryAdapter {
+        - cards: List<MemoryCard>
+        - cardSize: int
+        --
+        + getView(position, view, parent): View
+    }
+
+    class KeyboardAdapter {
+        - letters: String[]
+        - listener: OnKeyClickListener
+    }
+
+    class SubjectProgressAdapter {
+        - statsList: List<SubjectStat>
+    }
+}
+
+' ==================== Activities ====================
+package "Activities" #E0F2F1 {
+    abstract class BaseActivity {
+        # databaseService: DatabaseService
+        # drawerLayout: DrawerLayout
+        # navigationView: NavigationView
+        --
+        # hasSideMenu(): boolean
+        # showToolbar(): boolean
+        + onNavigationItemSelected(item): boolean
+    }
+
+    class LoginActivity
+    class RegisterActivity
+    class SelectChildActivity
+    class MainActivity
+    class SelectSubjectActivity
+    class UserProfileActivity
+
+    class MixedGameActivity {
+        - allQuestions: List<UnifiedQuestion>
+        - currentIndex: int
+        - attempts: int
+        - tts: TextToSpeech
+        --
+        - loadAllData(): void
+        - showCurrentQuestion(): void
+        - finishGame(): void
+    }
+
+    class FlashCardMain {
+        - cards: ArrayList<FlashCard>
+        - currentIndex: int
+        - tts: TextToSpeech
+    }
+
+    class PlacementTestActivity {
+        - testQuestions: List<Question>
+        - correctAnswersCount: int
+        - currentLevel: String
+    }
+
+    class ParentTrackingActivity {
+        - subjectsStats: List<SubjectStat>
+    }
+}
+
+' ==================== Relationships ====================
+
+' Inheritance - ירושה
+BaseActivity <|-- LoginActivity
+BaseActivity <|-- RegisterActivity
+BaseActivity <|-- SelectChildActivity
+BaseActivity <|-- MainActivity
+BaseActivity <|-- SelectSubjectActivity
+BaseActivity <|-- UserProfileActivity
+
+' Composition - הורה מכיל ילדים
+UserParent "1" *-- "0..*" UserChild : contains >
+
+' UnifiedQuestion uses Type enum
+UnifiedQuestion --> Type
+
+' Dependencies - תלויות
+BaseActivity ..> DatabaseService : uses >
+BaseActivity ..> SharedPreferencesUtil : uses >
+LoginActivity ..> Validator : validates >
+RegisterActivity ..> Validator : validates >
+MixedGameActivity ..> UnifiedQuestion : uses >
+MixedGameActivity ..> DatabaseService
+FlashCardMain ..> FlashCard
+PlacementTestActivity ..> Question
+ParentTrackingActivity ..> SubjectStat
+ParentTrackingActivity ..> SubjectProgressAdapter
+
+' Adapters depend on Models
+ChildAdapter ..> UserChild : displays >
+MemoryAdapter ..> MemoryCard : displays >
+SubjectProgressAdapter ..> SubjectStat : displays >
+
+' DatabaseService uses Callback
+DatabaseService ..> DBCallback : uses >
+
+' Services manage Models
+DatabaseService ..> UserParent : manages >
+DatabaseService ..> UserChild : manages >
+
+@enduml
