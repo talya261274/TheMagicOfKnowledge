@@ -14,12 +14,27 @@ public class GameProgress {
         this.timeSeconds = timeSeconds;
     }
 
-    public int getAttempts() { return attempts; }
-    public void setAttempts(int attempts) { this.attempts = attempts; }
+    public int getAttempts() {
+        return attempts;
+    }
 
-    public boolean isCompleted() { return completed; }
-    public void setCompleted(boolean completed) { this.completed = completed; }
+    public void setAttempts(int attempts) {
+        this.attempts = attempts;
+    }
 
-    public long getTimeSeconds() { return timeSeconds; }
-    public void setTimeSeconds(long timeSeconds) { this.timeSeconds = timeSeconds; }
+    public boolean isCompleted() {
+        return completed;
+    }
+
+    public void setCompleted(boolean completed) {
+        this.completed = completed;
+    }
+
+    public long getTimeSeconds() {
+        return timeSeconds;
+    }
+
+    public void setTimeSeconds(long timeSeconds) {
+        this.timeSeconds = timeSeconds;
+    }
 }

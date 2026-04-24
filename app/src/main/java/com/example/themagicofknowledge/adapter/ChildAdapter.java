@@ -5,10 +5,13 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
+
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
+
 import com.example.themagicofknowledge.R;
 import com.example.themagicofknowledge.models.UserChild;
+
 import java.util.List;
 
 public class ChildAdapter extends RecyclerView.Adapter<ChildAdapter.ChildViewHolder> {
@@ -16,15 +19,6 @@ public class ChildAdapter extends RecyclerView.Adapter<ChildAdapter.ChildViewHol
     private List<UserChild> children;
     private OnChildClickListener listener;
     private OnChildLongClickListener longClickListener;
-
-    // ממשקים להאזנה ללחיצות
-    public interface OnChildClickListener {
-        void onChildClick(UserChild child);
-    }
-
-    public interface OnChildLongClickListener {
-        void onChildLongClick(UserChild child);
-    }
 
     // קונסטרקטור
     public ChildAdapter(List<UserChild> children, OnChildClickListener listener, OnChildLongClickListener longClickListener) {
@@ -84,6 +78,15 @@ public class ChildAdapter extends RecyclerView.Adapter<ChildAdapter.ChildViewHol
     @Override
     public int getItemCount() {
         return children.size();
+    }
+
+    // ממשקים להאזנה ללחיצות
+    public interface OnChildClickListener {
+        void onChildClick(UserChild child);
+    }
+
+    public interface OnChildLongClickListener {
+        void onChildLongClick(UserChild child);
     }
 
     // ה-ViewHolder שמחזיק את הרכיבים של כל ריבוע

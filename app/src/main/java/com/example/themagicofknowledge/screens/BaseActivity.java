@@ -1,25 +1,21 @@
 package com.example.themagicofknowledge.screens;
 
+import android.app.Dialog;
 import android.content.Intent;
+import android.content.res.ColorStateList;
 import android.graphics.Color;
-import android.graphics.Typeface;
+import android.graphics.drawable.ColorDrawable;
 import android.os.Bundle;
-import android.text.Spannable;
-import android.text.SpannableString;
-import android.view.Menu;
 import android.view.MenuItem;
-import android.view.SubMenu;
 import android.view.View;
 import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.ActionBarDrawerToggle;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
-import androidx.core.content.res.ResourcesCompat;
 import androidx.core.view.GravityCompat;
 import androidx.drawerlayout.widget.DrawerLayout;
 
@@ -29,10 +25,6 @@ import com.example.themagicofknowledge.models.UserParent;
 import com.example.themagicofknowledge.services.DatabaseService;
 import com.example.themagicofknowledge.utils.SharedPreferencesUtil;
 import com.google.android.material.navigation.NavigationView;
-import android.app.Dialog;
-import android.graphics.drawable.ColorDrawable;
-import android.content.res.ColorStateList;
-import android.text.style.AbsoluteSizeSpan;
 
 public abstract class BaseActivity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener {
@@ -46,6 +38,7 @@ public abstract class BaseActivity extends AppCompatActivity
     protected boolean hasSideMenu() {
         return true;
     }
+
     protected boolean showToolbar() {
         return true;
     }
@@ -202,14 +195,10 @@ public abstract class BaseActivity extends AppCompatActivity
         else if (id == R.id.nav_profile) {
             navigateTo(UserProfileActivity.class);
 
-        }
-
-        else if (id == R.id.nav_progress) {
+        } else if (id == R.id.nav_progress) {
             navigateTo(ParentTrackingActivity.class);
 
-        }
-
-        else if (id == R.id.nav_change_child) {
+        } else if (id == R.id.nav_change_child) {
             navigateTo(SelectChildActivity.class);
 
         }
@@ -239,14 +228,10 @@ public abstract class BaseActivity extends AppCompatActivity
         else if (id == R.id.nav_game5) {
             navigateTo(SentenceCompletionActivity.class);
 
-        }
-
-        else if (id == R.id.nav_mix) {
+        } else if (id == R.id.nav_mix) {
             navigateTo(MixedGameActivity.class);
 
-        }
-
-        else if (id == R.id.nav_admin_users) {
+        } else if (id == R.id.nav_admin_users) {
             navigateTo(UsersListActivity.class);
 
         }

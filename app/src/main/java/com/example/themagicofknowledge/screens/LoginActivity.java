@@ -87,8 +87,8 @@ public class LoginActivity extends BaseActivity implements View.OnClickListener 
             Log.d(TAG, "onClick: Login button clicked");
 
             /// get the user name and password entered by the user
-            String UName = etUName.getText().toString()+"";
-            String password = etPassword.getText().toString()+"";
+            String UName = etUName.getText().toString() + "";
+            String password = etPassword.getText().toString() + "";
 
             /// log the user name and password
             Log.d(TAG, "onClick: User Name: " + UName);
@@ -110,6 +110,7 @@ public class LoginActivity extends BaseActivity implements View.OnClickListener 
 
     /// Method to check if the input is valid
     /// It checks if the yser name and password are valid
+    ///
     /// @see Validator#isUserNameValid(String) Valid(String)
     /// @see Validator#isPasswordValid(String)
     private boolean checkInput(String UName, String password) {

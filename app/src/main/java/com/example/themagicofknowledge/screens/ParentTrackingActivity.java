@@ -6,6 +6,7 @@ import android.view.Gravity;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
+
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.LinearLayoutManager;
@@ -125,7 +126,8 @@ public class ParentTrackingActivity extends AppCompatActivity {
 
                 DataSnapshot completedSnapshot = snapshot.child("completedSubjects");
                 for (DataSnapshot ds : completedSnapshot.getChildren()) {
-                    if (Boolean.TRUE.equals(ds.getValue(Boolean.class))) finishedSubjects.add(ds.getKey());
+                    if (Boolean.TRUE.equals(ds.getValue(Boolean.class)))
+                        finishedSubjects.add(ds.getKey());
                 }
 
                 DataSnapshot progressSnapshot = snapshot.child("progress");
@@ -146,21 +148,31 @@ public class ParentTrackingActivity extends AppCompatActivity {
                 tvCompletedCount.setText(String.valueOf(finishedSubjects.size()));
                 adapter.notifyDataSetChanged();
             }
+
             @Override
-            public void onCancelled(@NonNull DatabaseError error) { Log.e("ParentTracking", error.getMessage()); }
+            public void onCancelled(@NonNull DatabaseError error) {
+                Log.e("ParentTracking", error.getMessage());
+            }
         });
     }
 
     private String translateSubject(String sub) {
         if (sub == null) return "";
         switch (sub.toLowerCase()) {
-            case "animals": return "חיות";
-            case "numbers": return "מספרים";
-            case "colors": return "צבעים";
-            case "letters": return "אותיות";
-            case "shapes": return "צורות";
-            case "bodyparts": return "חלקי גוף";
-            default: return sub;
+            case "animals":
+                return "חיות";
+            case "numbers":
+                return "מספרים";
+            case "colors":
+                return "צבעים";
+            case "letters":
+                return "אותיות";
+            case "shapes":
+                return "צורות";
+            case "bodyparts":
+                return "חלקי גוף";
+            default:
+                return sub;
         }
     }
 }

@@ -1,9 +1,7 @@
 package com.example.themagicofknowledge.screens;
 
-import android.content.Intent;
 import android.os.Bundle;
 import android.os.Handler;
-import android.os.Looper;
 import android.util.DisplayMetrics;
 import android.view.View;
 import android.view.ViewGroup;
@@ -78,10 +76,10 @@ public class MemoryGameActivity extends AppCompatActivity {
         DisplayMetrics metrics = getResources().getDisplayMetrics();
 
         // חישוב רוחב זמין: רוחב המסך פחות ה-Padding של ה-Layout (24dp)
-        int screenWidth = metrics.widthPixels - (int)(24 * metrics.density);
+        int screenWidth = metrics.widthPixels - (int) (24 * metrics.density);
 
         // חישוב רווחים בין קלפים: יש לנו 3 עמודות, אז יש 2 רווחים של 12dp ביניהן
-        int totalSpacing = (int)(24 * metrics.density);
+        int totalSpacing = (int) (24 * metrics.density);
 
         // הגודל הסופי של כל כרטיס
         cardSize = (screenWidth - totalSpacing) / 3;
@@ -142,7 +140,8 @@ public class MemoryGameActivity extends AppCompatActivity {
             }
 
             @Override
-            public void onCancelled(@NonNull DatabaseError error) {}
+            public void onCancelled(@NonNull DatabaseError error) {
+            }
         });
     }
 
@@ -216,14 +215,14 @@ public class MemoryGameActivity extends AppCompatActivity {
 
         /**
          Intent intent = new Intent(this, GameResultActivity.class);
-        intent.putExtra("success", true);
-        intent.putExtra("subject", subject);
-        intent.putExtra("totalAttempts", finalTotalAttempts);
-        intent.putExtra("totalTime", finalTotalTime);
+         intent.putExtra("success", true);
+         intent.putExtra("subject", subject);
+         intent.putExtra("totalAttempts", finalTotalAttempts);
+         intent.putExtra("totalTime", finalTotalTime);
 
-        startActivity(intent);
-        finish();
-        **/
+         startActivity(intent);
+         finish();
+         **/
     }
 
     // מחלקת כרטיס

@@ -22,9 +22,9 @@
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:fontFamily="@font/gan"
                 android:layout_gravity="center"
                 android:layout_marginTop="20dp"
+                android:fontFamily="@font/gan"
                 android:shadowColor="@android:color/holo_blue_light"
                 android:shadowDx="5"
                 android:shadowDy="5"
@@ -37,16 +37,16 @@
             <com.google.android.material.card.MaterialCardView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                app:cardElevation="0dp"
-                app:cardBackgroundColor="#80E0E9E9"
                 android:layout_marginTop="30dp"
-                app:cardCornerRadius="16dp">
+                app:cardBackgroundColor="#80E0E9E9"
+                app:cardCornerRadius="16dp"
+                app:cardElevation="0dp">
 
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:orientation="vertical"
                     android:gravity="center"
+                    android:orientation="vertical"
                     android:padding="32dp">
 
 
@@ -60,19 +60,19 @@
                         android:id="@+id/tv_user_display_name"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
+                        android:layout_marginBottom="8dp"
                         android:text="שם משתמש"
-                        android:textSize="24sp"
-                        android:textStyle="bold"
                         android:textColor="#000000"
-                        android:layout_marginBottom="8dp" />
+                        android:textSize="24sp"
+                        android:textStyle="bold" />
 
                     <TextView
                         android:id="@+id/tv_user_display_id"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:text="000000000"
-                        android:textSize="14sp"
-                        android:textColor="#000000" />
+                        android:textColor="#000000"
+                        android:textSize="14sp" />
 
                     <com.google.android.material.card.MaterialCardView
                         android:id="@+id/admin_badge"
@@ -87,25 +87,25 @@
                         <LinearLayout
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
+                            android:gravity="center_vertical"
                             android:orientation="horizontal"
                             android:paddingHorizontal="12dp"
-                            android:paddingVertical="6dp"
-                            android:gravity="center_vertical">
+                            android:paddingVertical="6dp">
 
                             <TextView
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
+                                android:layout_marginEnd="6dp"
                                 android:text="⚙️"
-                                android:textSize="14sp"
-                                android:layout_marginEnd="6dp" />
+                                android:textSize="14sp" />
 
                             <TextView
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
                                 android:text="Administrator"
+                                android:textColor="#000000"
                                 android:textSize="12sp"
-                                android:textStyle="bold"
-                                android:textColor="#000000" />
+                                android:textStyle="bold" />
 
                         </LinearLayout>
 
@@ -118,10 +118,10 @@
             <com.google.android.material.card.MaterialCardView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                app:cardElevation="0dp"
-                app:cardBackgroundColor="#80E0E9E9"
                 android:layout_marginTop="15dp"
-                app:cardCornerRadius="16dp">
+                app:cardBackgroundColor="#80E0E9E9"
+                app:cardCornerRadius="16dp"
+                app:cardElevation="0dp">
 
                 <LinearLayout
                     android:layout_width="match_parent"
@@ -293,10 +293,10 @@
             <com.google.android.material.card.MaterialCardView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                app:cardElevation="0dp"
-                app:cardBackgroundColor="#80E0E9E9"
                 android:layout_marginTop="15dp"
-                app:cardCornerRadius="16dp">
+                app:cardBackgroundColor="#80E0E9E9"
+                app:cardCornerRadius="16dp"
+                app:cardElevation="0dp">
 
                 <LinearLayout
                     android:layout_width="match_parent"
@@ -307,37 +307,37 @@
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="מעקב ילדים:"
-                        android:fontFamily="@font/gveretlevin"
-                        android:textColor="@color/black"
-                        android:textSize="20sp"
+                        android:layout_gravity="right"
                         android:layout_marginBottom="12dp"
-                        android:layout_gravity="right" />
+                        android:fontFamily="@font/gveretlevin"
+                        android:text="מעקב ילדים:"
+                        android:textColor="@color/black"
+                        android:textSize="20sp" />
 
                     <LinearLayout
                         android:id="@+id/container_children_links"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:orientation="vertical"
-                        android:gravity="center" />
+                        android:gravity="center"
+                        android:orientation="vertical" />
 
                 </LinearLayout>
             </com.google.android.material.card.MaterialCardView>
 
             <com.google.android.material.button.MaterialButton
                 android:id="@+id/btn_sign_out"
+                style="@style/Widget.MaterialComponents.Button.OutlinedButton"
                 android:layout_width="match_parent"
                 android:layout_height="56dp"
+                android:layout_marginTop="20dp"
                 android:text="התנתקות"
                 android:textAllCaps="false"
-                android:layout_marginTop="20dp"
-                app:cornerRadius="26dp"
-                style="@style/Widget.MaterialComponents.Button.OutlinedButton"
-                app:strokeColor="#4493E0"
                 android:textColor="#4493E0"
-                app:strokeWidth="1.5dp"
                 android:textSize="17dp"
-                android:textStyle="bold"/>
+                android:textStyle="bold"
+                app:cornerRadius="26dp"
+                app:strokeColor="#4493E0"
+                app:strokeWidth="1.5dp" />
 
         </LinearLayout>
 

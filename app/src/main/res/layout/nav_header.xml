@@ -1,37 +1,36 @@
-<LinearLayout
-    xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="200dp"
-    android:orientation="vertical"
     android:background="@drawable/nav_background"
+    android:fitsSystemWindows="true"
     android:gravity="center"
-    android:padding="24dp"
-    android:fitsSystemWindows="true">
+    android:orientation="vertical"
+    android:padding="24dp">
 
     <ImageView
         android:id="@+id/nav_user_image"
         android:layout_width="80dp"
         android:layout_height="80dp"
         android:layout_marginBottom="16dp"
-        android:src="@drawable/logo"/>
+        android:src="@drawable/logo" />
 
     <TextView
         android:id="@+id/nav_user_name"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:fontFamily="@font/varelaround"
         android:text="שלום, משתמש"
         android:textColor="@color/white"
         android:textSize="20sp"
-        android:textStyle="bold"
-        android:fontFamily="@font/varelaround"/>
+        android:textStyle="bold" />
 
     <TextView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:layout_marginTop="4dp"
+        android:fontFamily="@font/gveretlevin"
         android:text="הקסם שבידע"
         android:textColor="@color/white"
-        android:textSize="14sp"
-        android:layout_marginTop="4dp"
-        android:fontFamily="@font/gveretlevin"/>
+        android:textSize="14sp" />
 
 </LinearLayout>

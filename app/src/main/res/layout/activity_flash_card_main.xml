@@ -1,11 +1,11 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:background="@drawable/main_background"
-    android:orientation="vertical"
     android:gravity="center"
+    android:orientation="vertical"
     android:padding="24dp">
 
     <!-- כותרת עליונה -->
@@ -31,16 +31,16 @@
         android:layout_width="280dp"
         android:layout_height="360dp"
         android:layout_marginBottom="24dp"
-        app:cardCornerRadius="20dp"
-        app:cardElevation="8dp"
         android:clickable="true"
-        android:focusable="true">
+        android:focusable="true"
+        app:cardCornerRadius="20dp"
+        app:cardElevation="8dp">
 
         <FrameLayout
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:padding="24dp"
-            android:background="#80FFFFFF">
+            android:background="#80FFFFFF"
+            android:padding="24dp">
 
             <!-- תמונה -->
             <ImageView
@@ -48,7 +48,7 @@
                 android:layout_width="200dp"
                 android:layout_height="200dp"
                 android:layout_gravity="center"
-                android:visibility="visible"/>
+                android:visibility="visible" />
 
             <!-- טקסט -->
             <TextView
@@ -57,10 +57,10 @@
                 android:layout_height="wrap_content"
                 android:layout_gravity="center"
                 android:gravity="center"
+                android:textColor="#000000"
                 android:textSize="40sp"
                 android:textStyle="bold"
-                android:textColor="#000000"
-                android:visibility="gone"/>
+                android:visibility="gone" />
 
         </FrameLayout>
     </com.google.android.material.card.MaterialCardView>
@@ -70,31 +70,32 @@
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:gravity="center"
         android:layout_marginTop="10dp"
         android:layout_marginBottom="20dp"
+        android:gravity="center"
         android:orientation="horizontal">
 
         <ImageButton
             android:id="@+id/btnPrev"
             android:layout_width="60dp"
             android:layout_height="60dp"
+            android:background="@drawable/btn_movesides"
             android:shadowColor="@android:color/holo_blue_light"
             android:shadowDx="4"
             android:shadowDy="4"
             android:shadowRadius="8"
-            android:background="@drawable/btn_movesides"
             android:src="@drawable/ic_arrow_back" />
 
         <View
             android:layout_width="70dp"
-            android:layout_height="10dp"/>
+            android:layout_height="10dp" />
 
         <ImageButton
             android:id="@+id/btnNext"
-            android:src="@drawable/ic_arrow_forward"            android:background="@drawable/btn_movesides"
             android:layout_width="60dp"
-            android:layout_height="60dp"/>
+            android:layout_height="60dp"
+            android:background="@drawable/btn_movesides"
+            android:src="@drawable/ic_arrow_forward" />
     </LinearLayout>
 
     <ImageButton
@@ -104,23 +105,23 @@
         android:layout_gravity="bottom|center_horizontal"
         android:layout_marginBottom="16dp"
         android:background="@drawable/btn_orange_selector"
-        android:src="@drawable/ic_volume_up"
+        android:contentDescription="Play Sound"
         android:scaleType="centerInside"
-        android:visibility="gone"
-        android:contentDescription="Play Sound"/>
+        android:src="@drawable/ic_volume_up"
+        android:visibility="gone" />
 
     <com.google.android.material.button.MaterialButton
         android:id="@+id/btnStartGame"
         android:layout_width="250dp"
         android:layout_height="55dp"
         android:layout_marginTop="10dp"
+        android:backgroundTint="#03A9F4"
+        android:fontFamily="@font/gan"
         android:text="בואו נשחק! 🎮"
+        android:textColor="@color/white"
         android:textSize="22sp"
         android:textStyle="bold"
-        android:fontFamily="@font/gan"
-        android:textColor="@color/white"
-        android:backgroundTint="#03A9F4"
-        app:cornerRadius="30dp"
-        android:visibility="gone" />
+        android:visibility="gone"
+        app:cornerRadius="30dp" />
 
 </LinearLayout>

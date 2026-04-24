@@ -4,7 +4,6 @@ import android.app.AlertDialog;
 import android.content.Intent;
 import android.graphics.Color;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
@@ -165,6 +164,7 @@ public class SelectChildActivity extends BaseActivity {
 
         dialog.show();
     }
+
     private void deleteChild(UserChild child) {
         new AlertDialog.Builder(this)
                 .setTitle("מחיקת ילד/ה")
@@ -204,6 +204,7 @@ public class SelectChildActivity extends BaseActivity {
                             Toast.makeText(SelectChildActivity.this, "הילד/ה נמחק/ה בהצלחה", Toast.LENGTH_SHORT).show();
                             loadChildrenFromDB();
                         }
+
                         @Override
                         public void onFailed(Exception e) {
                             Toast.makeText(SelectChildActivity.this, "שגיאה במחיקה", Toast.LENGTH_SHORT).show();

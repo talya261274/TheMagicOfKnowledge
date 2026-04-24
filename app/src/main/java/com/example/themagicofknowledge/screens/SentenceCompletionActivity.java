@@ -32,23 +32,6 @@ import java.util.List;
 
 public class SentenceCompletionActivity extends AppCompatActivity {
 
-    private TextView tvSentence;
-    private EditText etAnswer;
-    private ImageView ivHint;
-    private Button btnCheck;
-    private GridView keyboardGrid;
-    private ProgressBar testProgress;
-
-    private int attemptsFromBefore;
-    private long timeFromBefore;
-
-    private List<SentenceQuestion> questions = new ArrayList<>();
-    private int currentIndex = 0;
-    private int attempts = 0;
-    private long startTime;
-    private String subject;
-    private UserChild currentChild;
-
     private final String[] hebrewLetters = {
             // שורה 1: כפתור מחיקה + א עד ו
             "ו", "ה", "ד", "ג", "ב", "א", "DEL",
@@ -62,6 +45,20 @@ public class SentenceCompletionActivity extends AppCompatActivity {
             // שורה 4: האותיות הסופיות + ש ו- ת
             "ץ", "ף", "ן", "ם", "ך", "ת", "ש",
     };
+    private TextView tvSentence;
+    private EditText etAnswer;
+    private ImageView ivHint;
+    private Button btnCheck;
+    private GridView keyboardGrid;
+    private ProgressBar testProgress;
+    private int attemptsFromBefore;
+    private long timeFromBefore;
+    private List<SentenceQuestion> questions = new ArrayList<>();
+    private int currentIndex = 0;
+    private int attempts = 0;
+    private long startTime;
+    private String subject;
+    private UserChild currentChild;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -74,7 +71,10 @@ public class SentenceCompletionActivity extends AppCompatActivity {
         if (subject == null) subject = "animals";
 
         currentChild = SharedPreferencesUtil.getCurrentChild(this);
-        if (currentChild == null) { finish(); return; }
+        if (currentChild == null) {
+            finish();
+            return;
+        }
 
         initViews();
         setupCustomKeyboard();
@@ -116,8 +116,10 @@ public class SentenceCompletionActivity extends AppCompatActivity {
                     finish();
                 }
             }
+
             @Override
-            public void onCancelled(@NonNull DatabaseError error) {}
+            public void onCancelled(@NonNull DatabaseError error) {
+            }
         });
     }
 

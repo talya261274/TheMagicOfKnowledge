@@ -5,7 +5,8 @@ public class Pair {
     private String right;
     private String id;
 
-    public Pair() {}
+    public Pair() {
+    }
 
     public Pair(String left, String right, String id) {
         this.left = left;
@@ -35,5 +36,14 @@ public class Pair {
 
     public void setId(String id) {
         this.id = id;
+    }
+
+    @Override
+    public String toString() {
+        return "Pair{" +
+                "left='" + left + '\'' +
+                ", right='" + right + '\'' +
+                ", id='" + id + '\'' +
+                '}';
     }
 }

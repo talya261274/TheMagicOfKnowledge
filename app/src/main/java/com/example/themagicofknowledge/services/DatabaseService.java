@@ -45,14 +45,6 @@ public class DatabaseService {
         return instance;
     }
 
-    // Callback interface
-    public interface DatabaseCallback<T> {
-        void onCompleted(T object);
-        void onFailed(Exception e);
-    }
-
-    // --- Generic private methods for read/write ---
-
     private void writeData(@NotNull final String path, @NotNull final Object data, @Nullable final DatabaseCallback<Void> callback) {
         readData(path).setValue(data, (error, ref) -> {
             if (error != null) {
@@ -62,6 +54,8 @@ public class DatabaseService {
             }
         });
     }
+
+    // --- Generic private methods for read/write ---
 
     private void deleteData(@NotNull final String path, @Nullable final DatabaseCallback<Void> callback) {
         readData(path).removeValue((error, ref) -> {
@@ -134,11 +128,11 @@ public class DatabaseService {
         });
     }
 
-    // --- User Section ---
-
     public String generateUserId() {
         return generateNewId(USERS_PATH);
     }
+
+    // --- User Section ---
 
     public void createNewUser(@NotNull final UserParent user, @Nullable final DatabaseCallback<Void> callback) {
         writeData(USERS_PATH + "/" + user.getId(), user, callback);
@@ -301,5 +295,12 @@ public class DatabaseService {
                 .child("lastQuestionIndex")
                 .setValue(0);
 
+    }
+
+    // Callback interface
+    public interface DatabaseCallback<T> {
+        void onCompleted(T object);
+
+        void onFailed(Exception e);
     }
 }

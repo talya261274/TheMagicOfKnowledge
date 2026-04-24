@@ -9,7 +9,8 @@ public class Question {
     private int correctAnswerIndex;
     private String mediaUrl;
 
-    public Question() { }
+    public Question() {
+    }
 
     public Question(String questionText, List<String> options, List<String> optionLabels, int correctAnswerIndex, String mediaUrl) {
         this.questionText = questionText;

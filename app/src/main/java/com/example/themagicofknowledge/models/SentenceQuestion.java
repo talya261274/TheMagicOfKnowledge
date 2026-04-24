@@ -5,7 +5,8 @@ public class SentenceQuestion {
     private String correctAnswer;  // המילה שהילד צריך להקליד
     private String hintImage;      // שם התמונה ב-drawable
 
-    public SentenceQuestion() {}
+    public SentenceQuestion() {
+    }
 
     public SentenceQuestion(String sentence, String correctAnswer, String hintImage) {
         this.sentence = sentence;

@@ -6,8 +6,10 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.Toast;
+
 import androidx.annotation.NonNull;
 import androidx.cardview.widget.CardView;
+
 import com.example.themagicofknowledge.R;
 import com.example.themagicofknowledge.models.UserChild;
 import com.example.themagicofknowledge.utils.SharedPreferencesUtil;
@@ -24,7 +26,9 @@ public class SelectSubjectActivity extends BaseActivity {
     private UserChild currentChild;
 
     @Override
-    protected boolean hasSideMenu() { return true; }
+    protected boolean hasSideMenu() {
+        return true;
+    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -110,7 +114,8 @@ public class SelectSubjectActivity extends BaseActivity {
             }
 
             @Override
-            public void onCancelled(@NonNull DatabaseError error) {}
+            public void onCancelled(@NonNull DatabaseError error) {
+            }
         });
     }
 

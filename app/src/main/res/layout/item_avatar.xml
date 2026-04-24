@@ -9,9 +9,9 @@
         android:id="@+id/ivAvatarItem"
         android:layout_width="100dp"
         android:layout_height="100dp"
-        android:scaleType="centerCrop"
         android:background="@drawable/avatar_background_selector"
+        android:contentDescription="אוואטר"
         android:padding="10dp"
-        android:contentDescription="אוואטר" />
+        android:scaleType="centerCrop" />
 
 </LinearLayout>

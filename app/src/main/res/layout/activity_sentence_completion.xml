@@ -70,8 +70,9 @@
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
                 android:layout_marginHorizontal="20dp"
-                app:cardCornerRadius="20dp"
-                android:visibility="gone">
+                android:visibility="gone"
+                app:cardCornerRadius="20dp">
+
                 <ImageView
                     android:id="@+id/ivMixedImage"
                     android:layout_width="match_parent"
@@ -95,8 +96,8 @@
                 android:layout_margin="6dp"
                 android:textColor="#333333"
                 android:textSize="18sp"
-                app:cornerRadius="20dp"
                 app:backgroundTint="#FFFFFF"
+                app:cornerRadius="20dp"
                 app:iconGravity="top"
                 app:iconSize="80dp" />
 
@@ -108,8 +109,8 @@
                 android:layout_margin="6dp"
                 android:textColor="#333333"
                 android:textSize="18sp"
-                app:cornerRadius="20dp"
                 app:backgroundTint="#FFFFFF"
+                app:cornerRadius="20dp"
                 app:iconGravity="top"
                 app:iconSize="80dp" />
 
@@ -121,8 +122,8 @@
                 android:layout_margin="6dp"
                 android:textColor="#333333"
                 android:textSize="18sp"
-                app:cornerRadius="20dp"
                 app:backgroundTint="#FFFFFF"
+                app:cornerRadius="20dp"
                 app:iconGravity="top"
                 app:iconSize="80dp" />
 
@@ -134,8 +135,8 @@
                 android:layout_margin="6dp"
                 android:textColor="#333333"
                 android:textSize="18sp"
-                app:cornerRadius="20dp"
                 app:backgroundTint="#FFFFFF"
+                app:cornerRadius="20dp"
                 app:iconGravity="top"
                 app:iconSize="80dp" />
         </GridLayout>
@@ -147,24 +148,41 @@
         android:layout_height="0dp"
         android:layout_marginTop="20dp"
         android:orientation="horizontal"
-        android:weightSum="2"
         android:visibility="gone"
+        android:weightSum="2"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintTop_toBottomOf="@id/ivMixedAvatar">
 
-        <LinearLayout android:id="@+id/mixedLeftColumn" android:layout_width="0dp" android:layout_height="wrap_content" android:layout_weight="1" android:orientation="vertical" android:padding="8dp"/>
+        <LinearLayout
+            android:id="@+id/mixedLeftColumn"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:orientation="vertical"
+            android:padding="8dp" />
 
-        <View android:layout_width="2dp" android:layout_height="match_parent" android:alpha="0.3" android:background="@color/white" android:layout_marginVertical="20dp" />
+        <View
+            android:layout_width="2dp"
+            android:layout_height="match_parent"
+            android:layout_marginVertical="20dp"
+            android:alpha="0.3"
+            android:background="@color/white" />
 
-        <LinearLayout android:id="@+id/mixedRightColumn" android:layout_width="0dp" android:layout_height="wrap_content" android:layout_weight="1" android:orientation="vertical" android:padding="8dp"/>
+        <LinearLayout
+            android:id="@+id/mixedRightColumn"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:orientation="vertical"
+            android:padding="8dp" />
     </LinearLayout>
 
     <LinearLayout
         android:id="@+id/containerSentence"
         android:layout_width="match_parent"
         android:layout_height="0dp"
-        android:orientation="vertical"
         android:gravity="center_horizontal"
+        android:orientation="vertical"
         android:visibility="gone"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintTop_toBottomOf="@id/ivMixedAvatar">
@@ -180,28 +198,28 @@
             android:id="@+id/tvMixedSentenceText"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:textSize="25sp"
+            android:layout_marginVertical="10dp"
             android:gravity="center"
             android:textColor="@color/white"
-            android:layout_marginVertical="10dp" />
+            android:textSize="25sp" />
 
         <EditText
             android:id="@+id/etMixedAnswer"
             android:layout_width="match_parent"
             android:layout_height="50dp"
+            android:layout_marginBottom="10dp"
+            android:background="@drawable/keyboard_key_selector"
             android:focusable="false"
             android:gravity="center"
-            android:textColor="@color/white"
-            android:background="@drawable/keyboard_key_selector"
-            android:layout_marginBottom="10dp" />
+            android:textColor="@color/white" />
 
         <Button
             android:id="@+id/btnCheck"
             android:layout_width="match_parent"
             android:layout_height="55dp"
             android:layout_marginHorizontal="32dp"
-            android:text="בדוק תשובה"
             android:backgroundTint="#FF9800"
+            android:text="בדוק תשובה"
             android:textStyle="bold" />
 
         <GridView
@@ -209,10 +227,10 @@
             android:layout_width="match_parent"
             android:layout_height="0dp"
             android:layout_weight="1"
-            android:numColumns="7"
             android:horizontalSpacing="8dp"
-            android:verticalSpacing="8dp"
-            android:padding="8dp" />
+            android:numColumns="7"
+            android:padding="8dp"
+            android:verticalSpacing="8dp" />
     </LinearLayout>
 
     <RelativeLayout
@@ -227,12 +245,12 @@
             android:id="@+id/gvMemoryBoard"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
+            android:layout_marginTop="20dp"
             android:gravity="center"
             android:horizontalSpacing="12dp"
-            android:verticalSpacing="12dp"
             android:numColumns="3"
             android:stretchMode="columnWidth"
-            android:layout_marginTop="20dp"/>
+            android:verticalSpacing="12dp" />
     </RelativeLayout>
 
 </androidx.constraintlayout.widget.ConstraintLayout>

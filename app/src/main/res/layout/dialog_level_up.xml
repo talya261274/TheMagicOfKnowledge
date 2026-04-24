@@ -20,32 +20,32 @@
             android:src="@drawable/ic_trophy" />
 
         <TextView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="כל הכבוד! סיימת הכל!"
-        android:textColor="#FFFFFF"
-        android:textSize="24sp"
-        android:textStyle="bold"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
             android:layout_marginTop="10dp"
-        android:fontFamily="@font/gan" />
+            android:fontFamily="@font/gan"
+            android:text="כל הכבוד! סיימת הכל!"
+            android:textColor="#FFFFFF"
+            android:textSize="24sp"
+            android:textStyle="bold" />
 
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginTop="8dp"
             android:gravity="center"
-            android:textStyle="bold"
             android:text="עברת על כל הנושאים בהצלחה.\nמוכן לעלות לרמה הבאה?"
             android:textColor="#FFFFFF"
-            android:textSize="18sp" />
+            android:textSize="18sp"
+            android:textStyle="bold" />
 
         <com.google.android.material.button.MaterialButton
             android:id="@+id/btnLevelUp"
             android:layout_width="220dp"
             android:layout_height="55dp"
             android:layout_marginTop="24dp"
-            android:textStyle="bold"
             android:text="כן! בוא נעלה רמה"
+            android:textStyle="bold"
             app:backgroundTint="#4CAF50"
             app:cornerRadius="30dp" />
 

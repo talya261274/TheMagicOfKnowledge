@@ -5,28 +5,28 @@
     android:layout_height="wrap_content"
     android:layout_marginHorizontal="16dp"
     android:layout_marginVertical="8dp"
+    app:cardBackgroundColor="#FFFFFF"
     app:cardCornerRadius="20dp"
-    app:cardElevation="4dp"
-    app:cardBackgroundColor="#FFFFFF">
+    app:cardElevation="4dp">
 
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:layoutDirection="rtl"
         android:orientation="vertical"
-        android:padding="16dp"
-        android:layoutDirection="rtl">
+        android:padding="16dp">
 
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:orientation="horizontal"
-            android:gravity="center_vertical">
+            android:gravity="center_vertical"
+            android:orientation="horizontal">
 
             <androidx.cardview.widget.CardView
                 android:layout_width="50dp"
                 android:layout_height="50dp"
-                app:cardCornerRadius="12dp"
                 app:cardBackgroundColor="#F6EBF3"
+                app:cardCornerRadius="12dp"
                 app:cardElevation="0dp">
 
                 <ImageView
@@ -41,30 +41,30 @@
                 android:id="@+id/tvSubjectName"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
-                android:layout_weight="1"
                 android:layout_marginRight="16dp"
-                android:text="נושא: חיות"
+                android:layout_weight="1"
                 android:fontFamily="@font/gveretlevin"
+                android:text="נושא: חיות"
+                android:textColor="#1A237E"
                 android:textSize="18sp"
-                android:textStyle="bold"
-                android:textColor="#1A237E" />
+                android:textStyle="bold" />
 
             <TextView
                 android:id="@+id/tvAttempts"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="טעויות: 3"
                 android:fontFamily="@font/gan"
-                android:textSize="14sp"
-                android:textColor="#E74C3C" />
+                android:text="טעויות: 3"
+                android:textColor="#E74C3C"
+                android:textSize="14sp" />
         </LinearLayout>
 
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:orientation="horizontal"
             android:layout_marginTop="16dp"
-            android:gravity="center_vertical">
+            android:gravity="center_vertical"
+            android:orientation="horizontal">
 
             <com.google.android.material.progressindicator.LinearProgressIndicator
                 android:id="@+id/pbSubjectProgress"
@@ -83,8 +83,8 @@
                 android:layout_height="wrap_content"
                 android:layout_marginRight="12dp"
                 android:text="75%"
-                android:textSize="14sp"
                 android:textColor="#757575"
+                android:textSize="14sp"
                 android:textStyle="bold" />
         </LinearLayout>
 
@@ -95,8 +95,8 @@
             android:layout_gravity="left"
             android:layout_marginTop="8dp"
             android:text="זמן: 02:30"
-            android:textSize="12sp"
-            android:textColor="#95a5a6"/>
+            android:textColor="#95a5a6"
+            android:textSize="12sp" />
 
     </LinearLayout>
 </androidx.cardview.widget.CardView>

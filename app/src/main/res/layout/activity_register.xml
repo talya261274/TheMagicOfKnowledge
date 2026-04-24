@@ -1,20 +1,19 @@
 <?xml version="1.0" encoding="utf-8"?>
-<ScrollView
-    xmlns:android="http://schemas.android.com/apk/res/android"
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/register"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:fillViewport="true"
     android:background="@drawable/main_background"
-    android:id="@+id/register"
+    android:fillViewport="true"
     tools:context=".screens.RegisterActivity">
 
     <androidx.constraintlayout.widget.ConstraintLayout
+        android:id="@+id/main"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:padding="24dp"
-        android:id="@+id/main">
+        android:padding="24dp">
 
         <Button
             android:id="@+id/goBackBtn2"
@@ -32,19 +31,19 @@
             android:id="@+id/tvTitleRegister"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="@string/Register"
-            android:textSize="40sp"
+            android:layout_marginTop="30dp"
+            android:fontFamily="@font/gan"
             android:shadowColor="@android:color/holo_blue_light"
             android:shadowDx="5"
             android:shadowDy="5"
             android:shadowRadius="10"
-            android:textStyle="bold"
+            android:text="@string/Register"
             android:textColor="@color/white"
-            android:fontFamily="@font/gan"
-            app:layout_constraintTop_toTopOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
+            android:textSize="40sp"
+            android:textStyle="bold"
             app:layout_constraintEnd_toEndOf="parent"
-            android:layout_marginTop="30dp" />
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
 
         <!-- שם פרטי -->
         <com.google.android.material.textfield.TextInputLayout
@@ -202,9 +201,9 @@
             android:layout_marginTop="16dp"
             android:hint="@string/Password"
             android:maxWidth="488dp"
-            app:endIconMode="password_toggle"
             app:boxBackgroundColor="#66FFFFFF"
             app:boxBackgroundMode="outline"
+            app:endIconMode="password_toggle"
             app:hintTextColor="#5C6166"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
@@ -227,9 +226,9 @@
             android:layout_marginTop="16dp"
             android:hint="@string/PassVer"
             android:maxWidth="488dp"
-            app:endIconMode="password_toggle"
             app:boxBackgroundColor="#66FFFFFF"
             app:boxBackgroundMode="outline"
+            app:endIconMode="password_toggle"
             app:hintTextColor="#5C6166"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
@@ -250,18 +249,18 @@
             android:layout_height="49dp"
             android:layout_marginTop="32dp"
             android:background="@drawable/btn_blue_selector"
-            app:backgroundTint="@null"
+            android:elevation="8dp"
             android:maxWidth="488dp"
-            android:text="@string/SignUp"
-            android:textColor="#FFFFFF"
-            android:textSize="18sp"
-            android:textStyle="bold"
-            app:cornerRadius="50dp"
             android:shadowColor="@color/hint_text_color"
             android:shadowDx="5"
             android:shadowDy="5"
             android:shadowRadius="10"
-            android:elevation="8dp"
+            android:text="@string/SignUp"
+            android:textColor="#FFFFFF"
+            android:textSize="18sp"
+            android:textStyle="bold"
+            app:backgroundTint="@null"
+            app:cornerRadius="50dp"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@id/et_register_confirm_password" />

@@ -1,10 +1,8 @@
 package com.example.themagicofknowledge.screens;
 
 import android.content.Intent;
-import android.graphics.drawable.AnimatedVectorDrawable;
 import android.os.Bundle;
 import android.widget.Button;
-import android.widget.ImageView;
 
 import androidx.activity.EdgeToEdge;
 import androidx.appcompat.app.AppCompatActivity;
@@ -19,6 +17,7 @@ import com.example.themagicofknowledge.utils.SharedPreferencesUtil;
 public class LandingActivity extends AppCompatActivity {
 
     UserParent UserParent;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -32,7 +31,7 @@ public class LandingActivity extends AppCompatActivity {
         });
 
         UserParent = SharedPreferencesUtil.getUser(LandingActivity.this);
-        if(SharedPreferencesUtil.isUserLoggedIn(LandingActivity.this)){
+        if (SharedPreferencesUtil.isUserLoggedIn(LandingActivity.this)) {
             Intent intent = new Intent(LandingActivity.this, Total.class);
             intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
             startActivity(intent);

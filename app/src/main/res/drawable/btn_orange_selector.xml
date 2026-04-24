@@ -3,16 +3,16 @@
     <!--Pressed -->
     <item android:state_pressed="true">
         <shape android:shape="rectangle">
-            <solid android:color="#F28706"/> <!-- Darker pink -->
-            <corners android:radius="40dp"/>
+            <solid android:color="#F28706" /> <!-- Darker pink -->
+            <corners android:radius="40dp" />
         </shape>
     </item>
 
     <!-- Normal -->
     <item>
         <shape android:shape="rectangle">
-            <solid android:color="#fca503"/> <!-- Normal pink -->
-            <corners android:radius="40dp"/>
+            <solid android:color="#fca503" /> <!-- Normal pink -->
+            <corners android:radius="40dp" />
         </shape>
     </item>
 

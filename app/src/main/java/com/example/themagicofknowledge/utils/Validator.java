@@ -1,11 +1,12 @@
 package com.example.themagicofknowledge.utils;
 
 import android.util.Patterns;
+
+import androidx.annotation.Nullable;
+
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
-import java.util.Calendar;
 import java.util.Date;
-import androidx.annotation.Nullable;
 
 /// Validator class to validate user input.
 /// This class contains static methods to validate user input,

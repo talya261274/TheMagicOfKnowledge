@@ -63,8 +63,8 @@
         android:layout_height="wrap_content"
         android:layout_marginTop="20dp"
         android:columnCount="2"
-        app:layout_constraintTop_toBottomOf="@+id/btnPlayAudio"
         app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/btnPlayAudio"
         app:layout_constraintVertical_bias="0.2">
 
         <com.google.android.material.button.MaterialButton
@@ -75,14 +75,14 @@
             android:layout_columnWeight="1"
             android:layout_margin="8dp"
             android:minHeight="130dp"
+            android:padding="8dp"
             android:textColor="#333333"
             android:textSize="18sp"
             android:textStyle="bold"
             app:backgroundTint="#FFFFFF"
             app:cornerRadius="20dp"
             app:iconGravity="top"
-            app:iconSize="90dp"
-            android:padding="8dp" />
+            app:iconSize="90dp" />
 
         <com.google.android.material.button.MaterialButton
             android:id="@+id/btnAns2"
@@ -92,14 +92,14 @@
             android:layout_columnWeight="1"
             android:layout_margin="8dp"
             android:minHeight="130dp"
+            android:padding="8dp"
             android:textColor="#333333"
             android:textSize="18sp"
             android:textStyle="bold"
             app:backgroundTint="#FFFFFF"
             app:cornerRadius="20dp"
             app:iconGravity="top"
-            app:iconSize="90dp"
-            android:padding="8dp" />
+            app:iconSize="90dp" />
 
         <com.google.android.material.button.MaterialButton
             android:id="@+id/btnAns3"
@@ -109,14 +109,14 @@
             android:layout_columnWeight="1"
             android:layout_margin="8dp"
             android:minHeight="130dp"
+            android:padding="8dp"
             android:textColor="#333333"
             android:textSize="18sp"
             android:textStyle="bold"
             app:backgroundTint="#FFFFFF"
             app:cornerRadius="20dp"
             app:iconGravity="top"
-            app:iconSize="90dp"
-            android:padding="8dp" />
+            app:iconSize="90dp" />
 
         <com.google.android.material.button.MaterialButton
             android:id="@+id/btnAns4"
@@ -126,14 +126,14 @@
             android:layout_columnWeight="1"
             android:layout_margin="8dp"
             android:minHeight="130dp"
+            android:padding="8dp"
             android:textColor="#333333"
             android:textSize="18sp"
             android:textStyle="bold"
             app:backgroundTint="#FFFFFF"
             app:cornerRadius="20dp"
             app:iconGravity="top"
-            app:iconSize="90dp"
-            android:padding="8dp" />
+            app:iconSize="90dp" />
 
     </GridLayout>
 

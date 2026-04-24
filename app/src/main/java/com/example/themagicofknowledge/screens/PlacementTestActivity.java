@@ -1,6 +1,5 @@
 package com.example.themagicofknowledge.screens;
 
-import android.content.Intent;
 import android.os.Bundle;
 import android.speech.tts.TextToSpeech;
 import android.view.View;
@@ -15,7 +14,6 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
-import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 
 import com.example.themagicofknowledge.R;
@@ -133,8 +131,10 @@ public class PlacementTestActivity extends AppCompatActivity {
                     finish();
                 }
             }
+
             @Override
-            public void onCancelled(@NonNull DatabaseError error) {}
+            public void onCancelled(@NonNull DatabaseError error) {
+            }
         });
     }
 
@@ -165,8 +165,7 @@ public class PlacementTestActivity extends AppCompatActivity {
                 btnPlayAudio.setOnClickListener(v -> playAudio(q.getQuestionText()));
                 playAudio(q.getQuestionText());
                 setupChoiceButtons(q.getOptions(), true);
-            }
-            else if (currentLevel.equals("5-6")) {
+            } else if (currentLevel.equals("5-6")) {
                 // רמה 2: תמונה + בחירת מילה
                 cardMedia.setVisibility(View.VISIBLE);
                 answersContainer.setVisibility(View.VISIBLE);
@@ -174,8 +173,7 @@ public class PlacementTestActivity extends AppCompatActivity {
                 int resId = getResources().getIdentifier(q.getMediaUrl(), "drawable", getPackageName());
                 ivQuestionMedia.setImageResource(resId != 0 ? resId : R.drawable.wizard_placeholder);
                 setupChoiceButtons(q.getOptions(), false);
-            }
-            else if (currentLevel.equals("7-8")) {
+            } else if (currentLevel.equals("7-8")) {
                 // רמה 3: השלמת משפט + מקלדת
                 containerKeyboard.setVisibility(View.VISIBLE);
                 tvQuestion.setText(q.getQuestionText());
@@ -204,7 +202,7 @@ public class PlacementTestActivity extends AppCompatActivity {
 
     private void setupPlacementKeyboard(String correctWord) {
         etAnswer.setText("");
-        String[] alphabet = {"א","ב","ג","ד","ה","ו","ז","ח","ט","י","כ","ל","מ","נ","ס","ע","פ","צ","ק","ר","ש","ת"};
+        String[] alphabet = {"א", "ב", "ג", "ד", "ה", "ו", "ז", "ח", "ט", "י", "כ", "ל", "מ", "נ", "ס", "ע", "פ", "צ", "ק", "ר", "ש", "ת"};
 
         ArrayAdapter<String> adapter = new ArrayAdapter<>(this, android.R.layout.simple_list_item_1, alphabet);
         keyboardGrid.setAdapter(adapter);
@@ -362,7 +360,8 @@ public class PlacementTestActivity extends AppCompatActivity {
                     SharedPreferencesUtil.saveCurrentChild(this, selectedChild);
 
                     // הצגת הדיאלוג המעוצב רק אחרי שהנתונים נשמרו בענן
-                    showResultDialog(grade, level, "כל הכבוד! סיימת את המבחן בהצלחה.");                })
+                    showResultDialog(grade, level, "כל הכבוד! סיימת את המבחן בהצלחה.");
+                })
                 .addOnFailureListener(e -> {
                     // טיפול במקרה של שגיאת תקשורת
                     Toast.makeText(this, "שגיאה בשמירת הנתונים" + e.getMessage(), Toast.LENGTH_LONG).show();

@@ -1,7 +1,5 @@
-<androidx.constraintlayout.widget.ConstraintLayout
-    xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/main"
     android:layout_width="match_parent"
     android:layout_height="match_parent">
@@ -12,23 +10,23 @@
         android:layout_width="0dp"
         android:layout_height="0dp"
         android:scaleType="centerCrop"
-        app:srcCompat="@drawable/main_background"
-        app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent" />
+        app:layout_constraintTop_toTopOf="parent"
+        app:srcCompat="@drawable/main_background" />
 
     <!-- לוגו -->
     <ImageView
         android:id="@+id/main_img_logo"
         android:layout_width="280dp"
         android:layout_height="280dp"
-        android:scaleType="centerCrop"
         android:layout_marginTop="90dp"
-        app:srcCompat="@drawable/logo"
-        app:layout_constraintTop_toTopOf="parent"
+        android:scaleType="centerCrop"
+        app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent" />
+        app:layout_constraintTop_toTopOf="parent"
+        app:srcCompat="@drawable/logo" />
 
     <!-- כותרת -->
     <TextView
@@ -40,9 +38,9 @@
         android:text="הקסם שבידע"
         android:textColor="@color/white"
         android:textSize="60sp"
-        app:layout_constraintTop_toBottomOf="@id/main_img_logo"
+        app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent" />
+        app:layout_constraintTop_toBottomOf="@id/main_img_logo" />
 
 
     <com.google.android.material.button.MaterialButton
@@ -50,12 +48,12 @@
         android:layout_width="294dp"
         android:layout_height="74dp"
         android:layout_marginTop="54dp"
+        android:background="@drawable/btn_orange_selector"
         android:fontFamily="@font/varelaround"
         android:text="הרשמה"
         android:textColor="@android:color/white"
         android:textSize="27sp"
         android:textStyle="bold"
-        android:background="@drawable/btn_orange_selector"
         app:backgroundTint="@null"
         app:cornerRadius="40dp"
         app:layout_constraintEnd_toEndOf="parent"
@@ -69,12 +67,12 @@
         android:layout_height="74dp"
         android:layout_marginTop="20dp"
         android:layout_marginBottom="200dp"
+        android:background="@drawable/btn_blue_selector"
         android:fontFamily="@font/varelaround"
         android:text="התחברות"
         android:textColor="@android:color/white"
         android:textSize="27sp"
         android:textStyle="bold"
-        android:background="@drawable/btn_blue_selector"
         app:backgroundTint="@null"
         app:cornerRadius="40dp"
         app:layout_constraintBottom_toBottomOf="parent"

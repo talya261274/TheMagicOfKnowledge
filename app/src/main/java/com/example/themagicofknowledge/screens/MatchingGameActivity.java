@@ -12,15 +12,13 @@ import android.view.View;
 import android.widget.LinearLayout;
 import android.widget.ProgressBar;
 import android.widget.Toast;
+
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 
 import com.example.themagicofknowledge.R;
-import com.example.themagicofknowledge.models.GameProgress;
 import com.example.themagicofknowledge.models.Pair;
 import com.example.themagicofknowledge.models.UserChild;
-import com.example.themagicofknowledge.services.DatabaseService;
-import com.example.themagicofknowledge.utils.GameProgressManager;
 import com.example.themagicofknowledge.utils.SharedPreferencesUtil;
 import com.google.android.material.button.MaterialButton;
 import com.google.firebase.database.DataSnapshot;
@@ -28,6 +26,7 @@ import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
+
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -116,7 +115,8 @@ public class MatchingGameActivity extends AppCompatActivity {
             }
 
             @Override
-            public void onCancelled(@NonNull DatabaseError error) {}
+            public void onCancelled(@NonNull DatabaseError error) {
+            }
         });
     }
 
@@ -156,7 +156,8 @@ public class MatchingGameActivity extends AppCompatActivity {
 
         btn.setOnDragListener((v, event) -> {
             switch (event.getAction()) {
-                case DragEvent.ACTION_DRAG_STARTED: return true;
+                case DragEvent.ACTION_DRAG_STARTED:
+                    return true;
                 case DragEvent.ACTION_DRAG_ENTERED:
                     v.setBackgroundTintList(ColorStateList.valueOf(Color.parseColor("#FFE082")));
                     return true;
@@ -202,8 +203,7 @@ public class MatchingGameActivity extends AppCompatActivity {
             btn.setText("");
             btn.setIconSize(180);
             btn.setIconTint(null);
-        }
-        else if (content.equalsIgnoreCase("audio") || content.equalsIgnoreCase("speaker")) {
+        } else if (content.equalsIgnoreCase("audio") || content.equalsIgnoreCase("speaker")) {
             btn.setIconResource(R.drawable.ic_volume_up);
             btn.setText("");
             btn.setIconSize(150);
@@ -214,13 +214,13 @@ public class MatchingGameActivity extends AppCompatActivity {
                     tts.speak(matchId, android.speech.tts.TextToSpeech.QUEUE_FLUSH, null, "tts1");
                 }
             });
-        }
-        else {
+        } else {
             btn.setText(content);
             btn.setIconResource(0);
             btn.setTextSize(20);
         }
     }
+
     private void styleButton(MaterialButton btn) {
         LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(
                 LinearLayout.LayoutParams.MATCH_PARENT, 220);

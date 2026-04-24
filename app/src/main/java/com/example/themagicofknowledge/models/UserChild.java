@@ -1,8 +1,9 @@
 package com.example.themagicofknowledge.models;
 
+import com.google.firebase.database.Exclude;
+
 import java.util.HashMap;
 import java.util.Map;
-import com.google.firebase.database.Exclude;
 
 public class UserChild {
 
@@ -54,32 +55,77 @@ public class UserChild {
     }
 
 
-    public String getId() { return id; }
-    public void setId(String id) { this.id = id; }
+    public String getId() {
+        return id;
+    }
 
-    public String getParentId() { return parentId; }
-    public void setParentId(String parentId) { this.parentId = parentId; }
+    public void setId(String id) {
+        this.id = id;
+    }
 
-    public String getName() { return name; }
-    public void setName(String name) { this.name = name; }
+    public String getParentId() {
+        return parentId;
+    }
 
-    public String getAvatar() { return avatar; }
-    public void setAvatar(String avatar) { this.avatar = avatar; }
+    public void setParentId(String parentId) {
+        this.parentId = parentId;
+    }
 
-    public String getAgeGroup() { return ageGroup; }
-    public void setAgeGroup(String ageGroup) { this.ageGroup = ageGroup; }
+    public String getName() {
+        return name;
+    }
 
-    public int getAge() { return age; }
-    public void setAge(int age) { this.age = age; }
+    public void setName(String name) {
+        this.name = name;
+    }
 
-    public String getCurrentLevel() { return currentLevel; }
-    public void setCurrentLevel(String currentLevel) { this.currentLevel = currentLevel; }
+    public String getAvatar() {
+        return avatar;
+    }
 
-    public long getTotalTimeSeconds() { return totalTimeSeconds; }
-    public void setTotalTimeSeconds(long totalTimeSeconds) { this.totalTimeSeconds = totalTimeSeconds; }
+    public void setAvatar(String avatar) {
+        this.avatar = avatar;
+    }
 
-    public Map<String, Object> getProgress() { return progress; }
-    public void setProgress(Map<String, Object> progress) { this.progress = progress; }
+    public String getAgeGroup() {
+        return ageGroup;
+    }
+
+    public void setAgeGroup(String ageGroup) {
+        this.ageGroup = ageGroup;
+    }
+
+    public int getAge() {
+        return age;
+    }
+
+    public void setAge(int age) {
+        this.age = age;
+    }
+
+    public String getCurrentLevel() {
+        return currentLevel;
+    }
+
+    public void setCurrentLevel(String currentLevel) {
+        this.currentLevel = currentLevel;
+    }
+
+    public long getTotalTimeSeconds() {
+        return totalTimeSeconds;
+    }
+
+    public void setTotalTimeSeconds(long totalTimeSeconds) {
+        this.totalTimeSeconds = totalTimeSeconds;
+    }
+
+    public Map<String, Object> getProgress() {
+        return progress;
+    }
+
+    public void setProgress(Map<String, Object> progress) {
+        this.progress = progress;
+    }
 
     @Exclude
     public String getFormattedTime() {
@@ -101,5 +147,20 @@ public class UserChild {
         result.put("totalTimeSeconds", totalTimeSeconds);
         result.put("progress", progress);
         return result;
+    }
+
+    @Override
+    public String toString() {
+        return "UserChild{" +
+                "id='" + id + '\'' +
+                ", parentId='" + parentId + '\'' +
+                ", name='" + name + '\'' +
+                ", avatar='" + avatar + '\'' +
+                ", ageGroup='" + ageGroup + '\'' +
+                ", age=" + age +
+                ", currentLevel='" + currentLevel + '\'' +
+                ", totalTimeSeconds=" + totalTimeSeconds +
+                ", progress=" + progress +
+                '}';
     }
 }

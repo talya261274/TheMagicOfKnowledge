@@ -23,14 +23,14 @@
         android:layout_marginTop="30dp"
         android:fontFamily="@font/gan"
         android:gravity="center"
-        android:text="גררו והתאימו את הזוגות!"
-        android:textColor="@color/white"
-        android:textSize="30sp"
-        android:textStyle="bold"
         android:shadowColor="#40000000"
         android:shadowDx="2"
         android:shadowDy="2"
         android:shadowRadius="2"
+        android:text="גררו והתאימו את הזוגות!"
+        android:textColor="@color/white"
+        android:textSize="30sp"
+        android:textStyle="bold"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/testProgress" />
@@ -52,8 +52,7 @@
             android:layout_weight="1"
             android:gravity="center_horizontal"
             android:orientation="vertical"
-            android:padding="8dp">
-        </LinearLayout>
+            android:padding="8dp"></LinearLayout>
 
         <View
             android:layout_width="2dp"
@@ -70,8 +69,7 @@
             android:layout_weight="1"
             android:gravity="center_horizontal"
             android:orientation="vertical"
-            android:padding="8dp">
-        </LinearLayout>
+            android:padding="8dp"></LinearLayout>
 
     </LinearLayout>
 

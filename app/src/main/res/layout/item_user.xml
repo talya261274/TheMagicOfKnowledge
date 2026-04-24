@@ -6,26 +6,26 @@
     android:layout_height="wrap_content"
     android:layout_marginHorizontal="8dp"
     android:layout_marginVertical="4dp"
-    app:cardCornerRadius="12dp"
-    app:cardElevation="2dp"
     android:clickable="true"
     android:focusable="true"
-    android:foreground="#000000">
+    android:foreground="#000000"
+    app:cardCornerRadius="12dp"
+    app:cardElevation="2dp">
 
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:gravity="center_vertical"
         android:orientation="horizontal"
-        app:cardBackgroundColor="#80FFFFFF"
         android:padding="16dp"
-        android:gravity="center_vertical">
+        app:cardBackgroundColor="#80FFFFFF">
 
         <com.google.android.material.card.MaterialCardView
             android:layout_width="56dp"
             android:layout_height="56dp"
+            app:cardBackgroundColor="#3F51B5"
             app:cardCornerRadius="28dp"
-            app:cardElevation="0dp"
-            app:cardBackgroundColor="#3F51B5">
+            app:cardElevation="0dp">
 
             <TextView
                 android:id="@+id/tv_user_initials"
@@ -33,52 +33,52 @@
                 android:layout_height="match_parent"
                 android:gravity="center"
                 android:text="JD"
+                android:textColor="#2196F3"
                 android:textSize="20sp"
-                android:textStyle="bold"
-                android:textColor="#2196F3" />
+                android:textStyle="bold" />
 
         </com.google.android.material.card.MaterialCardView>
 
         <LinearLayout
             android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:orientation="vertical"
             android:layout_marginStart="16dp"
-            android:layout_marginEnd="8dp">
+            android:layout_marginEnd="8dp"
+            android:layout_weight="1"
+            android:orientation="vertical">
 
             <TextView
                 android:id="@+id/tv_item_user_name"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:layout_marginBottom="4dp"
                 android:text="John Doe"
+                android:textColor="#000000"
                 android:textSize="16sp"
                 android:textStyle="bold"
-                android:textColor="#000000"
-                android:layout_marginBottom="4dp"
                 tools:text="@tools:sample/full_names" />
 
             <LinearLayout
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:orientation="horizontal"
+                android:layout_marginBottom="2dp"
                 android:gravity="center_vertical"
-                android:layout_marginBottom="2dp">
+                android:orientation="horizontal">
 
                 <ImageView
                     android:layout_width="14dp"
                     android:layout_height="14dp"
+                    android:layout_marginEnd="6dp"
                     android:src="@android:drawable/ic_dialog_email"
-                    app:tint="#666666"
-                    android:layout_marginEnd="6dp" />
+                    app:tint="#666666" />
 
                 <TextView
                     android:id="@+id/tv_item_user_email"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="john.doe@example.com"
-                    android:textSize="14sp"
                     android:textColor="#000000"
+                    android:textSize="14sp"
                     tools:text="user@example.com" />
 
             </LinearLayout>
@@ -86,23 +86,23 @@
             <LinearLayout
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:orientation="horizontal"
-                android:gravity="center_vertical">
+                android:gravity="center_vertical"
+                android:orientation="horizontal">
 
                 <ImageView
                     android:layout_width="14dp"
                     android:layout_height="14dp"
+                    android:layout_marginEnd="6dp"
                     android:src="@android:drawable/sym_action_call"
-                    app:tint="#666666"
-                    android:layout_marginEnd="6dp" />
+                    app:tint="#666666" />
 
                 <TextView
                     android:id="@+id/tv_item_user_phone"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="+1 234 567 8900"
-                    android:textSize="14sp"
                     android:textColor="#000000"
+                    android:textSize="14sp"
                     tools:text="@tools:sample/us_phones" />
 
             </LinearLayout>

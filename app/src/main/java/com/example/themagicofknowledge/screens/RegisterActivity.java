@@ -1,13 +1,12 @@
 package com.example.themagicofknowledge.screens;
 
+import android.app.DatePickerDialog;
 import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.Toast;
-import java.util.Calendar;
-import android.app.DatePickerDialog;
 
 import androidx.activity.EdgeToEdge;
 import androidx.core.graphics.Insets;
@@ -21,7 +20,7 @@ import com.example.themagicofknowledge.utils.SharedPreferencesUtil;
 import com.example.themagicofknowledge.utils.Validator;
 import com.google.android.material.textfield.TextInputLayout;
 
-import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.HashMap;
 
 /// Activity for registering the user
@@ -118,7 +117,6 @@ public class RegisterActivity extends BaseActivity implements View.OnClickListen
             String CPassword = etCPassword.getEditText().getText().toString();
 
 
-
             /// log the input
             Log.d(TAG, "onClick: First Name: " + fName);
             Log.d(TAG, "onClick: Last Name: " + lName);
@@ -130,10 +128,9 @@ public class RegisterActivity extends BaseActivity implements View.OnClickListen
             Log.d(TAG, "onClick: Confirm Password: " + CPassword);
 
 
-
             /// Validate input
             Log.d(TAG, "onClick: Validating input...");
-            if (!checkInput(fName, lName,  email, phone, BDate, UName, password, CPassword)) {
+            if (!checkInput(fName, lName, email, phone, BDate, UName, password, CPassword)) {
                 /// stop if input is invalid
                 return;
             }
@@ -141,17 +138,18 @@ public class RegisterActivity extends BaseActivity implements View.OnClickListen
             Log.d(TAG, "onClick: Registering user...");
 
             /// Register user
-            registerUser(fName, lName,  email, phone, BDate, UName, password, CPassword);
+            registerUser(fName, lName, email, phone, BDate, UName, password, CPassword);
         }
     }
 
     /// Check if the input is valid
+    ///
     /// @return true if the input is valid, false otherwise
     /// @see Validator
     private boolean checkInput(String fName, String lName, String email, String phone, String BDate,
                                String UName, String password, String CPassword) {
 
-         if (!Validator.isNameValid(fName)) {
+        if (!Validator.isNameValid(fName)) {
             etFName.setError("שם פרטי חייב להכיל לפחות 2 אותיות");
             etFName.requestFocus();
             Log.i(TAG, "שם פרטי חייב להכיל לפחות 2 אותיות");
@@ -213,7 +211,7 @@ public class RegisterActivity extends BaseActivity implements View.OnClickListen
 
     /// Register the user
     private void registerUser(String fName, String lName, String email, String phone, String BDate,
-                              String UName, String password,String CPassword) {
+                              String UName, String password, String CPassword) {
         Log.d(TAG, "registerUser: Registering user...");
 
         String uid = databaseService.generateUserId();

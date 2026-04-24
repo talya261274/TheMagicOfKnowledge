@@ -3,16 +3,11 @@ package com.example.themagicofknowledge.screens;
 import android.content.Intent;
 import android.graphics.Color;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.Gravity;
-import android.view.View;
-import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
-import androidx.annotation.NonNull;
-import androidx.appcompat.app.AppCompatActivity;
 
 import com.example.themagicofknowledge.R;
 import com.example.themagicofknowledge.models.UserChild;
@@ -23,7 +18,7 @@ import com.google.android.material.button.MaterialButton;
 import com.google.android.material.textfield.TextInputEditText;
 import com.google.firebase.database.FirebaseDatabase;
 
-public class UserProfileActivity extends BaseActivity{
+public class UserProfileActivity extends BaseActivity {
 
     private static final String TAG = "UserProfileActivity";
 
@@ -121,9 +116,18 @@ public class UserProfileActivity extends BaseActivity{
         String pass = etPassword.getText().toString().trim();
 
         // שימוש ב-Validator (כמו ב-UpdateDetails המקורי שלך)
-        if (!Validator.isNameValid(fName)) { etFirstName.setError("שם לא תקין"); return; }
-        if (!Validator.isEmailValid(email)) { etEmail.setError("אימייל לא תקין"); return; }
-        if (!Validator.isPasswordValid(pass)) { etPassword.setError("סיסמה קצרה מדי"); return; }
+        if (!Validator.isNameValid(fName)) {
+            etFirstName.setError("שם לא תקין");
+            return;
+        }
+        if (!Validator.isEmailValid(email)) {
+            etEmail.setError("אימייל לא תקין");
+            return;
+        }
+        if (!Validator.isPasswordValid(pass)) {
+            etPassword.setError("סיסמה קצרה מדי");
+            return;
+        }
 
         // עדכון האובייקט
         currentUser.setFirstName(fName);

@@ -9,7 +9,6 @@ import android.widget.Button;
 import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.cardview.widget.CardView;
@@ -17,7 +16,7 @@ import androidx.cardview.widget.CardView;
 import com.example.themagicofknowledge.R;
 import com.example.themagicofknowledge.models.FlashCard;
 import com.example.themagicofknowledge.models.UserChild;
-import com.example.themagicofknowledge.services.DatabaseService; // הוספתי
+import com.example.themagicofknowledge.services.DatabaseService;
 import com.example.themagicofknowledge.utils.SharedPreferencesUtil;
 
 import java.util.ArrayList;

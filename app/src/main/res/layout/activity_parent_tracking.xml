@@ -1,12 +1,12 @@
 <?xml version="1.0" encoding="utf-8"?>
 <androidx.core.widget.NestedScrollView xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    xmlns:tools="http://schemas.android.com/tools"
-    android:layoutDirection="rtl"
     android:background="@drawable/main_background"
-    android:fillViewport="true">
+    android:fillViewport="true"
+    android:layoutDirection="rtl">
 
     <LinearLayout
         android:layout_width="match_parent"
@@ -18,8 +18,8 @@
             android:id="@+id/goBackBtnTracking"
             android:layout_width="70dp"
             android:layout_height="56dp"
-            android:layout_marginTop="10dp"
             android:layout_gravity="right"
+            android:layout_marginTop="10dp"
             android:backgroundTint="@android:color/transparent"
             android:text="➜"
             android:textColor="@color/white"
@@ -27,6 +27,7 @@
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintTop_toTopOf="parent"
             tools:ignore="MissingConstraints" />
+
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
@@ -55,6 +56,7 @@
             android:layout_height="wrap_content"
             android:layout_marginTop="8dp"
             android:scrollbars="none">
+
             <LinearLayout
                 android:id="@+id/container_children_selector"
                 android:layout_width="wrap_content"
@@ -74,9 +76,9 @@
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:gravity="center"
                 android:layout_marginTop="15dp"
                 android:layout_marginBottom="15dp"
+                android:gravity="center"
                 android:orientation="vertical"
                 android:padding="16dp">
 
@@ -90,8 +92,8 @@
                     android:id="@+id/tv_selected_child_name"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:fontFamily="@font/gan"
                     android:layout_marginTop="10dp"
+                    android:fontFamily="@font/gan"
                     android:text="שם הילד"
                     android:textColor="#000000"
                     android:textSize="24sp"
@@ -113,11 +115,13 @@
             android:layout_marginTop="20dp"
             app:cardBackgroundColor="#A2C9FF"
             app:cardCornerRadius="25dp">
+
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
                 android:gravity="center"
                 android:orientation="vertical">
+
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
@@ -125,6 +129,7 @@
                     android:textColor="#FFFFFF"
                     android:textSize="18sp"
                     android:textStyle="bold" />
+
                 <TextView
                     android:id="@+id/tvCompletedCount"
                     android:layout_width="wrap_content"
@@ -140,8 +145,8 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginTop="30dp"
-            android:text="פירוט ביצועים לפי נושאים:"
             android:fontFamily="@font/gveretlevin"
+            android:text="פירוט ביצועים לפי נושאים:"
             android:textColor="#000000"
             android:textSize="20sp"
             android:textStyle="bold" />

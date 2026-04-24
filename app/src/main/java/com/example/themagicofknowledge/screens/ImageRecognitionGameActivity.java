@@ -17,9 +17,13 @@ import androidx.appcompat.app.AppCompatActivity;
 import com.example.themagicofknowledge.R;
 import com.example.themagicofknowledge.models.Question;
 import com.example.themagicofknowledge.models.UserChild;
-import com.example.themagicofknowledge.services.DatabaseService; // הוספתי
+import com.example.themagicofknowledge.services.DatabaseService;
 import com.example.themagicofknowledge.utils.SharedPreferencesUtil;
-import com.google.firebase.database.*;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -102,7 +106,8 @@ public class ImageRecognitionGameActivity extends AppCompatActivity {
             }
 
             @Override
-            public void onCancelled(@NonNull DatabaseError error) {}
+            public void onCancelled(@NonNull DatabaseError error) {
+            }
         });
     }
 

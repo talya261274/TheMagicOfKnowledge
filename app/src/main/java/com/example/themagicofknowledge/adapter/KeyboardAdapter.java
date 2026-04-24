@@ -8,16 +8,12 @@ import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.GridView;
+
 import androidx.annotation.NonNull;
 
 import com.example.themagicofknowledge.R;
 
 public class KeyboardAdapter extends ArrayAdapter<String> {
-
-    // ממשק שמאפשר ל-Activity להגיב ללחיצות
-    public interface OnKeyClickListener {
-        void onKeyClick(String letter);
-    }
 
     private final OnKeyClickListener listener;
 
@@ -66,6 +62,11 @@ public class KeyboardAdapter extends ArrayAdapter<String> {
         });
 
         return btn;
+    }
+
+    // ממשק שמאפשר ל-Activity להגיב ללחיצות
+    public interface OnKeyClickListener {
+        void onKeyClick(String letter);
     }
 }
 

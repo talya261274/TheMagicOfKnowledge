@@ -9,11 +9,11 @@ import android.widget.TextView;
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.example.themagicofknowledge.R;
+import com.example.themagicofknowledge.models.SubjectStat;
+
 import java.util.List;
 import java.util.Locale;
-
-import com.example.themagicofknowledge.models.SubjectStat;
-import com.example.themagicofknowledge.R;
 
 public class SubjectProgressAdapter extends RecyclerView.Adapter<SubjectProgressAdapter.ViewHolder> {
 
@@ -81,6 +81,26 @@ public class SubjectProgressAdapter extends RecyclerView.Adapter<SubjectProgress
         return statsList != null ? statsList.size() : 0;
     }
 
+    private String translateSubject(String sub) {
+        if (sub == null) return "";
+        switch (sub) {
+            case "animals":
+                return "חיות";
+            case "numbers":
+                return "מספרים";
+            case "colors":
+                return "צבעים";
+            case "letters":
+                return "אותיות";
+            case "shapes":
+                return "צורות";
+            case "bodyparts":
+                return "חלקי גוף";
+            default:
+                return sub;
+        }
+    }
+
     public static class ViewHolder extends RecyclerView.ViewHolder {
         TextView tvName, tvAttempts, tvTime, tvProgressPercent;
         ImageView ivIcon;
@@ -94,19 +114,6 @@ public class SubjectProgressAdapter extends RecyclerView.Adapter<SubjectProgress
             tvProgressPercent = itemView.findViewById(R.id.tvProgressPercent);
             pbProgress = itemView.findViewById(R.id.pbSubjectProgress);
             ivIcon = itemView.findViewById(R.id.ivSubjectIcon);
-        }
-    }
-
-    private String translateSubject(String sub) {
-        if (sub == null) return "";
-        switch (sub) {
-            case "animals": return "חיות";
-            case "numbers": return "מספרים";
-            case "colors": return "צבעים";
-            case "letters": return "אותיות";
-            case "shapes": return "צורות";
-            case "bodyparts": return "חלקי גוף";
-            default: return sub;
         }
     }
 }

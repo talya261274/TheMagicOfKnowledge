@@ -12,7 +12,6 @@ import android.widget.Toast;
 import com.example.themagicofknowledge.R;
 import com.example.themagicofknowledge.models.UserChild;
 import com.example.themagicofknowledge.models.UserParent;
-import com.example.themagicofknowledge.services.DatabaseService;
 import com.example.themagicofknowledge.utils.SharedPreferencesUtil;
 import com.google.firebase.database.FirebaseDatabase;
 
@@ -108,11 +107,19 @@ public class AvatarSelectionActivity extends BaseActivity {
     // אדפטר פנימי להצגת האוואטרים ב-GridView
     private class AvatarAdapter extends BaseAdapter {
         @Override
-        public int getCount() { return avatarNames.size(); }
+        public int getCount() {
+            return avatarNames.size();
+        }
+
         @Override
-        public Object getItem(int position) { return avatarNames.get(position); }
+        public Object getItem(int position) {
+            return avatarNames.get(position);
+        }
+
         @Override
-        public long getItemId(int position) { return position; }
+        public long getItemId(int position) {
+            return position;
+        }
 
         @Override
         public View getView(int position, View convertView, ViewGroup parent) {

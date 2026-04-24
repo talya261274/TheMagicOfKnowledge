@@ -9,8 +9,10 @@ import android.widget.BaseAdapter;
 import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.TextView;
+
 import com.example.themagicofknowledge.R;
 import com.example.themagicofknowledge.models.MemoryCard;
+
 import java.util.List;
 
 public class MemoryAdapter extends BaseAdapter {

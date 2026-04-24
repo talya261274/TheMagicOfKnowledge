@@ -8,27 +8,27 @@
         <item
             android:id="@+id/nav_home"
             android:icon="@drawable/nav_home"
-            android:title="דף הבית"/>
+            android:title="דף הבית" />
 
         <item
             android:id="@+id/nav_subjects"
             android:icon="@drawable/nav_game"
-            android:title="בחירת נושא"/>
+            android:title="בחירת נושא" />
 
         <item
             android:id="@+id/nav_profile"
             android:icon="@drawable/nav_profile"
-            android:title="פרופיל הורה"/>
+            android:title="פרופיל הורה" />
 
         <item
             android:id="@+id/nav_progress"
             android:icon="@drawable/nav_progress"
-            android:title="מעקב התקדמות"/>
+            android:title="מעקב התקדמות" />
 
         <item
             android:id="@+id/nav_change_child"
             android:icon="@drawable/nav_profile"
-            android:title="החלפת ילד"/>
+            android:title="החלפת ילד" />
 
     </group>
 
@@ -37,32 +37,32 @@
             <item
                 android:id="@+id/nav_game1"
                 android:icon="@drawable/nav_game"
-                android:title="משחק בחירה מרובה"/>
+                android:title="משחק בחירה מרובה" />
 
             <item
                 android:id="@+id/nav_game2"
                 android:icon="@drawable/nav_game"
-                android:title="משחק הזיכרון"/>
+                android:title="משחק הזיכרון" />
 
             <item
                 android:id="@+id/nav_game3"
                 android:icon="@drawable/nav_game"
-                android:title="משחק זיהוי קול"/>
+                android:title="משחק זיהוי קול" />
 
             <item
                 android:id="@+id/nav_game4"
                 android:icon="@drawable/nav_game"
-                android:title="משחק התאמת זוגות - גרירה"/>
+                android:title="משחק התאמת זוגות - גרירה" />
 
             <item
                 android:id="@+id/nav_game5"
                 android:icon="@drawable/nav_game"
-                android:title="משחק השלמת משפט"/>
+                android:title="משחק השלמת משפט" />
 
             <item
                 android:id="@+id/nav_mix"
                 android:icon="@drawable/nav_game"
-                android:title="עולם משחקים"/>
+                android:title="עולם משחקים" />
 
         </menu>
     </item>
@@ -72,7 +72,7 @@
             <item
                 android:id="@+id/nav_admin_users"
                 android:icon="@drawable/nav_cards"
-                android:title="רשימת משתמשים"/>
+                android:title="רשימת משתמשים" />
         </menu>
     </item>
 
@@ -81,7 +81,7 @@
             <item
                 android:id="@+id/nav_logout"
                 android:icon="@drawable/nav_logout"
-                android:title="התנתקות"/>
+                android:title="התנתקות" />
         </menu>
     </item>
 </menu>

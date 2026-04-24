@@ -30,8 +30,8 @@
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_marginStart="6dp"
-        android:gravity="center"
         android:fontFamily="@font/gan"
+        android:gravity="center"
         android:text="מה מופיע בתמונה?"
         android:textColor="@color/white"
         android:textSize="32sp"
@@ -76,10 +76,10 @@
             android:layout_height="80dp"
             android:layout_columnWeight="1"
             android:layout_margin="6dp"
-            android:textSize="20sp"
-            app:cornerRadius="15dp"
             android:backgroundTint="#FF9800"
-            android:text="תשובה 1" />
+            android:text="תשובה 1"
+            android:textSize="20sp"
+            app:cornerRadius="15dp" />
 
         <com.google.android.material.button.MaterialButton
             android:id="@+id/btnAns2"
@@ -87,10 +87,10 @@
             android:layout_height="80dp"
             android:layout_columnWeight="1"
             android:layout_margin="6dp"
-            android:textSize="20sp"
-            app:cornerRadius="15dp"
             android:backgroundTint="#4CAF50"
-            android:text="תשובה 2" />
+            android:text="תשובה 2"
+            android:textSize="20sp"
+            app:cornerRadius="15dp" />
 
         <com.google.android.material.button.MaterialButton
             android:id="@+id/btnAns3"
@@ -98,10 +98,10 @@
             android:layout_height="80dp"
             android:layout_columnWeight="1"
             android:layout_margin="6dp"
-            android:textSize="20sp"
-            app:cornerRadius="15dp"
             android:backgroundTint="#2196F3"
-            android:text="תשובה 3" />
+            android:text="תשובה 3"
+            android:textSize="20sp"
+            app:cornerRadius="15dp" />
 
         <com.google.android.material.button.MaterialButton
             android:id="@+id/btnAns4"
@@ -109,10 +109,10 @@
             android:layout_height="80dp"
             android:layout_columnWeight="1"
             android:layout_margin="6dp"
-            android:textSize="20sp"
-            app:cornerRadius="15dp"
             android:backgroundTint="#E91E63"
-            android:text="תשובה 4" />
+            android:text="תשובה 4"
+            android:textSize="20sp"
+            app:cornerRadius="15dp" />
     </GridLayout>
 
 </androidx.constraintlayout.widget.ConstraintLayout>
