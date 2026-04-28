@@ -6,6 +6,7 @@ import android.view.Gravity;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
@@ -17,6 +18,7 @@ import com.example.themagicofknowledge.adapter.SubjectProgressAdapter;
 import com.example.themagicofknowledge.models.SubjectStat;
 import com.example.themagicofknowledge.models.UserChild;
 import com.example.themagicofknowledge.models.UserParent;
+import com.example.themagicofknowledge.models.UserRole;
 import com.example.themagicofknowledge.utils.SharedPreferencesUtil;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
@@ -41,6 +43,13 @@ public class ParentTrackingActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
+        if (UserRole.isChild(this)) {
+            Toast.makeText(this, "מסך זה אינו זמין", Toast.LENGTH_SHORT).show();
+            finish();
+            return;
+        }
+
         setContentView(R.layout.activity_parent_tracking);
 
         initViews();

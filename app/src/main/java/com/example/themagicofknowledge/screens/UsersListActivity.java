@@ -4,6 +4,7 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import androidx.activity.EdgeToEdge;
 import androidx.core.graphics.Insets;
@@ -15,7 +16,9 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.example.themagicofknowledge.R;
 import com.example.themagicofknowledge.adapter.UserAdapter;
 import com.example.themagicofknowledge.models.UserParent;
+import com.example.themagicofknowledge.models.UserRole;
 import com.example.themagicofknowledge.services.DatabaseService;
+import com.example.themagicofknowledge.utils.SharedPreferencesUtil;
 
 import java.util.List;
 
@@ -28,6 +31,15 @@ public class UsersListActivity extends BaseActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
+        // הגנת הרשאה
+        UserParent currentUser = SharedPreferencesUtil.getUser(this);
+        if (currentUser == null || !currentUser.isAdmin()) {
+            Toast.makeText(this, "אין לך הרשאה לצפות במסך זה", Toast.LENGTH_SHORT).show();
+            finish();
+            return;
+        }
+
         EdgeToEdge.enable(this);
         setContentView(R.layout.activity_users_list);
         ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.main), (v, insets) -> {
@@ -44,7 +56,7 @@ public class UsersListActivity extends BaseActivity {
             public void onUserClick(UserParent user) {
                 Log.d(TAG, "User clicked: " + user);
                 Intent intent = new Intent(UsersListActivity.this, UserProfileActivity.class);
-                intent.putExtra("USER_UID", user.getId());
+                intent.putExtra("USER_ID", user.getId());  // ← שני מ-USER_UID ל-USER_ID
                 startActivity(intent);
             }
 

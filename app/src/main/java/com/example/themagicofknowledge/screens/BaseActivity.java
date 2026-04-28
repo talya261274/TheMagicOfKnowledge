@@ -1,11 +1,17 @@
 package com.example.themagicofknowledge.screens;
 
+import static com.example.themagicofknowledge.models.UserRole.Role.ADMIN;
+import static com.example.themagicofknowledge.models.UserRole.Role.CHILD;
+import static com.example.themagicofknowledge.models.UserRole.Role.PARENT;
+
 import android.app.Dialog;
 import android.content.Intent;
 import android.content.res.ColorStateList;
 import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
 import android.os.Bundle;
+import android.util.Log;
+import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.FrameLayout;
@@ -22,6 +28,7 @@ import androidx.drawerlayout.widget.DrawerLayout;
 import com.example.themagicofknowledge.R;
 import com.example.themagicofknowledge.models.UserChild;
 import com.example.themagicofknowledge.models.UserParent;
+import com.example.themagicofknowledge.models.UserRole;
 import com.example.themagicofknowledge.services.DatabaseService;
 import com.example.themagicofknowledge.utils.SharedPreferencesUtil;
 import com.google.android.material.navigation.NavigationView;
@@ -45,48 +52,105 @@ public abstract class BaseActivity extends AppCompatActivity
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        databaseService = DatabaseService.getInstance();
+        try {
+            super.onCreate(savedInstanceState);
+            databaseService = DatabaseService.getInstance();
+            super.setContentView(R.layout.activity_base);
 
-        // טוען את ה-Base XML
-        super.setContentView(R.layout.activity_base);
+            toolbar = findViewById(R.id.toolBar);
+            ivToolbarAvatar = findViewById(R.id.ivToolbarAvatar);
+            setSupportActionBar(toolbar);
 
-        // אתחול ה-Toolbar והאוואטר שעליו
-        toolbar = findViewById(R.id.toolBar);
-        ivToolbarAvatar = findViewById(R.id.ivToolbarAvatar);
-        setSupportActionBar(toolbar);
+            drawerLayout = findViewById(R.id.nav_layout);
+            navigationView = findViewById(R.id.nav_view);
+            navigationView.setNavigationItemSelectedListener(this);
 
-        // Drawer
-        drawerLayout = findViewById(R.id.nav_layout);
-        navigationView = findViewById(R.id.nav_view);
-        navigationView.setNavigationItemSelectedListener(this);
+            navigationView.setBackgroundColor(Color.parseColor("#E0F7FA"));
+            navigationView.setItemTextAppearance(R.style.NavMenuItemStyle);
 
-        navigationView.setBackgroundColor(Color.parseColor("#E0F7FA"));
-        navigationView.setItemTextAppearance(R.style.NavMenuItemStyle);
-
-        if (hasSideMenu()) {
-            setupDrawer();
-        } else {
-            lockDrawer();
-        }
-
-        if (toolbar != null) {
-            if (showToolbar()) {
-                toolbar.setVisibility(View.VISIBLE);
+            if (hasSideMenu()) {
+                setupDrawer();
             } else {
-                toolbar.setVisibility(View.GONE);
+                lockDrawer();
+            }
+
+            if (toolbar != null) {
+                if (showToolbar()) {
+                    toolbar.setVisibility(View.VISIBLE);
+                } else {
+                    toolbar.setVisibility(View.GONE);
+                }
+            }
+        } catch (Exception e) {
+        }
+    }
+    private void updateNavMenuByRole() {
+        if (navigationView == null) return;
+
+        UserParent user = SharedPreferencesUtil.getUser(this);
+        if (user == null) return;
+
+        UserChild currentChild = SharedPreferencesUtil.getCurrentChild(this);
+        Menu menu = navigationView.getMenu();
+
+        if (user.isAdmin()) {
+            // מנהל - מסתיר הכל חוץ מניהול
+            hideMenuItem(menu, R.id.nav_subjects);
+            hideMenuItem(menu, R.id.nav_profile);
+            hideMenuItem(menu, R.id.nav_progress);
+            hideMenuItem(menu, R.id.nav_change_child);
+            hideMenuItem(menu, R.id.nav_mix);
+            hideMenuItem(menu, R.id.nav_back_to_parent);
+        } else if (currentChild != null) {
+            // ילד - הוא נכנס למצב משחק (יש currentChild)
+            hideMenuItem(menu, R.id.nav_profile);
+            hideMenuItem(menu, R.id.nav_progress);
+            hideMenuItem(menu, R.id.nav_change_child);
+            hideMenuItem(menu, R.id.nav_admin_users);
+            hideMenuItem(menu, R.id.nav_logout);
+            // nav_back_to_parent נשאר גלוי - הילד צריך אותו!
+        } else {
+            // הורה רגיל - לא בחר ילד עדיין, או במסכי ניהול
+            hideMenuItem(menu, R.id.nav_admin_users);
+            hideMenuItem(menu, R.id.nav_back_to_parent);  // ← הוספה - הורה לא צריך
+        }
+    }
+
+    private void setAllMenuItemsVisible(Menu menu, boolean visible) {
+        for (int i = 0; i < menu.size(); i++) {
+            MenuItem item = menu.getItem(i);
+            item.setVisible(visible);
+            if (item.hasSubMenu()) {
+                Menu subMenu = item.getSubMenu();
+                for (int j = 0; j < subMenu.size(); j++) {
+                    subMenu.getItem(j).setVisible(visible);
+                }
             }
         }
     }
 
-    /**
-     * פונקציה שמתבצעת בכל פעם שחוזרים למסך.
-     * זה מוודא שהשם והתמונה יתעדכנו גם אם החלפנו ילד רגע לפני.
-     */
+    private void hideMenuItem(Menu menu, int itemId) {
+        MenuItem item = menu.findItem(itemId);
+        if (item != null) {
+            item.setVisible(false);
+        }
+
+        // חיפוש בתת-תפריטים
+        for (int i = 0; i < menu.size(); i++) {
+            MenuItem parentItem = menu.getItem(i);
+            if (parentItem.hasSubMenu()) {
+                MenuItem subItem = parentItem.getSubMenu().findItem(itemId);
+                if (subItem != null) {
+                    subItem.setVisible(false);
+                }
+            }
+        }
+    }
     @Override
     protected void onStart() {
         super.onStart();
         updateUIComponents();
+        updateNavMenuByRole();
     }
 
     private void updateUIComponents() {
@@ -183,8 +247,12 @@ public abstract class BaseActivity extends AppCompatActivity
 
         // ניווט לדף הבית (Main)
         if (id == R.id.nav_home) {
-            navigateTo(MainActivity.class);
-
+            UserParent user = SharedPreferencesUtil.getUser(this);
+            if (user != null && user.isAdmin()) {
+                navigateTo(AdminDashboardActivity.class);
+            } else {
+                navigateTo(MainActivity.class);
+            }
         }
         // ניווט לפרופיל הורה/משתמש
         else if (id == R.id.nav_subjects) {
@@ -201,39 +269,28 @@ public abstract class BaseActivity extends AppCompatActivity
         } else if (id == R.id.nav_change_child) {
             navigateTo(SelectChildActivity.class);
 
-        }
-
-        // משחק בחירה מרובה
-        else if (id == R.id.nav_game1) {
-            navigateTo(ImageRecognitionGameActivity.class);
-
-        }
-        // משחק הזיכרון
-        else if (id == R.id.nav_game2) {
-            navigateTo(MemoryGameActivity.class);
-
-        }
-        // משחק זיהוי קול
-        else if (id == R.id.nav_game3) {
-            navigateTo(AudioRecognitionActivity.class);
-
-        }
-        // משחק התאמת זוגות - גרירה
-        else if (id == R.id.nav_game4) {
-            navigateTo(MatchingGameActivity.class);
-
-        }
-
-        // משחק השלמת משפט
-        else if (id == R.id.nav_game5) {
-            navigateTo(SentenceCompletionActivity.class);
-
         } else if (id == R.id.nav_mix) {
             navigateTo(MixedGameActivity.class);
 
         } else if (id == R.id.nav_admin_users) {
             navigateTo(UsersListActivity.class);
 
+        }
+        else if (id == R.id.nav_back_to_parent) {
+            // אישור עם דיאלוג
+            showCustomDialog(
+                    "חזרה למצב הורה",
+                    "האם להפסיק את התרגול ולחזור למצב הורה?",
+                    "כן, חזור",
+                    Color.parseColor("#FF9800"),
+                    () -> {
+                        SharedPreferencesUtil.clearSelectedChild(this);
+                        Intent intent = new Intent(this, SelectChildActivity.class);
+                        intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+                        startActivity(intent);
+                    }
+            );
+            return true;
         }
 
         // התנתקות מהמערכת

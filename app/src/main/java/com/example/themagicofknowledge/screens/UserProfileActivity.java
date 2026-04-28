@@ -4,6 +4,7 @@ import android.content.Intent;
 import android.graphics.Color;
 import android.os.Bundle;
 import android.view.Gravity;
+import android.view.View;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
@@ -12,6 +13,8 @@ import android.widget.Toast;
 import com.example.themagicofknowledge.R;
 import com.example.themagicofknowledge.models.UserChild;
 import com.example.themagicofknowledge.models.UserParent;
+import com.example.themagicofknowledge.models.UserRole;
+import com.example.themagicofknowledge.services.DatabaseService;
 import com.example.themagicofknowledge.utils.SharedPreferencesUtil;
 import com.example.themagicofknowledge.utils.Validator;
 import com.google.android.material.button.MaterialButton;
@@ -22,24 +25,47 @@ public class UserProfileActivity extends BaseActivity {
 
     private static final String TAG = "UserProfileActivity";
 
-    // רכיבי ממשק
     private TextInputEditText etFirstName, etLastName, etEmail, etPhone, etBirthDate, etPassword;
     private TextView tvUserName, tvId, btnUpdateAction;
     private LinearLayout containerChildrenLinks;
     private MaterialButton btnSignOut;
 
-    private UserParent currentUser;
-    private boolean isEditMode = false; // האם אנחנו כרגע במצב עריכה?
+    private UserParent currentUser;       // המשתמש שמוצג בפרופיל (אולי לא המחובר)
+    private UserParent loggedInUser;      // המשתמש המחובר (לבדיקת הרשאות)
+    private boolean isViewingOwnProfile = true;
+    private boolean isEditMode = false;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
+        // הגנה - ילדים לא רואים פרופיל
+        if (UserRole.isChild(this)) {
+            Toast.makeText(this, "מסך זה אינו זמין", Toast.LENGTH_SHORT).show();
+            finish();
+            return;
+        }
+
         setContentView(R.layout.activity_user_profile);
 
         initViews();
-        loadUserData();
 
-        // כפתור התנתקות
+        // 1. בדיקה אם הגיע USER_ID דרך ה-Intent (כלומר נכנסנו מרשימת משתמשים)
+        String requestedUserId = getIntent().getStringExtra("USER_ID");
+        loggedInUser = SharedPreferencesUtil.getUser(this);
+
+        if (requestedUserId != null && loggedInUser != null
+                && !requestedUserId.equals(loggedInUser.getId())) {
+            // צופים בפרופיל של מישהו אחר - טוענים מ-Firebase
+            isViewingOwnProfile = false;
+            loadUserFromFirebase(requestedUserId);
+        } else {
+            // המשתמש המחובר צופה בפרופיל שלו עצמו
+            isViewingOwnProfile = true;
+            currentUser = loggedInUser;
+            populateUI();
+        }
+
         btnSignOut.setOnClickListener(v -> {
             SharedPreferencesUtil.signOutUser(this);
             Intent intent = new Intent(UserProfileActivity.this, LandingActivity.class);
@@ -47,7 +73,6 @@ public class UserProfileActivity extends BaseActivity {
             startActivity(intent);
         });
 
-        // כפתור "עדכון פרטים" שהופך ל-"שמור שינויים"
         btnUpdateAction.setOnClickListener(v -> {
             if (!isEditMode) {
                 setEditMode(true);
@@ -67,27 +92,50 @@ public class UserProfileActivity extends BaseActivity {
         etBirthDate = findViewById(R.id.et_user_birth_date);
         etPassword = findViewById(R.id.et_user_password);
         btnSignOut = findViewById(R.id.btn_sign_out);
-        btnUpdateAction = findViewById(R.id.et_update); // הטקסט של ה"עדכון"
+        btnUpdateAction = findViewById(R.id.et_update);
         containerChildrenLinks = findViewById(R.id.container_children_links);
     }
 
-    private void loadUserData() {
-        currentUser = SharedPreferencesUtil.getUser(this);
-        if (currentUser != null) {
-            tvUserName.setText(currentUser.getUserName());
-            tvId.setText(currentUser.getId());
-            etFirstName.setText(currentUser.getFirstName());
-            etLastName.setText(currentUser.getLastName());
-            etEmail.setText(currentUser.getEmail());
-            etPhone.setText(currentUser.getPhone());
-            etBirthDate.setText(currentUser.getBirthDate());
-            etPassword.setText(currentUser.getPassword());
+    private void loadUserFromFirebase(String userId) {
+        DatabaseService.getInstance().getUser(userId, new DatabaseService.DatabaseCallback<UserParent>() {
+            @Override
+            public void onCompleted(UserParent user) {
+                if (user != null) {
+                    currentUser = user;
+                    populateUI();
+                } else {
+                    Toast.makeText(UserProfileActivity.this, "המשתמש לא נמצא", Toast.LENGTH_SHORT).show();
+                    finish();
+                }
+            }
 
-            setupChildrenProgressLinks();
-        }
+            @Override
+            public void onFailed(Exception e) {
+                Toast.makeText(UserProfileActivity.this, "שגיאה בטעינת המשתמש", Toast.LENGTH_SHORT).show();
+                finish();
+            }
+        });
     }
 
-    // פונקציה שפותחת או נועלת את השדות לעריכה
+    private void populateUI() {
+        if (currentUser == null) return;
+
+        tvUserName.setText(currentUser.getUserName());
+        tvId.setText(currentUser.getId());
+        etFirstName.setText(currentUser.getFirstName());
+        etLastName.setText(currentUser.getLastName());
+        etEmail.setText(currentUser.getEmail());
+        etPhone.setText(currentUser.getPhone());
+        etBirthDate.setText(currentUser.getBirthDate());
+        etPassword.setText(currentUser.getPassword());
+
+        if (!isViewingOwnProfile) {
+            btnSignOut.setVisibility(View.GONE);
+        }
+
+        setupChildrenProgressLinks();
+    }
+
     private void setEditMode(boolean enable) {
         isEditMode = enable;
         etFirstName.setEnabled(enable);
@@ -115,7 +163,6 @@ public class UserProfileActivity extends BaseActivity {
         String bDate = etBirthDate.getText().toString().trim();
         String pass = etPassword.getText().toString().trim();
 
-        // שימוש ב-Validator (כמו ב-UpdateDetails המקורי שלך)
         if (!Validator.isNameValid(fName)) {
             etFirstName.setError("שם לא תקין");
             return;
@@ -129,7 +176,6 @@ public class UserProfileActivity extends BaseActivity {
             return;
         }
 
-        // עדכון האובייקט
         currentUser.setFirstName(fName);
         currentUser.setLastName(lName);
         currentUser.setEmail(email);
@@ -137,58 +183,55 @@ public class UserProfileActivity extends BaseActivity {
         currentUser.setBirthDate(bDate);
         currentUser.setPassword(pass);
 
-        // שמירה ב-Firebase
         FirebaseDatabase.getInstance().getReference("users")
                 .child(currentUser.getId())
                 .setValue(currentUser)
                 .addOnSuccessListener(aVoid -> {
-                    SharedPreferencesUtil.saveUser(this, currentUser);
+                    // אם זה המשתמש המחובר - מעדכנים גם את ה-SharedPreferences
+                    if (isViewingOwnProfile) {
+                        SharedPreferencesUtil.saveUser(this, currentUser);
+                    }
                     setEditMode(false);
                     Toast.makeText(this, "הפרופיל עודכן בהצלחה!", Toast.LENGTH_SHORT).show();
                 })
                 .addOnFailureListener(e -> {
-                    Toast.makeText(this, "שגיאה בעדכון" + e.getMessage(), Toast.LENGTH_SHORT).show();
+                    Toast.makeText(this, "שגיאה בעדכון " + e.getMessage(), Toast.LENGTH_SHORT).show();
                 });
     }
 
     private void setupChildrenProgressLinks() {
         if (currentUser.getChildrenList() == null) return;
         containerChildrenLinks.removeAllViews();
-        containerChildrenLinks.setOrientation(LinearLayout.HORIZONTAL); // רשימה אופקית אם תרצי
+        containerChildrenLinks.setOrientation(LinearLayout.HORIZONTAL);
 
         for (UserChild child : currentUser.getChildrenList().values()) {
-            // ניצור Layout קטן לכל ילד (אייקון מעל שם)
             LinearLayout childLayout = new LinearLayout(this);
             childLayout.setOrientation(LinearLayout.VERTICAL);
             childLayout.setPadding(20, 20, 20, 20);
             childLayout.setGravity(Gravity.CENTER);
 
-            // תמונת האוואטר
             ImageView ivAvatar = new ImageView(this);
             ivAvatar.setLayoutParams(new LinearLayout.LayoutParams(150, 150));
 
-            // כאן את שמה את הלוגיקה שלך לבחירת האייקון לפי מה ששמור ב-child.getAvatar()
             int resId = getResources().getIdentifier(child.getAvatar(), "drawable", getPackageName());
             ivAvatar.setImageResource(resId != 0 ? resId : R.drawable.logo);
 
-            // שם הילד
             TextView tvName = new TextView(this);
             tvName.setText(child.getName());
             tvName.setGravity(Gravity.CENTER);
             tvName.setTextColor(Color.BLACK);
-            tvName.setTextSize(Color.BLACK);
-
+            tvName.setTextSize(16);
 
             childLayout.addView(ivAvatar);
             childLayout.addView(tvName);
 
-            // לחיצה למעבר לעמוד ההתקדמות
             childLayout.setOnClickListener(v -> {
                 Intent intent = new Intent(UserProfileActivity.this, ParentTrackingActivity.class);
-
-                // זה החלק הכי חשוב! להעביר את ה-ID הייחודי של הילד
                 intent.putExtra("SELECTED_CHILD_ID", child.getId());
-
+                // אם צופים בפרופיל של משתמש אחר - שולחים גם את ה-parentId
+                if (!isViewingOwnProfile) {
+                    intent.putExtra("PARENT_ID", currentUser.getId());
+                }
                 startActivity(intent);
             });
 

@@ -4,6 +4,7 @@ import android.app.AlertDialog;
 import android.content.Intent;
 import android.graphics.Color;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
@@ -17,6 +18,7 @@ import com.example.themagicofknowledge.R;
 import com.example.themagicofknowledge.adapter.ChildAdapter;
 import com.example.themagicofknowledge.models.UserChild;
 import com.example.themagicofknowledge.models.UserParent;
+import com.example.themagicofknowledge.models.UserRole;
 import com.example.themagicofknowledge.services.DatabaseService;
 import com.example.themagicofknowledge.utils.SharedPreferencesUtil;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
@@ -38,42 +40,39 @@ public class SelectChildActivity extends BaseActivity {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_select_child);
+        try {
+            super.onCreate(savedInstanceState);
 
-        rvChildren = findViewById(R.id.rvChildren);
-        currentParent = SharedPreferencesUtil.getUser(this);
+            setContentView(R.layout.activity_select_child);
 
-        // אתחול הרשימה
-        childrenList = new ArrayList<>();
-        if (currentParent.getChildrenList() != null) {
-            childrenList.addAll(currentParent.getChildrenListAsList());
-        }
+            rvChildren = findViewById(R.id.rvChildren);
 
-        // הגדרת RecyclerView פעם אחת בלבד
-        rvChildren.setLayoutManager(new GridLayoutManager(this, 2));
-        adapter = new ChildAdapter(childrenList,
-                child -> {
-                    // 1. שמירת הילד הנבחר בזיכרון המקומי
-                    SharedPreferencesUtil.saveCurrentChild(this, child);
-                    SharedPreferencesUtil.saveCurrentChildId(this, child.getId());
+            currentParent = SharedPreferencesUtil.getUser(this);
 
-                    // 2. מעבר למסך הראשי (MainActivity)
-                    Intent intent = new Intent(this, MainActivity.class);
-                    // השורה הזו מוודא שלא יהיה אפשר לחזור אחורה לבחירת ילד עם כפתור ה-Back
-                    intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
-                    startActivity(intent);
-                },
-                child -> {
-                    showDeleteConfirmationDialog(child);
-                }
-        );
-        rvChildren.setAdapter(adapter);
+            childrenList = new ArrayList<>();
+            if (currentParent != null && currentParent.getChildrenList() != null) {
+                childrenList.addAll(currentParent.getChildrenListAsList());
+            }
 
-        loadChildrenFromDB();
+            rvChildren.setLayoutManager(new GridLayoutManager(this, 2));
+            adapter = new ChildAdapter(childrenList,
+                    child -> {
+                        SharedPreferencesUtil.saveCurrentChild(this, child);
+                        SharedPreferencesUtil.saveCurrentChildId(this, child.getId());
+                        Intent intent = new Intent(this, MainActivity.class);
+                        intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+                        startActivity(intent);
+                    },
+                    child -> showDeleteConfirmationDialog(child)
+            );
+            rvChildren.setAdapter(adapter);
 
-        FloatingActionButton fabAddChild = findViewById(R.id.fabAddChild);
-        fabAddChild.setOnClickListener(v -> showAddChildDialog());
+            loadChildrenFromDB();
+
+            FloatingActionButton fabAddChild = findViewById(R.id.fabAddChild);
+            fabAddChild.setOnClickListener(v -> showAddChildDialog());
+
+        } catch (Exception e) {}
     }
 
     private void loadChildrenFromDB() {

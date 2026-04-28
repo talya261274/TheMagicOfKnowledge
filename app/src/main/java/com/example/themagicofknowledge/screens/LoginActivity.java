@@ -142,17 +142,21 @@ public class LoginActivity extends BaseActivity implements View.OnClickListener 
             @Override
             public void onCompleted(UserParent user) {
                 if (user == null) {
-                    /// Show error message to user
                     etPassword.setError("שם משתמש או סיסמה לא חוקיים");
                     etPassword.requestFocus();
                     return;
                 }
                 Log.d(TAG, "onCompleted: User logged in: " + user);
-                /// save the user data to shared preferences
                 SharedPreferencesUtil.saveUser(LoginActivity.this, user);
-                /// Redirect to main activity and clear back stack to prevent user from going back to login screen
-                Intent mainIntent = new Intent(LoginActivity.this, SelectChildActivity.class);
-                /// Clear the back stack (clear history) and start the MainActivity
+
+                // החלטה לאן להפנות לפי תפקיד
+                Intent mainIntent;
+                if (user.isAdmin()) {
+                    mainIntent = new Intent(LoginActivity.this, AdminDashboardActivity.class);
+                } else {
+                    mainIntent = new Intent(LoginActivity.this, SelectChildActivity.class);
+                }
+
                 mainIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
                 startActivity(mainIntent);
             }

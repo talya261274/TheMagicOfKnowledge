@@ -10,19 +10,13 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.TheMagicOfKnowledge">
         <activity
+            android:name=".screens.AdminDashboardActivity"
+            android:exported="false" />
+        <activity
             android:name=".screens.MixedGameActivity"
             android:exported="false" />
         <activity
             android:name=".screens.ParentTrackingActivity"
-            android:exported="false" />
-        <activity
-            android:name=".screens.SentenceCompletionActivity"
-            android:exported="false" />
-        <activity
-            android:name=".screens.MatchingGameActivity"
-            android:exported="false" />
-        <activity
-            android:name=".screens.AudioRecognitionActivity"
             android:exported="false" />
         <activity
             android:name=".screens.AvatarSelectionActivity"
@@ -44,12 +38,6 @@
             android:name=".screens.MainActivity"
             android:exported="true" />
         <activity
-            android:name=".screens.MemoryGameActivity"
-            android:exported="true" />
-        <activity
-            android:name=".screens.ImageRecognitionGameActivity"
-            android:exported="true" />
-        <activity
             android:name=".screens.BaseActivity"
             android:exported="true" />
         <activity
@@ -63,9 +51,6 @@
             android:exported="true" />
         <activity
             android:name=".screens.SelectSubjectActivity"
-            android:exported="true" />
-        <activity
-            android:name=".screens.Total"
             android:exported="true" />
         <activity
             android:name=".screens.UsersListActivity"

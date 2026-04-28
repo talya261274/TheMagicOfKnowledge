@@ -30,35 +30,15 @@
             android:icon="@drawable/nav_profile"
             android:title="החלפת ילד" />
 
+        <item
+            android:id="@+id/nav_back_to_parent"
+            android:icon="@drawable/nav_profile"
+            android:title="חזרה למצב הורה" />
+
     </group>
 
     <item android:title="משחקים">
         <menu>
-            <item
-                android:id="@+id/nav_game1"
-                android:icon="@drawable/nav_game"
-                android:title="משחק בחירה מרובה" />
-
-            <item
-                android:id="@+id/nav_game2"
-                android:icon="@drawable/nav_game"
-                android:title="משחק הזיכרון" />
-
-            <item
-                android:id="@+id/nav_game3"
-                android:icon="@drawable/nav_game"
-                android:title="משחק זיהוי קול" />
-
-            <item
-                android:id="@+id/nav_game4"
-                android:icon="@drawable/nav_game"
-                android:title="משחק התאמת זוגות - גרירה" />
-
-            <item
-                android:id="@+id/nav_game5"
-                android:icon="@drawable/nav_game"
-                android:title="משחק השלמת משפט" />
-
             <item
                 android:id="@+id/nav_mix"
                 android:icon="@drawable/nav_game"
