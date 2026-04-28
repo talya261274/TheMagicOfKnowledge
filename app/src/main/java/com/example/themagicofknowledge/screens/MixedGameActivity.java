@@ -4,8 +4,10 @@ import android.content.res.ColorStateList;
 import android.graphics.Color;
 import android.os.Bundle;
 import android.os.Handler;
+import android.os.Looper;
 import android.speech.tts.TextToSpeech;
 import android.util.DisplayMetrics;
+import android.util.Log;
 import android.view.DragEvent;
 import android.view.View;
 import android.widget.Button;
@@ -22,6 +24,7 @@ import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 
 import com.example.themagicofknowledge.R;
+import com.example.themagicofknowledge.adapter.KeyboardAdapter;
 import com.example.themagicofknowledge.adapter.MemoryAdapter;
 import com.example.themagicofknowledge.models.MemoryCard;
 import com.example.themagicofknowledge.models.Pair;
@@ -41,10 +44,14 @@ import com.google.firebase.database.ValueEventListener;
 
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
+import java.util.Map;
 
 public class MixedGameActivity extends AppCompatActivity {
+
+    private static final String TAG = "MixedGameActivity";
 
     private final String[] hebrewLetters = {
             "ו", "ה", "ד", "ג", "ב", "א", "DEL",
@@ -56,32 +63,29 @@ public class MixedGameActivity extends AppCompatActivity {
     private int currentIndex = 0;
     private int attempts = 0;
     private int cardSize;
-    private long startTime;
     private String subject;
     private boolean isProcessingAnswer = false;
     private UserChild currentChild;
     private TextToSpeech tts;
-    // רכיבי UI כלליים
+    
     private ProgressBar globalProgress;
     private TextView tvQuestionTitle;
-    // מכולות (Containers)
-    private View containerSelection, containerMatching, containerSentence;
-    // רכיבי משחקי בחירה (שמע/תמונה)
+    private View containerSelection, containerMatching, containerSentence, containerMemory;
+    
     private MaterialButton btnPlayAudio;
     private ImageView ivQuestionImage;
-    private MaterialButton[] selectionButtons = new MaterialButton[4];
-    // רכיבי משחק ההתאמה
+    private final MaterialButton[] selectionButtons = new MaterialButton[4];
+    private final String[] buttonColors = {"#FF9800", "#4CAF50", "#2196F3", "#E91E63"};
+    
     private LinearLayout leftColumn, rightColumn;
-    private View selectedView = null;
     private int matchesFound = 0;
     private int totalPairs;
-    // משתני טעינה
-    private int tasksToLoad = 5;
+    
+    private int tasksToLoad = 3;
     private int tasksCompleted = 0;
-    // רכיבי זיכרון
-    private View containerMemory;
+    
     private GridView gvMemoryBoard;
-    private List<MemoryCard> memoryCards = new ArrayList<>();
+    private final List<MemoryCard> memoryCards = new ArrayList<>();
     private MemoryAdapter memoryAdapter;
     private MemoryCard firstMemorySelected = null;
     private MemoryCard secondMemorySelected = null;
@@ -94,15 +98,14 @@ public class MixedGameActivity extends AppCompatActivity {
 
         subject = getIntent().getStringExtra("subject");
         currentChild = SharedPreferencesUtil.getCurrentChild(this);
-        if (currentChild == null) {
+        if (currentChild == null || subject == null) {
+            Log.e(TAG, "Child or subject is null. Finishing.");
             finish();
             return;
         }
 
         initViews();
         setupTTS();
-
-        startTime = System.currentTimeMillis();
         loadAllData();
     }
 
@@ -113,6 +116,7 @@ public class MixedGameActivity extends AppCompatActivity {
         containerSelection = findViewById(R.id.containerSelection);
         containerMatching = findViewById(R.id.containerMatching);
         containerSentence = findViewById(R.id.containerSentence);
+        containerMemory = findViewById(R.id.containerMemory);
 
         btnPlayAudio = findViewById(R.id.btnMixedPlayAudio);
         ivQuestionImage = findViewById(R.id.ivMixedImage);
@@ -125,7 +129,6 @@ public class MixedGameActivity extends AppCompatActivity {
         leftColumn = findViewById(R.id.mixedLeftColumn);
         rightColumn = findViewById(R.id.mixedRightColumn);
 
-        containerMemory = findViewById(R.id.containerMemory);
         gvMemoryBoard = findViewById(R.id.gvMemoryBoard);
 
         DisplayMetrics metrics = getResources().getDisplayMetrics();
@@ -139,80 +142,78 @@ public class MixedGameActivity extends AppCompatActivity {
         });
     }
 
-    // --- שלב 1: טעינת נתונים מכל המקורות ---
     private void loadAllData() {
         String level = currentChild.getAgeGroup().replace("-", "_");
         DatabaseReference rootRef = FirebaseDatabase.getInstance().getReference("Games");
+        tasksCompleted = 0;
+        allQuestions.clear();
 
-        // חלוקה לפי גיל - כל רמה מקבלת רק את המשחקים שמתאימים לה
         if (level.equals("3_4") || level.equals("5_6")) {
-            // גילאי 3-4 ו-5-6: שמע, התאמה, זיכרון (3 סוגי משחקים)
             tasksToLoad = 3;
-
             loadCategory(rootRef.child("audioRecognition").child("level_" + level).child(subject),
                     UnifiedQuestion.Type.AUDIO, Question.class);
-
-            loadCategory(rootRef.child("matching").child("level_" + level).child(subject),
+            loadCategory(rootRef.child("matching").child("level_" + level).child(subject).child("pairs"),
                     UnifiedQuestion.Type.MATCHING, Pair.class);
-
             loadCategory(rootRef.child("memoryGame").child("level_" + level).child(subject),
                     UnifiedQuestion.Type.MEMORY, DataSnapshot.class);
         } else if (level.equals("7_8")) {
-            // גילאי 7-8: זיהוי תמונה, השלמת משפט, זיכרון (3 סוגי משחקים)
             tasksToLoad = 3;
-
             loadCategory(rootRef.child("imageRecognition").child("level_" + level).child(subject),
                     UnifiedQuestion.Type.IMAGE, Question.class);
-
             loadCategory(rootRef.child("sentenceCompletion").child("level_" + level).child(subject),
                     UnifiedQuestion.Type.SENTENCE, SentenceQuestion.class);
-
             loadCategory(rootRef.child("memoryGame").child("level_" + level).child(subject),
                     UnifiedQuestion.Type.MEMORY, DataSnapshot.class);
         } else {
-            // ברירת מחדל - אם הגיל לא מזוהה, טעינה כמו 3-4
-            tasksToLoad = 3;
+            tasksToLoad = 1;
             loadCategory(rootRef.child("audioRecognition").child("level_3_4").child(subject),
                     UnifiedQuestion.Type.AUDIO, Question.class);
-            loadCategory(rootRef.child("matching").child("level_3_4").child(subject),
-                    UnifiedQuestion.Type.MATCHING, Pair.class);
-            loadCategory(rootRef.child("memoryGame").child("level_3_4").child(subject),
-                    UnifiedQuestion.Type.MEMORY, DataSnapshot.class);
         }
     }
-
 
     private void loadCategory(Query query, UnifiedQuestion.Type type, Class<?> modelClass) {
         query.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
-                if (type == UnifiedQuestion.Type.MEMORY) {
-                    // לוגיקה לפיצול משחק הזיכרון ליחידות קטנות
-                    List<DataSnapshot> allItems = new ArrayList<>();
-                    for (DataSnapshot item : snapshot.getChildren()) {
-                        allItems.add(item);
+                try {
+                    if (type == UnifiedQuestion.Type.MEMORY) {
+                        List<DataSnapshot> allItems = new ArrayList<>();
+                        for (DataSnapshot item : snapshot.getChildren()) {
+                            allItems.add(item);
+                        }
+                        int chunkSize = 3; 
+                        for (int i = 0; i < allItems.size(); i += chunkSize) {
+                            int end = Math.min(i + chunkSize, allItems.size());
+                            allQuestions.add(new UnifiedQuestion(type, new ArrayList<>(allItems.subList(i, end))));
+                        }
+                    } else if (type == UnifiedQuestion.Type.MATCHING) {
+                        List<Pair> pairs = new ArrayList<>();
+                        for (DataSnapshot ds : snapshot.getChildren()) {
+                            Pair p = ds.getValue(Pair.class);
+                            if (p != null) pairs.add(p);
+                        }
+                        if (!pairs.isEmpty()) {
+                            int chunkSize = 4;
+                            for (int i = 0; i < pairs.size(); i += chunkSize) {
+                                int end = Math.min(i + chunkSize, pairs.size());
+                                allQuestions.add(new UnifiedQuestion(type, new ArrayList<>(pairs.subList(i, end))));
+                            }
+                        }
+                    } else {
+                        for (DataSnapshot ds : snapshot.getChildren()) {
+                            Object data = ds.getValue(modelClass);
+                            if (data != null) allQuestions.add(new UnifiedQuestion(type, data));
+                        }
                     }
-
-                    int chunkSize = 3; // כמה זוגות בכל "שלב" של משחק זיכרון
-                    for (int i = 0; i < allItems.size(); i += chunkSize) {
-                        int end = Math.min(i + chunkSize, allItems.size());
-                        List<DataSnapshot> subList = allItems.subList(i, end);
-
-                        // מוסיף כל שלב כ"שאלה" נפרדת ברשימה המעורבבת
-                        allQuestions.add(new UnifiedQuestion(type, subList));
-                    }
-                } else {
-                    // שאר המשחקים נטענים כרגיל
-                    for (DataSnapshot ds : snapshot.getChildren()) {
-                        Object data = ds.getValue(modelClass);
-                        if (data != null) allQuestions.add(new UnifiedQuestion(type, data));
-                    }
+                } catch (Exception e) {
+                    Log.e(TAG, "Error parsing " + type + " data: " + e.getMessage());
                 }
                 checkIfLoadingFinished();
             }
 
             @Override
             public void onCancelled(@NonNull DatabaseError error) {
+                Log.e(TAG, "Database error loading " + type + ": " + error.getMessage());
                 checkIfLoadingFinished();
             }
         });
@@ -220,8 +221,9 @@ public class MixedGameActivity extends AppCompatActivity {
 
     private void checkIfLoadingFinished() {
         tasksCompleted++;
-        if (tasksCompleted == tasksToLoad) {
+        if (tasksCompleted >= tasksToLoad) {
             if (allQuestions.isEmpty()) {
+                Log.w(TAG, "No questions loaded.");
                 new AlertDialog.Builder(this)
                         .setTitle("הקוסם נח כרגע")
                         .setMessage("עוד אין שאלות בנושא הזה. בוא ננסה נושא אחר!")
@@ -230,13 +232,45 @@ public class MixedGameActivity extends AppCompatActivity {
                         .show();
                 return;
             }
-            Collections.shuffle(allQuestions);
+            allQuestions = interleaveQuestions(allQuestions);
             checkSavedProgress();
         }
     }
 
-    // --- שלב 2: בדיקת המשכיות ---
+    private List<UnifiedQuestion> interleaveQuestions(List<UnifiedQuestion> original) {
+        Map<UnifiedQuestion.Type, List<UnifiedQuestion>> grouped = new HashMap<>();
+        for (UnifiedQuestion.Type type : UnifiedQuestion.Type.values()) {
+            grouped.put(type, new ArrayList<>());
+        }
+        for (UnifiedQuestion q : original) {
+            List<UnifiedQuestion> list = grouped.get(q.getType());
+            if (list != null) list.add(q);
+        }
+        for (List<UnifiedQuestion> list : grouped.values()) {
+            Collections.shuffle(list);
+        }
+        List<UnifiedQuestion> interleaved = new ArrayList<>();
+        boolean added;
+        do {
+            added = false;
+            List<UnifiedQuestion.Type> types = new ArrayList<>(grouped.keySet());
+            Collections.shuffle(types);
+            for (UnifiedQuestion.Type type : types) {
+                List<UnifiedQuestion> list = grouped.get(type);
+                if (list != null && !list.isEmpty()) {
+                    interleaved.add(list.remove(0));
+                    added = true;
+                }
+            }
+        } while (added);
+        return interleaved;
+    }
+
     private void checkSavedProgress() {
+        if (SharedPreferencesUtil.getUser(this) == null) {
+            showCurrentQuestion();
+            return;
+        }
         String pId = SharedPreferencesUtil.getUser(this).getId();
         DatabaseReference ref = FirebaseDatabase.getInstance().getReference("users")
                 .child(pId).child("childrenList").child(currentChild.getId())
@@ -246,17 +280,17 @@ public class MixedGameActivity extends AppCompatActivity {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
                 if (snapshot.exists()) {
-                    int savedIdx = snapshot.getValue(Integer.class);
-                    if (savedIdx > 0 && savedIdx < allQuestions.size()) {
+                    Integer savedIdx = snapshot.getValue(Integer.class);
+                    if (savedIdx != null && savedIdx > 0 && savedIdx < allQuestions.size()) {
                         showContinueDialog(savedIdx);
                         return;
                     }
                 }
                 showCurrentQuestion();
             }
-
             @Override
             public void onCancelled(@NonNull DatabaseError error) {
+                showCurrentQuestion();
             }
         });
     }
@@ -276,7 +310,6 @@ public class MixedGameActivity extends AppCompatActivity {
                 .setCancelable(false).show();
     }
 
-    // --- שלב 3: מנוע הצגת השאלות ---
     private void showCurrentQuestion() {
         isProcessingAnswer = false;
         if (currentIndex >= allQuestions.size()) {
@@ -288,32 +321,28 @@ public class MixedGameActivity extends AppCompatActivity {
         updateProgressInFirebase();
 
         UnifiedQuestion uq = allQuestions.get(currentIndex);
-
-        switch (uq.getType()) {
-            case AUDIO:
-                displayAudioQuestion((Question) uq.getData());
-                break;
-            case IMAGE:
-                displayImageQuestion((Question) uq.getData());
-                break;
-            case MATCHING:
-                displayMatchingQuestion((List<Pair>) uq.getData());
-                break;
-            case SENTENCE:
-                displaySentenceQuestion((SentenceQuestion) uq.getData());
-                break;
-            case MEMORY:
-                displayMemoryGame((DataSnapshot) uq.getData());
-                break;
+        Log.d(TAG, "Showing question " + currentIndex + " type: " + uq.getType());
+        try {
+            switch (uq.getType()) {
+                case AUDIO: displayAudioQuestion((Question) uq.getData()); break;
+                case IMAGE: displayImageQuestion((Question) uq.getData()); break;
+                case MATCHING: displayMatchingQuestion((List<Pair>) uq.getData()); break;
+                case SENTENCE: displaySentenceQuestion((SentenceQuestion) uq.getData()); break;
+                case MEMORY: displayMemoryGame((List<DataSnapshot>) uq.getData()); break;
+            }
+        } catch (Exception e) {
+            Log.e(TAG, "Error displaying question: " + e.getMessage());
+            currentIndex++;
+            showCurrentQuestion();
         }
     }
 
     private void displayAudioQuestion(Question q) {
         containerSelection.setVisibility(View.VISIBLE);
+        resetSelectionButtonColors();
         btnPlayAudio.setVisibility(View.VISIBLE);
         ivQuestionImage.setVisibility(View.GONE);
         tvQuestionTitle.setText("הקשיבו לשאלה:");
-
         playTTS(q.getQuestionText());
         btnPlayAudio.setOnClickListener(v -> playTTS(q.getQuestionText()));
         setupSelectionButtons(q);
@@ -325,44 +354,36 @@ public class MixedGameActivity extends AppCompatActivity {
         btnPlayAudio.setVisibility(View.GONE);
         ivQuestionImage.setVisibility(View.VISIBLE);
         tvQuestionTitle.setText(q.getQuestionText());
-
         int resId = getResources().getIdentifier(q.getMediaUrl(), "drawable", getPackageName());
         ivQuestionImage.setImageResource(resId != 0 ? resId : R.drawable.wizard_placeholder);
         setupSelectionButtons(q);
-
     }
 
     private void displaySentenceQuestion(SentenceQuestion sq) {
         containerSentence.setVisibility(View.VISIBLE);
         tvQuestionTitle.setText("השלם את המשפט:");
-
         ImageView ivHint = findViewById(R.id.ivMixedSentenceHint);
         TextView tvSentence = findViewById(R.id.tvMixedSentenceText);
         EditText etAnswer = findViewById(R.id.etMixedAnswer);
         GridView keyboardGrid = findViewById(R.id.mixedKeyboard);
         Button btnCheck = findViewById(R.id.btnCheck);
 
-        // הגדרת תוכן
         int resId = getResources().getIdentifier(sq.getHintImage(), "drawable", getPackageName());
         ivHint.setImageResource(resId != 0 ? resId : R.drawable.wizard_placeholder);
         tvSentence.setText(sq.getSentence());
         etAnswer.setText("");
-        etAnswer.setBackgroundTintList(null); // איפוס צבע מהשאלה הקודמת
+        etAnswer.setBackgroundTintList(null);
 
-        // הגדרת המקלדת המקורית שלך
-        com.example.themagicofknowledge.adapter.KeyboardAdapter adapter = new com.example.themagicofknowledge.adapter.KeyboardAdapter(this, hebrewLetters, letter -> {
+        KeyboardAdapter adapter = new KeyboardAdapter(this, hebrewLetters, letter -> {
             if (letter.equals("DEL")) {
                 String str = etAnswer.getText().toString();
-                if (str.length() > 0) {
-                    etAnswer.setText(str.substring(0, str.length() - 1));
-                }
+                if (!str.isEmpty()) etAnswer.setText(str.substring(0, str.length() - 1));
             } else {
                 etAnswer.append(letter);
             }
         });
         keyboardGrid.setAdapter(adapter);
 
-        // לוגיקת בדיקה
         btnCheck.setOnClickListener(v -> {
             if (isProcessingAnswer) return;
             String userAns = etAnswer.getText().toString().trim();
@@ -371,40 +392,32 @@ public class MixedGameActivity extends AppCompatActivity {
                 etAnswer.setBackgroundTintList(ColorStateList.valueOf(Color.GREEN));
                 handleCorrect();
             } else {
-                handleWrong(etAnswer); // ישתמש באנימציה והרעד שהגדרנו קודם!
+                handleWrong(etAnswer);
             }
         });
     }
 
-    private void displayMemoryGame(DataSnapshot data) {
+    private void displayMemoryGame(List<DataSnapshot> items) {
         containerMemory.setVisibility(View.VISIBLE);
         tvQuestionTitle.setText("משחק הזיכרון - מצאו את הזוגות!");
         memoryCards.clear();
-
-        List<DataSnapshot> items = (List<DataSnapshot>) data;
-
         for (DataSnapshot ds : items) {
             String imageName = ds.child("image").getValue(String.class);
             String displayName = ds.child("name").getValue(String.class);
-
             if (imageName != null && displayName != null) {
                 int resId = getResources().getIdentifier(imageName, "drawable", getPackageName());
                 addPairToMemoryList(resId, displayName);
             }
         }
-
         Collections.shuffle(memoryCards);
         memoryAdapter = new MemoryAdapter(this, memoryCards, cardSize);
         gvMemoryBoard.setAdapter(memoryAdapter);
-
         gvMemoryBoard.setOnItemClickListener((parent, view, position, id) -> {
             if (isMemoryBusy) return;
             MemoryCard selected = memoryCards.get(position);
-            if (selected.isMatched || selected.isFlipped) return;
-
-            selected.isFlipped = true;
+            if (selected.isMatched() || selected.isFlipped()) return;
+            selected.setFlipped(true);
             memoryAdapter.notifyDataSetChanged();
-
             if (firstMemorySelected == null) {
                 firstMemorySelected = selected;
             } else {
@@ -427,19 +440,15 @@ public class MixedGameActivity extends AppCompatActivity {
 
     private void checkMemoryMatch() {
         isMemoryBusy = true;
-        new Handler().postDelayed(() -> {
-            if (firstMemorySelected.matchId.equals(secondMemorySelected.matchId)) {
-                firstMemorySelected.isMatched = true;
-                secondMemorySelected.isMatched = true;
-
-                // בדיקה אם הכל נפתר
-                if (checkAllMemoryMatched()) {
-                    handleCorrect(); // עובר לשאלה המעורבבת הבאה!
-                }
+        new Handler(Looper.getMainLooper()).postDelayed(() -> {
+            if (firstMemorySelected.getMatchId().equals(secondMemorySelected.getMatchId())) {
+                firstMemorySelected.setMatched(true);
+                secondMemorySelected.setMatched(true);
+                if (checkAllMemoryMatched()) handleCorrect();
             } else {
-                firstMemorySelected.isFlipped = false;
-                secondMemorySelected.isFlipped = false;
-                attempts++; // מעדכן את מונה הטעויות הכללי של המנוע
+                firstMemorySelected.setFlipped(false);
+                secondMemorySelected.setFlipped(false);
+                attempts++;
             }
             firstMemorySelected = null;
             secondMemorySelected = null;
@@ -449,42 +458,28 @@ public class MixedGameActivity extends AppCompatActivity {
     }
 
     private boolean checkAllMemoryMatched() {
-        for (MemoryCard c : memoryCards) if (!c.isMatched) return false;
+        for (MemoryCard c : memoryCards) if (!c.isMatched()) return false;
         return true;
     }
 
     private void displayMatchingQuestion(List<Pair> pairs) {
         containerMatching.setVisibility(View.VISIBLE);
         tvQuestionTitle.setText("התאימו את הזוגות!");
-
         leftColumn.removeAllViews();
         rightColumn.removeAllViews();
         matchesFound = 0;
-        totalPairs = pairs.size(); // שומרים כמה זוגות צריך למצוא כדי לנצח
-        selectedView = null;
-
-        // יצירת רשימות נפרדות לצד ימין ושמאל כדי לערבב אותן
+        totalPairs = pairs.size();
         List<Pair> leftSide = new ArrayList<>(pairs);
         List<Pair> rightSide = new ArrayList<>(pairs);
         Collections.shuffle(leftSide);
         Collections.shuffle(rightSide);
-
-        // הוספת הכפתורים לטור שמאל
-        for (Pair p : leftSide) {
-            setupMatchingView(p.getLeft(), p.getId(), leftColumn);
-        }
-
-        // הוספת הכפתורים לטור ימין
-        for (Pair p : rightSide) {
-            setupMatchingView(p.getRight(), p.getId(), rightColumn);
-        }
+        for (Pair p : leftSide) setupMatchingView(p.getLeft(), p.getId(), leftColumn);
+        for (Pair p : rightSide) setupMatchingView(p.getRight(), p.getId(), rightColumn);
     }
 
     private void setupMatchingView(String content, String id, LinearLayout column) {
         MaterialButton btn = (MaterialButton) getLayoutInflater().inflate(R.layout.item_matching_button, column, false);
         btn.setTag(id);
-
-        // לוגיקת תוכן (מבוסס על setupContent מהמקור)
         if (content != null) {
             if (content.startsWith("ss_")) {
                 int resId = getResources().getIdentifier(content, "drawable", getPackageName());
@@ -497,54 +492,39 @@ public class MixedGameActivity extends AppCompatActivity {
                 btn.setText("");
                 btn.setIconSize(150);
                 btn.setIconTint(ColorStateList.valueOf(Color.parseColor("#2196F3")));
-                btn.setOnClickListener(v -> playTTS(id)); // בדרך כלל ה-ID הוא המילה שצריך להקריא
+                btn.setOnClickListener(v -> playTTS(id));
             } else {
                 btn.setText(content);
                 btn.setIconResource(0);
             }
         }
-
-        // הגדרת גרירה (Drag)
         btn.setOnLongClickListener(v -> {
             View.DragShadowBuilder shadowBuilder = new View.DragShadowBuilder(v);
             v.startDragAndDrop(null, shadowBuilder, v, 0);
-            v.setVisibility(View.INVISIBLE); // מעלים את המקור בזמן הגרירה
+            v.setVisibility(View.INVISIBLE);
             return true;
         });
-
-        // הגדרת יעד (Drop)
         btn.setOnDragListener((v, event) -> {
             switch (event.getAction()) {
-                case DragEvent.ACTION_DRAG_STARTED:
-                    return true;
-                case DragEvent.ACTION_DRAG_ENTERED:
-                    v.setBackgroundTintList(ColorStateList.valueOf(Color.parseColor("#FFE082"))); // צהוב בכניסה
-                    return true;
-                case DragEvent.ACTION_DRAG_EXITED:
-                    v.setBackgroundTintList(ColorStateList.valueOf(Color.WHITE)); // חזרה ללבן ביציאה
-                    return true;
+                case DragEvent.ACTION_DRAG_STARTED: return true;
+                case DragEvent.ACTION_DRAG_ENTERED: v.setBackgroundTintList(ColorStateList.valueOf(Color.parseColor("#FFE082"))); return true;
+                case DragEvent.ACTION_DRAG_EXITED: v.setBackgroundTintList(ColorStateList.valueOf(Color.WHITE)); return true;
                 case DragEvent.ACTION_DROP:
                     View draggedView = (View) event.getLocalState();
-                    if (draggedView.getParent() != v.getParent() && draggedView.getTag().equals(v.getTag())) {
-                        // הצלחה
+                    if (draggedView != null && draggedView.getParent() != v.getParent() && draggedView.getTag().equals(v.getTag())) {
                         v.setVisibility(View.INVISIBLE);
                         draggedView.setVisibility(View.INVISIBLE);
                         matchesFound++;
                         if (matchesFound == totalPairs) handleCorrect();
                     } else {
-                        // טעות
                         handleWrong(v);
-                        draggedView.setVisibility(View.VISIBLE); // מחזיר את הגרור למקום
+                        if (draggedView != null) draggedView.setVisibility(View.VISIBLE);
                     }
                     return true;
-                case DragEvent.ACTION_DRAG_ENDED:
-                    if (!event.getResult())
-                        btn.setVisibility(View.VISIBLE); // אם הגרירה בוטלה, נחזיר את הכפתור
-                    return true;
+                case DragEvent.ACTION_DRAG_ENDED: if (!event.getResult()) btn.setVisibility(View.VISIBLE); return true;
             }
             return false;
         });
-
         column.addView(btn);
     }
 
@@ -553,30 +533,24 @@ public class MixedGameActivity extends AppCompatActivity {
         for (int i = 0; i < 4; i++) {
             final int index = i;
             String item = options.get(i);
-
-            // בדיקה: האם זו שאלת שמע? אם כן, נשים תמונה. אם לא (זיהוי תמונה), נשים טקסט.
             int resId = getResources().getIdentifier(item, "drawable", getPackageName());
-
             if (resId != 0) {
-                // אם נמצאה תמונה (כמו במקור), נציג אותה כפי שעשית
                 selectionButtons[i].setIconResource(resId);
-                selectionButtons[i].setText(""); // מוחק טקסט
+                selectionButtons[i].setIconTint(null);
+                selectionButtons[i].setText("");
                 selectionButtons[i].setIconSize(220);
-                selectionButtons[i].setIconGravity(MaterialButton.ICON_GRAVITY_TEXT_START); // מרכז האייקון
+                selectionButtons[i].setIconGravity(MaterialButton.ICON_GRAVITY_TEXT_START);
             } else {
-                // אם אין תמונה, נציג טקסט רגיל
                 selectionButtons[i].setIconResource(0);
                 selectionButtons[i].setText(item);
             }
-
             selectionButtons[i].setOnClickListener(v -> {
-                if (isProcessingAnswer) return; // אם כבר לחץ - אל תעשה כלום
-                isProcessingAnswer = true; // חוסם לחיצות נוספות
-
+                if (isProcessingAnswer) return;
+                isProcessingAnswer = true;
                 if (index == q.getCorrectAnswerIndex()) {
                     handleCorrect();
                 } else {
-                    isProcessingAnswer = false; // בשגיאה משחררים כדי שיוכל לנסות שוב
+                    isProcessingAnswer = false;
                     handleWrong(selectionButtons[index]);
                 }
             });
@@ -584,50 +558,46 @@ public class MixedGameActivity extends AppCompatActivity {
     }
 
     private void handleCorrect() {
-        //android.media.MediaPlayer.create(this, R.raw.correct_sound).start();
         currentIndex++;
-        new Handler().postDelayed(this::showCurrentQuestion, 1000);
+        new Handler(Looper.getMainLooper()).postDelayed(this::showCurrentQuestion, 1000);
     }
 
     private void handleWrong(View view) {
-        //android.media.MediaPlayer.create(this, R.raw.wrong_sound).start();
         attempts++;
-
-        // צביעת הכפתור באדום
+        final ColorStateList originalTint = view.getBackgroundTintList();
         view.setBackgroundTintList(ColorStateList.valueOf(Color.RED));
-
-        // הוסיפי את האנימציה הזו - זה הופך את זה להרבה יותר חי!
         view.animate().translationX(20).setDuration(50).withEndAction(() ->
                 view.animate().translationX(-20).setDuration(50).withEndAction(() ->
                         view.animate().translationX(0).setDuration(50).start()
                 ).start()
         ).start();
-
-        new Handler().postDelayed(() -> {
-            // החזרה לצבע המקורי (לבן או צבע הכפתור)
-            view.setBackgroundTintList(ColorStateList.valueOf(Color.WHITE));
+        new Handler(Looper.getMainLooper()).postDelayed(() -> {
+            boolean restored = false;
+            for (int i = 0; i < selectionButtons.length; i++) {
+                if (view == selectionButtons[i]) {
+                    view.setBackgroundTintList(ColorStateList.valueOf(Color.parseColor(buttonColors[i])));
+                    restored = true;
+                    break;
+                }
+            }
+            if (!restored) view.setBackgroundTintList(originalTint);
         }, 1000);
     }
 
     private void updateProgressInFirebase() {
-        // חישוב אחוז ליניארי מ-15% עד 100%
+        if (allQuestions.isEmpty()) return;
         int percent = 15 + (int) (((double) currentIndex / allQuestions.size()) * 85);
+        if (SharedPreferencesUtil.getUser(this) == null) return;
         String pId = SharedPreferencesUtil.getUser(this).getId();
-
-        DatabaseService.getInstance().updateDetailedProgress(
-                pId, currentChild.getId(), currentChild.getAgeGroup(),
-                subject, 0, 0, percent, currentIndex
-        );
+        DatabaseService.getInstance().updateDetailedProgress(pId, currentChild.getId(), currentChild.getAgeGroup(), subject, 0, 0, percent, currentIndex);
         globalProgress.setProgress(percent);
     }
 
     private void resetSelectionButtonColors() {
-        // מערך הצבעים מהמשחק המקורי שלך
-        String[] colors = {"#FF9800", "#4CAF50", "#2196F3", "#E91E63"};
         for (int i = 0; i < selectionButtons.length; i++) {
             if (selectionButtons[i] != null) {
-                selectionButtons[i].setBackgroundTintList(ColorStateList.valueOf(Color.parseColor(colors[i])));
-                selectionButtons[i].setTextColor(Color.WHITE); // כדי שהטקסט יהיה קריא
+                selectionButtons[i].setBackgroundTintList(ColorStateList.valueOf(Color.parseColor(buttonColors[i])));
+                selectionButtons[i].setTextColor(Color.WHITE);
             }
         }
     }
@@ -644,77 +614,45 @@ public class MixedGameActivity extends AppCompatActivity {
     }
 
     private void finishGame() {
-        long totalTime = (System.currentTimeMillis() - startTime) / 1000;
-
-        // חישוב ציון: (מספר שאלות / (מספר שאלות + טעויות)) * 100
-        // ככה אם הוא ענה על הכל נכון בלי טעויות בכלל הוא מקבל 100
         double score = ((double) allQuestions.size() / (allQuestions.size() + attempts)) * 100;
-
         if (score >= 80) {
-            // הצלחה! שומרים את ה-"וי" ב-Firebase
             markSubjectAsCompletedInFirebase();
-
-            // כאן תציגי את דיאלוג ההצלחה שלך (גביע/מזל טוב)
             showSuccessDialog(score);
         } else {
-            // הציון נמוך מדי - לא שומרים את ה-"וי"
-            // מציגים דיאלוג "כמעט הצלחת, בוא ננסה שוב"
             showTryAgainDialog(score);
         }
     }
 
     private void showTryAgainDialog(double score) {
         final android.app.Dialog dialog = new android.app.Dialog(this);
-        dialog.setContentView(R.layout.dialog_test_result); // משתמשים ב-XML הקיים שלך
-
-        if (dialog.getWindow() != null) {
-            dialog.getWindow().setBackgroundDrawableResource(android.R.color.transparent);
-        }
-
-        // חיבור הרכיבים מה-XML
+        dialog.setContentView(R.layout.dialog_test_result);
+        if (dialog.getWindow() != null) dialog.getWindow().setBackgroundDrawableResource(android.R.color.transparent);
         TextView tvTitle = dialog.findViewById(R.id.tvDialogTitle);
         TextView tvMessage = dialog.findViewById(R.id.tvDialogMessage);
         ImageView ivStatus = dialog.findViewById(R.id.ivStatusIcon);
         Button btnAction = dialog.findViewById(R.id.btnDialogAction);
-        Button btnStay = dialog.findViewById(R.id.btnStayAtCurrentLevel); // הכפתור השני שהוספנו
+        Button btnStay = dialog.findViewById(R.id.btnStayAtCurrentLevel);
         RatingBar ratingBar = dialog.findViewById(R.id.dialogRatingBar);
 
-        // התאמת התוכן למקרה של "נסה שוב"
-        tvTitle.setText("כמעט הצלחת!");
-        tvTitle.setTextColor(Color.parseColor("#333333")); // צבע כהה כי הרקע לבן
-
-        tvMessage.setText("קיבלת " + (int) score + " נקודות.\nכדי לקבל את ה-V צריך לפחות 80.\nרוצה לנסות שוב?");
-        tvMessage.setTextColor(Color.parseColor("#666666"));
-
-        // שינוי האייקון למשהו פחות "חגיגי" מגביע (אולי מדליה או הקוסם)
-        ivStatus.setImageResource(R.drawable.ic_medal);
-
-        // עדכון הכוכבים לפי הציון שהשיג
-        if (ratingBar != null) {
-            ratingBar.setRating((float) (score / 20));
+        if (tvTitle != null) tvTitle.setText("כמעט הצלחת!");
+        if (tvMessage != null) tvMessage.setText("קיבלת " + (int) score + " נקודות.\nכדי לקבל את ה-V צריך לפחות 80.");
+        if (ivStatus != null) ivStatus.setImageResource(R.drawable.ic_medal);
+        if (ratingBar != null) ratingBar.setRating((float) (score / 20));
+        if (btnAction != null) {
+            btnAction.setText("אני רוצה לנסות שוב!");
+            btnAction.setOnClickListener(v -> {
+                dialog.dismiss();
+                currentIndex = 0;
+                attempts = 0;
+                Collections.shuffle(allQuestions);
+                showCurrentQuestion();
+            });
         }
-
-        // הגדרת הכפתור המרכזי - לנסות שוב
-        btnAction.setText("אני רוצה לנסות שוב!");
-        btnAction.setOnClickListener(v -> {
-            dialog.dismiss();
-            // איפוס נתונים והרצה מחדש
-            currentIndex = 0;
-            attempts = 0;
-            Collections.shuffle(allQuestions);
-            showCurrentQuestion();
-        });
-
-        // הגדרת הכפתור המשני - לצאת לתפריט
         if (btnStay != null) {
             btnStay.setVisibility(View.VISIBLE);
             btnStay.setText("אולי אחר כך");
-            btnStay.setOnClickListener(v -> {
-                dialog.dismiss();
-                finish(); // חוזר למסך בחירת הנושאים
-            });
+            btnStay.setOnClickListener(v -> { dialog.dismiss(); finish(); });
         }
-
         dialog.setCancelable(false);
         dialog.show();
     }
@@ -722,11 +660,7 @@ public class MixedGameActivity extends AppCompatActivity {
     private void showSuccessDialog(double score) {
         final android.app.Dialog dialog = new android.app.Dialog(this);
         dialog.setContentView(R.layout.dialog_test_result);
-
-        if (dialog.getWindow() != null) {
-            dialog.getWindow().setBackgroundDrawableResource(android.R.color.transparent);
-        }
-
+        if (dialog.getWindow() != null) dialog.getWindow().setBackgroundDrawableResource(android.R.color.transparent);
         TextView tvTitle = dialog.findViewById(R.id.tvDialogTitle);
         TextView tvMessage = dialog.findViewById(R.id.tvDialogMessage);
         ImageView ivStatus = dialog.findViewById(R.id.ivStatusIcon);
@@ -734,49 +668,31 @@ public class MixedGameActivity extends AppCompatActivity {
         Button btnAction = dialog.findViewById(R.id.btnDialogAction);
         Button btnStay = dialog.findViewById(R.id.btnStayAtCurrentLevel);
 
-        tvTitle.setText("וואו! אלוף!");
-        tvTitle.setTextColor(Color.parseColor("#4CAF50"));
-        tvMessage.setText("סיימת את התרגול בהצלחה!\nעכשיו מופיע לך V ירוק בתפריט.");
-        tvMessage.setTextColor(Color.parseColor("#333333"));
-        ivStatus.setImageResource(R.drawable.ic_trophy);
-
+        if (tvTitle != null) tvTitle.setText("וואו! אלוף!");
+        if (tvMessage != null) tvMessage.setText("סיימת את התרגול בהצלחה!\nעכשיו מופיע לך V ירוק בתפריט.");
+        if (ivStatus != null) ivStatus.setImageResource(R.drawable.ic_trophy);
         if (ratingBar != null) ratingBar.setRating((float) (score / 20));
-        if (btnStay != null) btnStay.setVisibility(View.GONE); // מחביאים את הכפתור המיותר
-
-        btnAction.setText("חזור לתפריט");
-        btnAction.setOnClickListener(v -> {
-            dialog.dismiss();
-            finish();
-        });
-
+        if (btnStay != null) btnStay.setVisibility(View.GONE);
+        if (btnAction != null) {
+            btnAction.setText("חזור לתפריט");
+            btnAction.setOnClickListener(v -> { dialog.dismiss(); finish(); });
+        }
         dialog.setCancelable(false);
         dialog.show();
     }
 
     private void markSubjectAsCompletedInFirebase() {
+        if (SharedPreferencesUtil.getUser(this) == null) return;
         String parentId = SharedPreferencesUtil.getUser(this).getId();
-        DatabaseReference ref = FirebaseDatabase.getInstance().getReference("users")
-                .child(parentId)
-                .child("childrenList")
-                .child(currentChild.getId())
-                .child("completedSubjects");
-
-        // שמירת הנושא כהושלם (למשל animals: true)
+        DatabaseReference ref = FirebaseDatabase.getInstance().getReference("users").child(parentId).child("childrenList").child(currentChild.getId()).child("completedSubjects");
         ref.child(subject).setValue(true).addOnSuccessListener(aVoid -> {
-            // עדכון אחוז התקדמות ל-100%
-            DatabaseService.getInstance().updateDetailedProgress(
-                    parentId, currentChild.getId(), currentChild.getAgeGroup(),
-                    subject, 0, 0, 100, currentIndex
-            );
+            DatabaseService.getInstance().updateDetailedProgress(parentId, currentChild.getId(), currentChild.getAgeGroup(), subject, 0, 0, 100, currentIndex);
         });
     }
 
     @Override
     protected void onDestroy() {
-        if (tts != null) {
-            tts.stop();
-            tts.shutdown();
-        }
+        if (tts != null) { tts.stop(); tts.shutdown(); }
         super.onDestroy();
     }
 }
