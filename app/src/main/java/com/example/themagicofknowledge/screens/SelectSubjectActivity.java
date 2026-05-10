@@ -5,6 +5,7 @@ import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
 import android.widget.ImageView;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
@@ -83,11 +84,18 @@ public class SelectSubjectActivity extends BaseActivity {
     private void checkCompletedSubjects() {
         if (currentChild == null) return;
 
+        String ageGroup = currentChild.getAgeGroup();
+        if (ageGroup == null || ageGroup.isEmpty()) {
+            return;
+        }
+
+        // ⭐ עכשיו אנחנו מסתכלים ב-progress/[ageGroup] במקום completedSubjects
         DatabaseReference ref = FirebaseDatabase.getInstance().getReference("users")
                 .child(currentChild.getParentId())
                 .child("childrenList")
                 .child(currentChild.getId())
-                .child("completedSubjects");
+                .child("progress")
+                .child(ageGroup);
 
         ref.addValueEventListener(new ValueEventListener() {
             @Override
@@ -97,19 +105,29 @@ public class SelectSubjectActivity extends BaseActivity {
                 ImageView[] vImages = {ivVAnimals, ivVColors, ivVNumbers, ivVLetters, ivVShapes, ivVBodyParts};
 
                 for (int i = 0; i < subjects.length; i++) {
+                    boolean isComplete = false;
+
                     if (snapshot.hasChild(subjects[i])) {
-                        Boolean isComplete = snapshot.child(subjects[i]).getValue(Boolean.class);
-                        if (isComplete != null && isComplete) {
-                            if (vImages[i] != null) vImages[i].setVisibility(View.VISIBLE);
-                            completedCount++;
+                        // ⭐ עכשיו צריך להיכנס לתוך הנושא ולבדוק את השדה "completed"
+                        DataSnapshot subjectSnapshot = snapshot.child(subjects[i]);
+                        if (subjectSnapshot.hasChild("completed")) {
+                            Boolean completedValue = subjectSnapshot.child("completed").getValue(Boolean.class);
+                            isComplete = completedValue != null && completedValue;
                         }
-                    } else {
-                        if (vImages[i] != null) vImages[i].setVisibility(View.GONE);
+                    }
+
+                    if (vImages[i] != null) {
+                        vImages[i].setVisibility(isComplete ? View.VISIBLE : View.GONE);
+                    }
+
+                    if (isComplete) {
+                        completedCount++;
                     }
                 }
 
+                // ⭐ אם סיים את כל 6 הנושאים - דיאלוג מתאים
                 if (completedCount >= 6) {
-                    new android.os.Handler().postDelayed(() -> showLevelUpDialog(), 500);
+                    new android.os.Handler().postDelayed(() -> handleAllSubjectsCompleted(), 500);
                 }
             }
 
@@ -119,7 +137,28 @@ public class SelectSubjectActivity extends BaseActivity {
         });
     }
 
-    // הפונקציה הזו חייבת להיות כאן - ישירות תחת ה-Class
+    /**
+     * ⭐⭐⭐ פונקציה חדשה - בוחרת איזה דיאלוג להציג ⭐⭐⭐
+     * אם הילד ברמה 3-4 או 5-6 → דיאלוג רגיל של עליית רמה
+     * אם הילד ברמה 7-8 (הרמה האחרונה) → דיאלוג מיוחד של "סיימת את הקסם!"
+     */
+    private void handleAllSubjectsCompleted() {
+        if (currentChild == null) return;
+
+        String currentLevel = currentChild.getAgeGroup();
+
+        if (currentLevel.equals("7-8")) {
+            // ⭐ רמה אחרונה - דיאלוג מיוחד
+            showFinalAchievementDialog();
+        } else {
+            // ⭐ יש רמה הבאה - דיאלוג עליית רמה רגיל
+            showLevelUpDialog();
+        }
+    }
+
+    /**
+     * דיאלוג עליית רמה רגיל (לרמות 3-4 ו-5-6)
+     */
     private void showLevelUpDialog() {
         final android.app.Dialog dialog = new android.app.Dialog(this);
         dialog.setContentView(R.layout.dialog_level_up);
@@ -139,6 +178,82 @@ public class SelectSubjectActivity extends BaseActivity {
         dialog.show();
     }
 
+    /**
+     * ⭐⭐⭐ פונקציה חדשה - דיאלוג סיום סופי לרמה 7-8 ⭐⭐⭐
+     * מציג "סיימת את הקסם!" עם 2 כפתורים:
+     * 1. שחק מההתחלה - איפוס completedSubjects
+     * 2. חזור הביתה - finish()
+     */
+    private void showFinalAchievementDialog() {
+        final android.app.Dialog dialog = new android.app.Dialog(this);
+        dialog.setContentView(R.layout.dialog_final_achievement);
+
+        if (dialog.getWindow() != null) {
+            dialog.getWindow().setBackgroundDrawableResource(android.R.color.transparent);
+        }
+
+        Button btnPlayAgain = dialog.findViewById(R.id.btnPlayAgain);
+        Button btnGoHome = dialog.findViewById(R.id.btnGoHome);
+
+        if (btnPlayAgain != null) {
+            btnPlayAgain.setOnClickListener(v -> {
+                dialog.dismiss();
+                resetAllSubjects();
+            });
+        }
+
+        if (btnGoHome != null) {
+            btnGoHome.setOnClickListener(v -> {
+                dialog.dismiss();
+                Intent intent = new Intent(SelectSubjectActivity.this, MainActivity.class);
+                intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+                startActivity(intent);
+                finish();
+            });
+        }
+
+        dialog.setCancelable(false);
+        dialog.show();
+    }
+
+    /**
+     * ⭐⭐⭐ פונקציה חדשה - איפוס כל הנושאים ⭐⭐⭐
+     * מוחק את completedSubjects כך שהילד יוכל לשחק שוב מההתחלה
+     */
+    private void resetAllSubjects() {
+        String ageGroup = currentChild.getAgeGroup();
+
+        DatabaseReference progressRef = FirebaseDatabase.getInstance().getReference("users")
+                .child(currentChild.getParentId())
+                .child("childrenList")
+                .child(currentChild.getId())
+                .child("progress")
+                .child(ageGroup);
+
+        // ⭐ מאפס את ה-completed של כל נושא ל-false
+        String[] subjects = {"animals", "colors", "numbers", "letters", "shapes", "bodyparts"};
+
+        java.util.Map<String, Object> updates = new java.util.HashMap<>();
+        for (String subject : subjects) {
+            updates.put(subject + "/completed", false);
+            updates.put(subject + "/progressPercent", 0);
+            updates.put(subject + "/attempts", 0);
+            updates.put(subject + "/timeSeconds", 0);
+        }
+
+        progressRef.updateChildren(updates)
+                .addOnSuccessListener(aVoid -> {
+                    Toast.makeText(this, "מעולה! בואו נתחיל מחדש 🎮", Toast.LENGTH_SHORT).show();
+                    // ה-ValueEventListener אוטומטית יעדכן את ה-V הירוקים
+                })
+                .addOnFailureListener(e -> {
+                    Toast.makeText(this, "שגיאה באיפוס: " + e.getMessage(), Toast.LENGTH_SHORT).show();
+                });
+    }
+
+    /**
+     * עליית רמה רגילה (3-4 → 5-6 או 5-6 → 7-8)
+     */
     private void handleLevelUpgrade() {
         String currentLevel = currentChild.getAgeGroup();
         String nextLevel;
@@ -146,26 +261,27 @@ public class SelectSubjectActivity extends BaseActivity {
         if (currentLevel.equals("3-4")) nextLevel = "5-6";
         else if (currentLevel.equals("5-6")) nextLevel = "7-8";
         else {
-            Toast.makeText(this, "סיימת את כל הרמות! אלוף!", Toast.LENGTH_LONG).show();
             return;
         }
+
+        final String finalNextLevel = nextLevel;
 
         DatabaseReference childRef = FirebaseDatabase.getInstance().getReference("users")
                 .child(currentChild.getParentId())
                 .child("childrenList")
                 .child(currentChild.getId());
 
-        childRef.child("ageGroup").setValue(nextLevel).addOnSuccessListener(aVoid -> {
-            childRef.child("completedSubjects").removeValue().addOnSuccessListener(unused -> {
-                currentChild.setAgeGroup(nextLevel);
-                SharedPreferencesUtil.saveCurrentChild(SelectSubjectActivity.this, currentChild);
+        // ⭐ רק מעדכן את ageGroup - לא צריך למחוק כלום
+        // כי הנושאים של הרמה הבאה עוד לא קיימים, אז ממילא יראו ריקים
+        childRef.child("ageGroup").setValue(finalNextLevel).addOnSuccessListener(aVoid -> {
+            currentChild.setAgeGroup(finalNextLevel);
+            SharedPreferencesUtil.saveCurrentChild(SelectSubjectActivity.this, currentChild);
 
-                Intent intent = new Intent(SelectSubjectActivity.this, PlacementTestActivity.class);
-                intent.putExtra("isUpgrade", true);
-                intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-                startActivity(intent);
-                finish();
-            });
+            Intent intent = new Intent(SelectSubjectActivity.this, PlacementTestActivity.class);
+            intent.putExtra("isUpgrade", true);
+            intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+            startActivity(intent);
+            finish();
         });
     }
 }

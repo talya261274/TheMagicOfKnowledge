@@ -329,11 +329,11 @@ public class FlashCardMain extends AppCompatActivity {
                 cards.add(new FlashCard(R.drawable.ss_shapes_square, "ריבוע"));
                 cards.add(new FlashCard(R.drawable.ss_shapes_triangle, "משולש"));
                 cards.add(new FlashCard(R.drawable.ss_shapes_rectangle, "מלבן"));
-                cards.add(new FlashCard(R.drawable.ss_shapes_oval, "אליפסה"));
+                cards.add(new FlashCard(R.drawable.ss_shapes_ellipse, "אליפסה"));
                 cards.add(new FlashCard(R.drawable.ss_shapes_diamond, "מעוין"));
                 cards.add(new FlashCard(R.drawable.ss_shapes_parallelogram, "מקבילית"));
                 cards.add(new FlashCard(R.drawable.ss_shapes_trapezoid, "טרפז"));
-                cards.add(new FlashCard(R.drawable.ss_shapes_diamond1, "דלתון"));
+                cards.add(new FlashCard(R.drawable.ss_shapes_dalton, "דלתון"));
                 cards.add(new FlashCard(R.drawable.ss_shapes_pentagon, "מחומש"));
                 cards.add(new FlashCard(R.drawable.ss_shapes_hexagon, "משושה"));
                 cards.add(new FlashCard(R.drawable.ss_shapes_heptagon, "משובע"));

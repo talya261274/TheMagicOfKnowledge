@@ -17,6 +17,9 @@ public class UserChild {
     private long totalTimeSeconds;
     private Map<String, Object> progress = new HashMap<>();
 
+    // ⭐ חדש - ציון המבדק (null = לא עשה מבדק עדיין)
+    private Double lastPlacementScore;
+
     public UserChild() {
     }
 
@@ -26,11 +29,12 @@ public class UserChild {
         this.name = name;
         this.age = age;
         this.totalTimeSeconds = 0;
+        this.lastPlacementScore = null;  // ⭐ ילד חדש - לא עשה מבדק עדיין
 
         if (age >= 3 && age <= 4) this.ageGroup = "3-4";
         else if (age >= 5 && age <= 6) this.ageGroup = "5-6";
         else if (age >= 7 && age <= 8) this.ageGroup = "7-8";
-        else this.ageGroup = "general"; // ברירת מחדל
+        else this.ageGroup = "general";
 
         this.currentLevel = this.ageGroup;
 
@@ -54,78 +58,38 @@ public class UserChild {
         this.progress.put(this.ageGroup, subjects);
     }
 
+    // ===== Getters and Setters =====
 
-    public String getId() {
-        return id;
-    }
+    public String getId() { return id; }
+    public void setId(String id) { this.id = id; }
 
-    public void setId(String id) {
-        this.id = id;
-    }
+    public String getParentId() { return parentId; }
+    public void setParentId(String parentId) { this.parentId = parentId; }
 
-    public String getParentId() {
-        return parentId;
-    }
+    public String getName() { return name; }
+    public void setName(String name) { this.name = name; }
 
-    public void setParentId(String parentId) {
-        this.parentId = parentId;
-    }
+    public String getAvatar() { return avatar; }
+    public void setAvatar(String avatar) { this.avatar = avatar; }
 
-    public String getName() {
-        return name;
-    }
+    public String getAgeGroup() { return ageGroup; }
+    public void setAgeGroup(String ageGroup) { this.ageGroup = ageGroup; }
 
-    public void setName(String name) {
-        this.name = name;
-    }
+    public int getAge() { return age; }
+    public void setAge(int age) { this.age = age; }
 
-    public String getAvatar() {
-        return avatar;
-    }
+    public String getCurrentLevel() { return currentLevel; }
+    public void setCurrentLevel(String currentLevel) { this.currentLevel = currentLevel; }
 
-    public void setAvatar(String avatar) {
-        this.avatar = avatar;
-    }
+    public long getTotalTimeSeconds() { return totalTimeSeconds; }
+    public void setTotalTimeSeconds(long totalTimeSeconds) { this.totalTimeSeconds = totalTimeSeconds; }
 
-    public String getAgeGroup() {
-        return ageGroup;
-    }
+    public Map<String, Object> getProgress() { return progress; }
+    public void setProgress(Map<String, Object> progress) { this.progress = progress; }
 
-    public void setAgeGroup(String ageGroup) {
-        this.ageGroup = ageGroup;
-    }
-
-    public int getAge() {
-        return age;
-    }
-
-    public void setAge(int age) {
-        this.age = age;
-    }
-
-    public String getCurrentLevel() {
-        return currentLevel;
-    }
-
-    public void setCurrentLevel(String currentLevel) {
-        this.currentLevel = currentLevel;
-    }
-
-    public long getTotalTimeSeconds() {
-        return totalTimeSeconds;
-    }
-
-    public void setTotalTimeSeconds(long totalTimeSeconds) {
-        this.totalTimeSeconds = totalTimeSeconds;
-    }
-
-    public Map<String, Object> getProgress() {
-        return progress;
-    }
-
-    public void setProgress(Map<String, Object> progress) {
-        this.progress = progress;
-    }
+    // ⭐ Getter ו-Setter לשדה החדש
+    public Double getLastPlacementScore() { return lastPlacementScore; }
+    public void setLastPlacementScore(Double lastPlacementScore) { this.lastPlacementScore = lastPlacementScore; }
 
     @Exclude
     public String getFormattedTime() {
@@ -146,6 +110,7 @@ public class UserChild {
         result.put("currentLevel", currentLevel);
         result.put("totalTimeSeconds", totalTimeSeconds);
         result.put("progress", progress);
+        result.put("lastPlacementScore", lastPlacementScore);  // ⭐ הוספה
         return result;
     }
 
@@ -153,14 +118,9 @@ public class UserChild {
     public String toString() {
         return "UserChild{" +
                 "id='" + id + '\'' +
-                ", parentId='" + parentId + '\'' +
                 ", name='" + name + '\'' +
-                ", avatar='" + avatar + '\'' +
                 ", ageGroup='" + ageGroup + '\'' +
-                ", age=" + age +
-                ", currentLevel='" + currentLevel + '\'' +
-                ", totalTimeSeconds=" + totalTimeSeconds +
-                ", progress=" + progress +
+                ", lastPlacementScore=" + lastPlacementScore +
                 '}';
     }
 }

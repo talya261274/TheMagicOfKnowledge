@@ -1,29 +1,15 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/avatarContainer"
     android:layout_width="match_parent"
-    android:layout_height="wrap_content"
-    android:gravity="center"
-    android:orientation="vertical"
-    android:padding="4dp">
+    android:layout_height="100dp"
+    android:background="@drawable/default_avatar_background"
+    android:padding="8dp">
 
-    <!-- כרטיס מסביב לאווטר -->
-    <androidx.cardview.widget.CardView
-        android:layout_width="100dp"
-        android:layout_height="100dp"
-        android:foreground="?attr/selectableItemBackground"
-        app:cardBackgroundColor="#dafaf5"
-        app:cardCornerRadius="24dp"
-        app:cardElevation="8dp">
+    <ImageView
+        android:id="@+id/ivAvatarItem"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:scaleType="fitCenter" />
 
-        <ImageView
-            android:id="@+id/ivAvatarItem"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:contentDescription="אווטאר"
-            android:padding="8dp"
-            android:scaleType="centerCrop" />
-
-    </androidx.cardview.widget.CardView>
-
-</LinearLayout>
+</FrameLayout>

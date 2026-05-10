@@ -1,71 +1,41 @@
 package com.example.themagicofknowledge.screens;
 
-
-// ===== Imports =====
-
-// ----- כלים גרפיים -----
-// ColorStateList - "רשימת מצבי צבע" - לכפתורים שמשנים צבע במצבים שונים
 import android.content.res.ColorStateList;
-// Color - מחלקה עם פונקציות להמרת צבעים (parseColor, RGB וכו')
 import android.graphics.Color;
-
-// ----- כלים בסיסיים של אנדרואיד -----
 import android.os.Bundle;
-// Handler + Looper - לתזמון פעולות (כמו "תעשה את זה אחרי שנייה")
-// משתמשים בזה כדי להציג תשובה נכונה למשך שנייה לפני שעוברים לשאלה הבאה
 import android.os.Handler;
 import android.os.Looper;
-
-// TextToSpeech - מחלקה שמשמיעה טקסט בקול ("יודע לדבר")
-// משמש לקריאת השאלות באודיו
 import android.speech.tts.TextToSpeech;
-
-// DisplayMetrics - מידע על המסך (רוחב, גובה, צפיפות פיקסלים)
 import android.util.DisplayMetrics;
 import android.util.Log;
-
-// DragEvent - אירועי גרירה (drag and drop)
-// משמש במשחק התאמת הזוגות
 import android.view.DragEvent;
 import android.view.View;
-
-// רכיבי UI שונים
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.GridView;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.ProgressBar;
-import android.widget.RatingBar;     // כוכבים (לדיאלוג סיום)
+import android.widget.RatingBar;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
-// AlertDialog - דיאלוג חלון קופץ ("האם להמשיך?")
 import androidx.appcompat.app.AlertDialog;
-// AppCompatActivity - האב של ה-Activity (שימי לב - לא BaseActivity!)
 import androidx.appcompat.app.AppCompatActivity;
 
 import com.example.themagicofknowledge.R;
-
-// ----- האדפטרים שלנו -----
 import com.example.themagicofknowledge.adapter.KeyboardAdapter;
 import com.example.themagicofknowledge.adapter.MemoryAdapter;
-
-// ----- המודלים שלנו -----
 import com.example.themagicofknowledge.models.MemoryCard;
 import com.example.themagicofknowledge.models.Pair;
 import com.example.themagicofknowledge.models.Question;
 import com.example.themagicofknowledge.models.SentenceQuestion;
 import com.example.themagicofknowledge.models.UnifiedQuestion;
 import com.example.themagicofknowledge.models.UserChild;
-
-// ----- שירותים -----
 import com.example.themagicofknowledge.services.DatabaseService;
+import com.example.themagicofknowledge.utils.GameProgressManager;
 import com.example.themagicofknowledge.utils.SharedPreferencesUtil;
-
 import com.google.android.material.button.MaterialButton;
-
-// ----- Firebase -----
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
@@ -79,7 +49,6 @@ public class MixedGameActivity extends AppCompatActivity {
 
     private static final String TAG = "MixedGameActivity";
 
-    // ===== מערך של אותיות עבריות למקלדת =====
     private final String[] hebrewLetters = {
             "ו", "ה", "ד", "ג", "ב", "א", "DEL",
             "מ", "ל", "כ", "י", "ט", "ח", "ז",
@@ -94,36 +63,34 @@ public class MixedGameActivity extends AppCompatActivity {
     private int cardSize;
     private String subject;
     private boolean isProcessingAnswer = false;
+
+    // ⭐ חדש - מעקב אחר זמן המשחק
+    private long gameStartTime;
+
     private UserChild currentChild;
     private TextToSpeech tts;
-
 
     // ===== רכיבי UI =====
     private ProgressBar globalProgress;
     private TextView tvQuestionTitle;
-    private TextView tvProgressText;  // ⭐ חדש - הטקסט של האחוזים
+    private TextView tvProgressText;
     private View containerSelection, containerMatching, containerSentence, containerMemory;
 
-
-    // ===== רכיבים לשאלות בחירה (AUDIO/IMAGE) =====
+    // ===== רכיבים לשאלות בחירה =====
     private MaterialButton btnPlayAudio;
     private ImageView ivQuestionImage;
+    private View imageCardContainer;
     private final MaterialButton[] selectionButtons = new MaterialButton[4];
-
-    // ⭐ עכשיו הצבעים תואמים לעיצוב החדש (כתום, ירוק, כחול, ורוד)
     private final String[] buttonColors = {"#FF9800", "#4CAF50", "#2196F3", "#E91E63"};
-
 
     // ===== רכיבים למשחק ההתאמה =====
     private LinearLayout leftColumn, rightColumn;
     private int matchesFound = 0;
     private int totalPairs;
 
-
     // ===== ניהול טעינת הנתונים =====
     private int tasksToLoad = 3;
     private int tasksCompleted = 0;
-
 
     // ===== רכיבים למשחק הזיכרון =====
     private GridView gvMemoryBoard;
@@ -133,11 +100,9 @@ public class MixedGameActivity extends AppCompatActivity {
     private MemoryCard secondMemorySelected = null;
     private boolean isMemoryBusy = false;
 
-    // ===== הפונקציה הראשית - נקראת בעת יצירת המסך =====
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-
         setContentView(R.layout.activity_mixed_game);
 
         subject = getIntent().getStringExtra("subject");
@@ -149,22 +114,25 @@ public class MixedGameActivity extends AppCompatActivity {
             return;
         }
 
+        // ⭐ חדש - מתחילים למדוד זמן
+        gameStartTime = System.currentTimeMillis();
+
         initViews();
         setupTTS();
         loadAllData();
     }
 
-
-    // ===== חיבור הרכיבים מה-XML למשתנים =====
     private void initViews() {
         globalProgress = findViewById(R.id.globalProgress);
-        tvProgressText = findViewById(R.id.tvProgressText);  // ⭐ חדש
+        tvProgressText = findViewById(R.id.tvProgressText);
         tvQuestionTitle = findViewById(R.id.tvMixedQuestionTitle);
 
         containerSelection = findViewById(R.id.containerSelection);
         containerMatching = findViewById(R.id.containerMatching);
         containerSentence = findViewById(R.id.containerSentence);
         containerMemory = findViewById(R.id.containerMemory);
+
+        imageCardContainer = findViewById(R.id.imageCardContainer);
 
         btnPlayAudio = findViewById(R.id.btnMixedPlayAudio);
         ivQuestionImage = findViewById(R.id.ivMixedImage);
@@ -184,24 +152,36 @@ public class MixedGameActivity extends AppCompatActivity {
         cardSize = (screenWidth - (int) (24 * metrics.density)) / 3;
     }
 
-
-    // ===== אתחול TextToSpeech =====
     private void setupTTS() {
         tts = new TextToSpeech(this, status -> {
             if (status == TextToSpeech.SUCCESS) tts.setLanguage(new Locale("he"));
         });
     }
 
-    // ===== טעינת כל סוגי השאלות מ-Firebase =====
     private void loadAllData() {
         String level = currentChild.getAgeGroup().replace("-", "_");
         DatabaseReference rootRef = FirebaseDatabase.getInstance().getReference("Games");
+
+        Log.d(TAG, "==========================================");
+        Log.d(TAG, "🎮 התחלת טעינת נתונים");
+        Log.d(TAG, "📚 נושא: " + subject);
+        Log.d(TAG, "🎯 רמה: " + level);
+        Log.d(TAG, "==========================================");
 
         tasksCompleted = 0;
         allQuestions.clear();
 
         if (level.equals("3_4") || level.equals("5_6")) {
             tasksToLoad = 3;
+
+            String audioPath = "Games/audioRecognition/level_" + level + "/" + subject;
+            String matchingPath = "Games/matching/level_" + level + "/" + subject + "/pairs";
+            String memoryPath = "Games/memoryGame/level_" + level + "/" + subject;
+
+            Log.d(TAG, "🔊 נתיב audio: " + audioPath);
+            Log.d(TAG, "🔗 נתיב matching: " + matchingPath);
+            Log.d(TAG, "🎴 נתיב memory: " + memoryPath);
+
             loadCategory(rootRef.child("audioRecognition").child("level_" + level).child(subject),
                     UnifiedQuestion.Type.AUDIO, Question.class);
             loadCategory(rootRef.child("matching").child("level_" + level).child(subject).child("pairs"),
@@ -211,43 +191,64 @@ public class MixedGameActivity extends AppCompatActivity {
 
         } else if (level.equals("7_8")) {
             tasksToLoad = 3;
+
+            String imagePath = "Games/imageRecognition/level_" + level + "/" + subject;
+            String sentencePath = "Games/sentenceCompletion/level_" + level + "/" + subject;
+            String memoryPath = "Games/memoryGame/level_" + level + "/" + subject;
+
+            Log.d(TAG, "🖼️ נתיב image: " + imagePath);
+            Log.d(TAG, "✏️ נתיב sentence: " + sentencePath);
+            Log.d(TAG, "🎴 נתיב memory: " + memoryPath);
+
             loadCategory(rootRef.child("imageRecognition").child("level_" + level).child(subject),
                     UnifiedQuestion.Type.IMAGE, Question.class);
             loadCategory(rootRef.child("sentenceCompletion").child("level_" + level).child(subject),
                     UnifiedQuestion.Type.SENTENCE, SentenceQuestion.class);
             loadCategory(rootRef.child("memoryGame").child("level_" + level).child(subject),
                     UnifiedQuestion.Type.MEMORY, DataSnapshot.class);
-
-        } else {
-            tasksToLoad = 1;
-            loadCategory(rootRef.child("audioRecognition").child("level_3_4").child(subject),
-                    UnifiedQuestion.Type.AUDIO, Question.class);
         }
     }
 
-
-    // ===== טעינת קטגוריה אחת מ-Firebase =====
     private void loadCategory(Query query, UnifiedQuestion.Type type, Class<?> modelClass) {
         query.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
+                Log.d(TAG, "==========================================");
+                Log.d(TAG, "📦 קיבלתי נתונים מ-" + type);
+                Log.d(TAG, "📦 snapshot.exists(): " + snapshot.exists());
+                Log.d(TAG, "📦 מספר items: " + snapshot.getChildrenCount());
+
+                // 🔍 הדפסת כל המפתחות
+                for (DataSnapshot child : snapshot.getChildren()) {
+                    Log.d(TAG, "   🔑 key: " + child.getKey());
+                }
+
                 try {
                     if (type == UnifiedQuestion.Type.MEMORY) {
                         List<DataSnapshot> allItems = new ArrayList<>();
                         for (DataSnapshot item : snapshot.getChildren()) {
                             allItems.add(item);
+
+                            // 🔍 לוג של פרטי כל פריט
+                            String image = item.child("image").getValue(String.class);
+                            String name = item.child("name").getValue(String.class);
+                            Log.d(TAG, "   🎴 image=" + image + ", name=" + name);
                         }
                         int chunkSize = 3;
                         for (int i = 0; i < allItems.size(); i += chunkSize) {
                             int end = Math.min(i + chunkSize, allItems.size());
                             allQuestions.add(new UnifiedQuestion(type, new ArrayList<>(allItems.subList(i, end))));
                         }
+                        Log.d(TAG, "✅ נוצרו " + (allItems.size() / chunkSize) + " משחקי זיכרון");
 
                     } else if (type == UnifiedQuestion.Type.MATCHING) {
                         List<Pair> pairs = new ArrayList<>();
                         for (DataSnapshot ds : snapshot.getChildren()) {
                             Pair p = ds.getValue(Pair.class);
-                            if (p != null) pairs.add(p);
+                            if (p != null) {
+                                pairs.add(p);
+                                Log.d(TAG, "   🔗 left=" + p.getLeft() + ", right=" + p.getRight() + ", id=" + p.getId());
+                            }
                         }
                         if (!pairs.isEmpty()) {
                             int chunkSize = 4;
@@ -256,15 +257,32 @@ public class MixedGameActivity extends AppCompatActivity {
                                 allQuestions.add(new UnifiedQuestion(type, new ArrayList<>(pairs.subList(i, end))));
                             }
                         }
+                        Log.d(TAG, "✅ נוצרו " + pairs.size() + " זוגות התאמה");
 
                     } else {
+                        int count = 0;
                         for (DataSnapshot ds : snapshot.getChildren()) {
                             Object data = ds.getValue(modelClass);
-                            if (data != null) allQuestions.add(new UnifiedQuestion(type, data));
+                            if (data != null) {
+                                allQuestions.add(new UnifiedQuestion(type, data));
+                                count++;
+
+                                // 🔍 פרטי שאלה
+                                if (data instanceof Question) {
+                                    Question q = (Question) data;
+                                    Log.d(TAG, "   ❓ question=" + q.getQuestionText()
+                                            + ", mediaUrl=" + q.getMediaUrl()
+                                            + ", options=" + q.getOptions()
+                                            + ", correctIdx=" + q.getCorrectAnswerIndex());
+                                }
+                            } else {
+                                Log.w(TAG, "   ⚠️ data is null for key: " + ds.getKey());
+                            }
                         }
+                        Log.d(TAG, "✅ נטענו " + count + " שאלות מסוג " + type);
                     }
                 } catch (Exception e) {
-                    Log.e(TAG, "Error parsing " + type + " data: " + e.getMessage());
+                    Log.e(TAG, "❌ שגיאה בעיבוד " + type + ": " + e.getMessage(), e);
                 }
 
                 checkIfLoadingFinished();
@@ -272,19 +290,16 @@ public class MixedGameActivity extends AppCompatActivity {
 
             @Override
             public void onCancelled(@NonNull DatabaseError error) {
-                Log.e(TAG, "Database error loading " + type + ": " + error.getMessage());
+                Log.e(TAG, "❌ שגיאת Firebase ב-" + type + ": " + error.getMessage());
                 checkIfLoadingFinished();
             }
         });
     }
 
-
-    // ===== בדיקה אם כל הטעינות הסתיימו =====
     private void checkIfLoadingFinished() {
         tasksCompleted++;
 
         if (tasksCompleted >= tasksToLoad) {
-
             if (allQuestions.isEmpty()) {
                 Log.w(TAG, "No questions loaded.");
                 new AlertDialog.Builder(this)
@@ -301,8 +316,6 @@ public class MixedGameActivity extends AppCompatActivity {
         }
     }
 
-
-    // ===== עירבוב חכם של השאלות =====
     private List<UnifiedQuestion> interleaveQuestions(List<UnifiedQuestion> original) {
         Map<UnifiedQuestion.Type, List<UnifiedQuestion>> grouped = new HashMap<>();
 
@@ -339,7 +352,6 @@ public class MixedGameActivity extends AppCompatActivity {
         return interleaved;
     }
 
-    // ===== בדיקה אם יש התקדמות שמורה =====
     private void checkSavedProgress() {
         if (SharedPreferencesUtil.getUser(this) == null) {
             showCurrentQuestion();
@@ -371,8 +383,6 @@ public class MixedGameActivity extends AppCompatActivity {
         });
     }
 
-
-    // ===== דיאלוג "להמשיך מאיפה שעצרנו?" =====
     private void showContinueDialog(int savedIdx) {
         new AlertDialog.Builder(this)
                 .setTitle("להמשיך מאיפה שעצרנו?")
@@ -388,7 +398,6 @@ public class MixedGameActivity extends AppCompatActivity {
                 .setCancelable(false).show();
     }
 
-    // ===== הצגת השאלה הנוכחית =====
     private void showCurrentQuestion() {
         isProcessingAnswer = false;
 
@@ -428,13 +437,16 @@ public class MixedGameActivity extends AppCompatActivity {
         }
     }
 
-
-    // ===== הצגת שאלת אודיו =====
     private void displayAudioQuestion(Question q) {
+        Log.d(TAG, "🔊 הצגת שאלת שמע");
+
         containerSelection.setVisibility(View.VISIBLE);
         resetSelectionButtonColors();
         btnPlayAudio.setVisibility(View.VISIBLE);
-        ivQuestionImage.setVisibility(View.GONE);
+
+        // ⭐ מסתיר את כרטיס התמונה
+        imageCardContainer.setVisibility(View.GONE);
+
         tvQuestionTitle.setText("האזינו לשאלה 🎧");
 
         playTTS(q.getQuestionText());
@@ -443,23 +455,28 @@ public class MixedGameActivity extends AppCompatActivity {
         setupSelectionButtons(q);
     }
 
-
-    // ===== הצגת שאלת תמונה =====
     private void displayImageQuestion(Question q) {
+        Log.d(TAG, "🖼️ הצגת שאלת תמונה");
+        Log.d(TAG, "   - mediaUrl: " + q.getMediaUrl());
+
         containerSelection.setVisibility(View.VISIBLE);
         resetSelectionButtonColors();
         btnPlayAudio.setVisibility(View.GONE);
+
+        // ⭐ מציג את הכרטיס שמכיל את התמונה
+        imageCardContainer.setVisibility(View.VISIBLE);
         ivQuestionImage.setVisibility(View.VISIBLE);
+
         tvQuestionTitle.setText(q.getQuestionText());
 
         int resId = getResources().getIdentifier(q.getMediaUrl(), "drawable", getPackageName());
+        Log.d(TAG, "   - resId: " + resId + (resId == 0 ? " ❌ לא נמצא!" : " ✅"));
+
         ivQuestionImage.setImageResource(resId != 0 ? resId : R.drawable.wizard_placeholder);
 
         setupSelectionButtons(q);
     }
 
-
-    // ===== הצגת שאלת השלמת משפט =====
     private void displaySentenceQuestion(SentenceQuestion sq) {
         containerSentence.setVisibility(View.VISIBLE);
         tvQuestionTitle.setText("השלימו את המשפט ✏️");
@@ -502,8 +519,11 @@ public class MixedGameActivity extends AppCompatActivity {
         });
     }
 
-    // ===== הצגת משחק זיכרון =====
     private void displayMemoryGame(List<DataSnapshot> items) {
+        Log.d(TAG, "🎴 displayMemoryGame - מתחיל");
+        Log.d(TAG, "🎴 מספר items: " + items.size());
+        Log.d(TAG, "🎴 cardSize: " + cardSize);
+
         containerMemory.setVisibility(View.VISIBLE);
         tvQuestionTitle.setText("מצאו את הזוגות 🎴");
         memoryCards.clear();
@@ -512,27 +532,30 @@ public class MixedGameActivity extends AppCompatActivity {
             String imageName = ds.child("image").getValue(String.class);
             String displayName = ds.child("name").getValue(String.class);
 
+            Log.d(TAG, "   🎴 image=" + imageName + ", name=" + displayName);
+
             if (imageName != null && displayName != null) {
                 int resId = getResources().getIdentifier(imageName, "drawable", getPackageName());
+                Log.d(TAG, "      → resId=" + resId + (resId == 0 ? " ❌ לא נמצא!" : " ✅ נמצא"));
                 addPairToMemoryList(resId, displayName);
             }
         }
 
+        Log.d(TAG, "🎴 סה\"כ memoryCards: " + memoryCards.size());
         Collections.shuffle(memoryCards);
 
         memoryAdapter = new MemoryAdapter(this, memoryCards, cardSize);
         gvMemoryBoard.setAdapter(memoryAdapter);
 
+        Log.d(TAG, "🎴 gvMemoryBoard visibility: " + gvMemoryBoard.getVisibility());
+        Log.d(TAG, "🎴 containerMemory visibility: " + containerMemory.getVisibility());
+
         gvMemoryBoard.setOnItemClickListener((parent, view, position, id) -> {
             if (isMemoryBusy) return;
-
             MemoryCard selected = memoryCards.get(position);
-
             if (selected.isMatched() || selected.isFlipped()) return;
-
             selected.setFlipped(true);
             memoryAdapter.notifyDataSetChanged();
-
             if (firstMemorySelected == null) {
                 firstMemorySelected = selected;
             } else {
@@ -542,8 +565,6 @@ public class MixedGameActivity extends AppCompatActivity {
         });
     }
 
-
-    // ===== הוספת זוג קלפים לרשימה =====
     private void addPairToMemoryList(int resId, String name) {
         String ageGroup = currentChild.getAgeGroup();
 
@@ -556,15 +577,11 @@ public class MixedGameActivity extends AppCompatActivity {
         }
     }
 
-
-    // ===== בדיקת התאמה במשחק הזיכרון =====
-    // ⭐ עכשיו עם הדגשה ויזואלית של זוג שנמצא
     private void checkMemoryMatch() {
         isMemoryBusy = true;
 
         new Handler(Looper.getMainLooper()).postDelayed(() -> {
             if (firstMemorySelected.getMatchId().equals(secondMemorySelected.getMatchId())) {
-                // ⭐ התאמה! מסמנים אותם כהתאמה
                 firstMemorySelected.setMatched(true);
                 secondMemorySelected.setMatched(true);
 
@@ -582,8 +599,6 @@ public class MixedGameActivity extends AppCompatActivity {
         }, 800);
     }
 
-
-    // ===== בדיקה אם כל הקלפים הותאמו =====
     private boolean checkAllMemoryMatched() {
         for (MemoryCard c : memoryCards) {
             if (!c.isMatched()) return false;
@@ -591,7 +606,6 @@ public class MixedGameActivity extends AppCompatActivity {
         return true;
     }
 
-    // ===== הצגת משחק התאמת זוגות =====
     private void displayMatchingQuestion(List<Pair> pairs) {
         containerMatching.setVisibility(View.VISIBLE);
         tvQuestionTitle.setText("התאימו את הזוגות 🔗");
@@ -611,9 +625,6 @@ public class MixedGameActivity extends AppCompatActivity {
         for (Pair p : rightSide) setupMatchingView(p.getRight(), p.getId(), rightColumn);
     }
 
-
-    // ===== יצירת View אחד למשחק ההתאמה =====
-    // ⭐ עכשיו הכרטיסים נשארים אחרי התאמה - רק משנים מראה
     private void setupMatchingView(String content, String id, LinearLayout column) {
         MaterialButton btn = (MaterialButton) getLayoutInflater().inflate(R.layout.item_matching_button, column, false);
         btn.setTag(id);
@@ -640,9 +651,7 @@ public class MixedGameActivity extends AppCompatActivity {
             }
         }
 
-        // ===== הגדרת drag (גרירה) =====
         btn.setOnLongClickListener(v -> {
-            // ⭐ אם הכרטיס כבר הותאם - לא ניתן לגרור אותו
             if (Boolean.TRUE.equals(v.getTag(R.id.tag_matched))) {
                 return false;
             }
@@ -653,21 +662,18 @@ public class MixedGameActivity extends AppCompatActivity {
             return true;
         });
 
-        // ===== הגדרת drop (שחרור על יעד) =====
         btn.setOnDragListener((v, event) -> {
             switch (event.getAction()) {
                 case DragEvent.ACTION_DRAG_STARTED:
                     return true;
 
                 case DragEvent.ACTION_DRAG_ENTERED:
-                    // ⭐ רק אם זה לא כרטיס שכבר הותאם
                     if (!Boolean.TRUE.equals(v.getTag(R.id.tag_matched))) {
                         v.setBackgroundTintList(ColorStateList.valueOf(Color.parseColor("#FFE082")));
                     }
                     return true;
 
                 case DragEvent.ACTION_DRAG_EXITED:
-                    // ⭐ חוזר לצבע הרגיל רק אם לא הותאם
                     if (!Boolean.TRUE.equals(v.getTag(R.id.tag_matched))) {
                         v.setBackgroundTintList(ColorStateList.valueOf(Color.WHITE));
                     }
@@ -680,7 +686,6 @@ public class MixedGameActivity extends AppCompatActivity {
                             && draggedView.getTag().equals(v.getTag())
                             && !Boolean.TRUE.equals(v.getTag(R.id.tag_matched))) {
 
-                        // ⭐ התאמה! במקום להעלים - מסמנים כמותאם
                         markCardAsMatched(v);
                         markCardAsMatched(draggedView);
 
@@ -705,27 +710,15 @@ public class MixedGameActivity extends AppCompatActivity {
         column.addView(btn);
     }
 
-
-    // ⭐ פונקציה חדשה - סימון כרטיס כמותאם
     private void markCardAsMatched(View view) {
-        // מסמנים כמותאם בעזרת tag
         view.setTag(R.id.tag_matched, true);
-
-        // משאירים את הכרטיס גלוי - אבל משנים את המראה!
         view.setVisibility(View.VISIBLE);
-
-        // צבע ירוק עדין
         view.setBackgroundTintList(ColorStateList.valueOf(Color.parseColor("#A5D6A7")));
-
-        // מקטינים את האטימות (חצי שקוף)
         view.setAlpha(0.5f);
-
-        // מבטלים את האפשרות ללחוץ/לגרור שוב
         view.setEnabled(false);
         view.setClickable(false);
         view.setLongClickable(false);
 
-        // אנימציה קלה - כיווץ והרחבה
         view.animate()
                 .scaleX(0.95f).scaleY(0.95f)
                 .setDuration(200)
@@ -736,16 +729,22 @@ public class MixedGameActivity extends AppCompatActivity {
                 .start();
     }
 
-
-    // ===== הגדרת 4 כפתורי התשובה (לAUDIO/IMAGE) =====
     private void setupSelectionButtons(Question q) {
         List<String> options = q.getOptions();
+        Log.d(TAG, "🔘 הגדרת כפתורי בחירה:");
+
+        if (options == null || options.size() < 4) {
+            Log.e(TAG, "❌ אין מספיק אפשרויות! options=" + options);
+            return;
+        }
 
         for (int i = 0; i < 4; i++) {
             final int index = i;
             String item = options.get(i);
 
             int resId = getResources().getIdentifier(item, "drawable", getPackageName());
+            Log.d(TAG, "   כפתור " + i + ": '" + item + "' → resId=" + resId
+                    + (resId == 0 ? " ❌ אין תמונה" : " ✅ יש תמונה"));
 
             if (resId != 0) {
                 selectionButtons[i].setIconResource(resId);
@@ -772,14 +771,11 @@ public class MixedGameActivity extends AppCompatActivity {
         }
     }
 
-    // ===== טיפול בתשובה נכונה =====
     private void handleCorrect() {
         currentIndex++;
         new Handler(Looper.getMainLooper()).postDelayed(this::showCurrentQuestion, 1000);
     }
 
-
-    // ===== טיפול בתשובה שגויה =====
     private void handleWrong(View view) {
         attempts++;
 
@@ -808,8 +804,7 @@ public class MixedGameActivity extends AppCompatActivity {
         }, 1000);
     }
 
-
-    // ===== עדכון התקדמות ב-Firebase =====
+    // ⭐⭐⭐ הפונקציה המעודכנת ⭐⭐⭐
     private void updateProgressInFirebase() {
         if (allQuestions.isEmpty()) return;
 
@@ -818,21 +813,34 @@ public class MixedGameActivity extends AppCompatActivity {
         if (SharedPreferencesUtil.getUser(this) == null) return;
         String pId = SharedPreferencesUtil.getUser(this).getId();
 
+        // ⭐ חישוב הזמן שעבר מאז העדכון האחרון
+        long timeSpent = (System.currentTimeMillis() - gameStartTime) / 1000;
+
         DatabaseService.getInstance().updateDetailedProgress(
                 pId, currentChild.getId(), currentChild.getAgeGroup(),
-                subject, 0, 0, percent, currentIndex
+                subject,
+                attempts,    // ⭐ שולחים את הטעויות שנצברו
+                timeSpent,   // ⭐ שולחים את הזמן שעבר
+                percent,
+                currentIndex
         );
+
+        // ⭐ עדכון totalTimeSeconds של הילד (סה"כ זמן באפליקציה)
+        if (timeSpent > 0) {
+            GameProgressManager.updateTotalTime(pId, currentChild.getId(), timeSpent);
+        }
 
         globalProgress.setProgress(percent);
 
-        // ⭐ עדכון הטקסט של האחוזים
         if (tvProgressText != null) {
             tvProgressText.setText(percent + "%");
         }
+
+        // ⭐ מאפסים אחרי שליחה - כדי שלא יוכפלו בעדכון הבא
+        gameStartTime = System.currentTimeMillis();
+        attempts = 0;
     }
 
-
-    // ===== איפוס צבעי כפתורי התשובה =====
     private void resetSelectionButtonColors() {
         for (int i = 0; i < selectionButtons.length; i++) {
             if (selectionButtons[i] != null) {
@@ -844,8 +852,6 @@ public class MixedGameActivity extends AppCompatActivity {
         }
     }
 
-
-    // ===== הסתרת כל הקונטיינרים =====
     private void hideAllLayouts() {
         containerSelection.setVisibility(View.GONE);
         containerMatching.setVisibility(View.GONE);
@@ -853,17 +859,16 @@ public class MixedGameActivity extends AppCompatActivity {
         containerMemory.setVisibility(View.GONE);
     }
 
-
-    // ===== השמעת טקסט בקול =====
     private void playTTS(String text) {
         if (tts != null) {
             tts.speak(text, TextToSpeech.QUEUE_FLUSH, null, null);
         }
     }
 
-
-    // ===== סיום המשחק =====
     private void finishGame() {
+        // ⭐ עדכון אחרון של הזמן והטעויות לפני סיום
+        updateProgressInFirebase();
+
         double score = ((double) allQuestions.size() / (allQuestions.size() + attempts)) * 100;
 
         if (score >= 80) {
@@ -874,8 +879,6 @@ public class MixedGameActivity extends AppCompatActivity {
         }
     }
 
-
-    // ===== דיאלוג "נסה שוב" =====
     private void showTryAgainDialog(double score) {
         final android.app.Dialog dialog = new android.app.Dialog(this);
         dialog.setContentView(R.layout.dialog_test_result);
@@ -901,6 +904,7 @@ public class MixedGameActivity extends AppCompatActivity {
                 dialog.dismiss();
                 currentIndex = 0;
                 attempts = 0;
+                gameStartTime = System.currentTimeMillis();  // ⭐ איפוס זמן
                 Collections.shuffle(allQuestions);
                 showCurrentQuestion();
             });
@@ -919,8 +923,6 @@ public class MixedGameActivity extends AppCompatActivity {
         dialog.show();
     }
 
-
-    // ===== דיאלוג הצלחה =====
     private void showSuccessDialog(double score) {
         final android.app.Dialog dialog = new android.app.Dialog(this);
         dialog.setContentView(R.layout.dialog_test_result);
@@ -950,8 +952,6 @@ public class MixedGameActivity extends AppCompatActivity {
         dialog.show();
     }
 
-
-    // ===== סימון נושא כהושלם ב-Firebase =====
     private void markSubjectAsCompletedInFirebase() {
         if (SharedPreferencesUtil.getUser(this) == null) return;
         String parentId = SharedPreferencesUtil.getUser(this).getId();
@@ -968,10 +968,13 @@ public class MixedGameActivity extends AppCompatActivity {
         });
     }
 
-
-    // ===== ניקוי כשה-Activity נסגר =====
     @Override
     protected void onDestroy() {
+        // ⭐ עדכון אחרון לפני סגירת המסך
+        if (currentChild != null && SharedPreferencesUtil.getUser(this) != null && allQuestions != null && !allQuestions.isEmpty()) {
+            updateProgressInFirebase();
+        }
+
         if (tts != null) {
             tts.stop();
             tts.shutdown();

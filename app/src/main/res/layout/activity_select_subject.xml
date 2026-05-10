@@ -125,7 +125,8 @@
                 android:id="@+id/ivCompletedAnimals"
                 android:layout_width="32dp"
                 android:layout_height="32dp"
-                android:layout_gravity="top|end"
+                android:layout_gravity="top|start"
+                android:layoutDirection="rtl"
                 android:layout_margin="8dp"
                 android:src="@drawable/ic_check_circle"
                 android:visibility="gone" />
@@ -172,8 +173,8 @@
                 android:id="@+id/ivCompletedColors"
                 android:layout_width="32dp"
                 android:layout_height="32dp"
-                android:layout_gravity="top|end"
-                android:layout_margin="8dp"
+                android:layout_gravity="top|start"
+                android:layoutDirection="rtl"                android:layout_margin="8dp"
                 android:src="@drawable/ic_check_circle"
                 android:visibility="gone" />
         </androidx.cardview.widget.CardView>
@@ -235,8 +236,8 @@
                 android:id="@+id/ivCompletedNumbers"
                 android:layout_width="32dp"
                 android:layout_height="32dp"
-                android:layout_gravity="top|end"
-                android:layout_margin="8dp"
+                android:layout_gravity="top|start"
+                android:layoutDirection="rtl"                android:layout_margin="8dp"
                 android:src="@drawable/ic_check_circle"
                 android:visibility="gone" />
         </androidx.cardview.widget.CardView>
@@ -282,8 +283,8 @@
                 android:id="@+id/ivCompletedLetters"
                 android:layout_width="32dp"
                 android:layout_height="32dp"
-                android:layout_gravity="top|end"
-                android:layout_margin="8dp"
+                android:layout_gravity="top|start"
+                android:layoutDirection="rtl"                android:layout_margin="8dp"
                 android:src="@drawable/ic_check_circle"
                 android:visibility="gone" />
         </androidx.cardview.widget.CardView>
@@ -345,8 +346,8 @@
                 android:id="@+id/ivCompletedShapes"
                 android:layout_width="32dp"
                 android:layout_height="32dp"
-                android:layout_gravity="top|end"
-                android:layout_margin="8dp"
+                android:layout_gravity="top|start"
+                android:layoutDirection="rtl"                android:layout_margin="8dp"
                 android:src="@drawable/ic_check_circle"
                 android:visibility="gone" />
         </androidx.cardview.widget.CardView>
@@ -392,8 +393,8 @@
                 android:id="@+id/ivCompletedBodyParts"
                 android:layout_width="32dp"
                 android:layout_height="32dp"
-                android:layout_gravity="top|end"
-                android:layout_margin="8dp"
+                android:layout_gravity="top|start"
+                android:layoutDirection="rtl"                android:layout_margin="8dp"
                 android:src="@drawable/ic_check_circle"
                 android:visibility="gone" />
         </androidx.cardview.widget.CardView>

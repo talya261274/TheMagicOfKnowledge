@@ -466,23 +466,24 @@
         <!-- ============================================== -->
         <!-- ===== מצב 4: משחק זיכרון ===== -->
         <!-- ============================================== -->
-        <GridView
-            android:id="@+id/gvMemoryBoard"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:gravity="center"
-            android:horizontalSpacing="12dp"
-            android:numColumns="3"
-            android:stretchMode="columnWidth"
-            android:verticalSpacing="12dp"
-            android:visibility="gone" />
-
         <LinearLayout
             android:id="@+id/containerMemory"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:orientation="vertical"
-            android:visibility="gone" />
+            android:visibility="gone">
+
+            <GridView
+                android:id="@+id/gvMemoryBoard"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:gravity="center"
+                android:horizontalSpacing="12dp"
+                android:numColumns="3"
+                android:stretchMode="columnWidth"
+                android:verticalSpacing="12dp" />
+
+        </LinearLayout>
 
     </FrameLayout>
 

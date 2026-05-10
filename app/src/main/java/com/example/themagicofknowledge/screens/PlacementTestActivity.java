@@ -1,5 +1,6 @@
 package com.example.themagicofknowledge.screens;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.speech.tts.TextToSpeech;
 import android.view.View;
@@ -41,6 +42,7 @@ public class PlacementTestActivity extends AppCompatActivity {
     private int correctAnswersCount = 0;
     private boolean isFirstAttempt = true;
     private boolean isUpgradeMode = false;
+    private boolean isNewChild = false;  // ⭐ חדש - מציין אם זה ילד חדש
     private UserChild selectedChild;
     private String currentLevel;
     private TextToSpeech tts;
@@ -77,7 +79,9 @@ public class PlacementTestActivity extends AppCompatActivity {
             finish();
         }
 
+        // ⭐ קבלת הפרמטרים מה-Intent
         isUpgradeMode = getIntent().getBooleanExtra("isUpgrade", false);
+        isNewChild = getIntent().getBooleanExtra("isNewChild", false);
     }
 
     private void initViews() {
@@ -88,13 +92,11 @@ public class PlacementTestActivity extends AppCompatActivity {
         testProgress = findViewById(R.id.testProgress);
         answersContainer = findViewById(R.id.answersContainer);
 
-        // לחצני בחירה
         choiceButtons[0] = findViewById(R.id.btnAns1);
         choiceButtons[1] = findViewById(R.id.btnAns2);
         choiceButtons[2] = findViewById(R.id.btnAns3);
         choiceButtons[3] = findViewById(R.id.btnAns4);
 
-        // מקלדת (לרמה 7-8)
         containerKeyboard = findViewById(R.id.containerKeyboard);
         keyboardGrid = findViewById(R.id.placementKeyboard);
         etAnswer = findViewById(R.id.etPlacementAnswer);
@@ -128,14 +130,24 @@ public class PlacementTestActivity extends AppCompatActivity {
                     showNextQuestion();
                 } else {
                     Toast.makeText(PlacementTestActivity.this, "לא נמצאו שאלות לרמה זו", Toast.LENGTH_SHORT).show();
-                    finish();
+                    // ⭐ אם אין שאלות - שמירת ציון ברירת מחדל ומעבר ל-Main
+                    saveDefaultScoreAndProceed();
                 }
             }
 
             @Override
             public void onCancelled(@NonNull DatabaseError error) {
+                Toast.makeText(PlacementTestActivity.this, "שגיאה בטעינה", Toast.LENGTH_SHORT).show();
+                saveDefaultScoreAndProceed();
             }
         });
+    }
+
+    /**
+     * ⭐ אם אין שאלות במבדק - שומרים ציון ברירת מחדל וממשיכים
+     */
+    private void saveDefaultScoreAndProceed() {
+        updateChildLevelInFirebase(currentLevel, 70.0);  // ציון ברירת מחדל
     }
 
     private void showNextQuestion() {
@@ -147,7 +159,6 @@ public class PlacementTestActivity extends AppCompatActivity {
         Question q = testQuestions.get(currentQuestionIndex);
         testProgress.setProgress(currentQuestionIndex + 1);
 
-        // איפוס נראות
         cardMedia.setVisibility(View.GONE);
         btnPlayAudio.setVisibility(View.GONE);
         answersContainer.setVisibility(View.GONE);
@@ -156,9 +167,7 @@ public class PlacementTestActivity extends AppCompatActivity {
         if (isUpgradeMode && currentQuestionIndex == 0) {
             tvQuestion.setText("כל הכבוד על עליית הרמה! בוא נראה אם אתה מוכן לאתגר החדש:");
         } else {
-            // הטקסט הרגיל של השאלה לפי הרמה (כמו שכתבנו קודם)
             if (currentLevel.equals("3-4")) {
-                // רמה 1: שמע + בחירת תמונה
                 btnPlayAudio.setVisibility(View.VISIBLE);
                 answersContainer.setVisibility(View.VISIBLE);
                 tvQuestion.setText("הקשיבו וביחרו בתמונה הנכונה:");
@@ -166,7 +175,6 @@ public class PlacementTestActivity extends AppCompatActivity {
                 playAudio(q.getQuestionText());
                 setupChoiceButtons(q.getOptions(), true);
             } else if (currentLevel.equals("5-6")) {
-                // רמה 2: תמונה + בחירת מילה
                 cardMedia.setVisibility(View.VISIBLE);
                 answersContainer.setVisibility(View.VISIBLE);
                 tvQuestion.setText("מה מופיע בתמונה?");
@@ -174,10 +182,8 @@ public class PlacementTestActivity extends AppCompatActivity {
                 ivQuestionMedia.setImageResource(resId != 0 ? resId : R.drawable.wizard_placeholder);
                 setupChoiceButtons(q.getOptions(), false);
             } else if (currentLevel.equals("7-8")) {
-                // רמה 3: השלמת משפט + מקלדת
                 containerKeyboard.setVisibility(View.VISIBLE);
                 tvQuestion.setText(q.getQuestionText());
-                // התשובה הנכונה נמצאת בתוך רשימת האופציות לפי ה-CorrectAnswerIndex
                 String correctWord = q.getOptions().get(q.getCorrectAnswerIndex());
                 setupPlacementKeyboard(correctWord);
             }
@@ -213,7 +219,7 @@ public class PlacementTestActivity extends AppCompatActivity {
 
         btnSubmit.setOnClickListener(v -> {
             if (etAnswer.getText().toString().trim().equals(correctWord)) {
-                checkAnswer(999); // קוד מעבר להצלחה במקלדת
+                checkAnswer(999);
             } else {
                 isFirstAttempt = false;
                 Toast.makeText(this, "תשובה שגויה, נסה שוב", Toast.LENGTH_SHORT).show();
@@ -243,14 +249,10 @@ public class PlacementTestActivity extends AppCompatActivity {
         double percent = ((double) correctAnswersCount / testQuestions.size()) * 100;
         String newLevel = determineNewLevel(currentLevel, percent);
 
-        // בדיקה: האם הגענו ממצב של עליית רמה ונכשלנו?
         if (isUpgradeMode && percent < 60) {
-            // לא מורידים אותו רמה! משאירים אותו ברמה החדשה (הוא הרי סיים את הקודמת)
-            // אבל נותנים הודעה מעודדת
             showResultDialog(percent, currentLevel, "איזה אומץ! ניסית רמה קשה יותר. בוא נתאמן עוד קצת על הנושאים כאן כדי להיות אלופים!");
         } else {
-            // לוגיקה רגילה (למשל במבדק ראשון כשנרשמים)
-            updateChildLevelInFirebase(newLevel, percent);
+            showResultDialog(percent, newLevel, "כל הכבוד! סיימת את המבחן בהצלחה.");
         }
     }
 
@@ -273,27 +275,20 @@ public class PlacementTestActivity extends AppCompatActivity {
             dialog.getWindow().setBackgroundDrawableResource(android.R.color.transparent);
         }
 
-        // חיבור רכיבים
         TextView tvTitle = dialog.findViewById(R.id.tvDialogTitle);
         TextView tvMessage = dialog.findViewById(R.id.tvDialogMessage);
         ImageView ivStatus = dialog.findViewById(R.id.ivStatusIcon);
         RatingBar ratingBar = dialog.findViewById(R.id.dialogRatingBar);
 
-        // כפתור ההמלצה (הקיים)
         Button btnRecommended = dialog.findViewById(R.id.btnDialogAction);
-
-        // כפתור ה"להישאר ברמה שלי" (צריך להוסיף ל-XML עם ה-ID הזה)
         Button btnStay = dialog.findViewById(R.id.btnStayAtCurrentLevel);
 
-        // 1. הגדרת כוכבים
         if (ratingBar != null) {
             ratingBar.setRating((float) (percent / 20));
         }
 
-        // 2. עדכון טקסט ההודעה
         tvMessage.setText(message + "\nהרמה המומלצת עבורך: " + recommendedLevel);
 
-        // 3. לוגיקה ויזואלית לפי ציון
         if (percent >= 90) {
             ivStatus.setImageResource(R.drawable.ic_trophy);
             tvTitle.setText("מדהים!");
@@ -305,16 +300,13 @@ public class PlacementTestActivity extends AppCompatActivity {
             tvTitle.setText("נחמד מאוד!");
         }
 
-        // 4. הגדרת כפתור ההמלצה
         btnRecommended.setText("התחל רמה " + recommendedLevel);
         btnRecommended.setOnClickListener(v -> {
             dialog.dismiss();
             updateChildLevelInFirebase(recommendedLevel, percent);
         });
 
-        // 5. הגדרת כפתור ה"בחירה חופשית" (להישאר ברמה הקודמת)
         if (btnStay != null) {
-            // אם הרמה המומלצת היא ממילא הרמה הנוכחית, אין טעם בכפתור כפול
             if (recommendedLevel.equals(currentLevel)) {
                 btnStay.setVisibility(View.GONE);
             } else {
@@ -322,7 +314,6 @@ public class PlacementTestActivity extends AppCompatActivity {
                 btnStay.setText("אני מעדיף להישאר ברמה " + currentLevel);
                 btnStay.setOnClickListener(v -> {
                     dialog.dismiss();
-                    // מעדכנים את ה-Score אבל משאירים את הרמה המקורית
                     updateChildLevelInFirebase(currentLevel, percent);
                 });
             }
@@ -332,8 +323,11 @@ public class PlacementTestActivity extends AppCompatActivity {
         dialog.show();
     }
 
+    /**
+     * ⭐⭐⭐ הפונקציה המעודכנת ⭐⭐⭐
+     * עכשיו שומרת גם את lastPlacementScore ומעבירה ל-MainActivity
+     */
     private void updateChildLevelInFirebase(String level, double grade) {
-        // 1. בדיקת בטיחות: מוודאים שהאובייקט קיים
         if (selectedChild == null || selectedChild.getParentId() == null || selectedChild.getId() == null) {
             Toast.makeText(this, "שגיאה: לא נמצאו נתוני ילד", Toast.LENGTH_SHORT).show();
             return;
@@ -350,21 +344,24 @@ public class PlacementTestActivity extends AppCompatActivity {
 
         Map<String, Object> updates = new HashMap<>();
         updates.put("ageGroup", level);
-        updates.put("lastPlacementScore", grade);
+        updates.put("lastPlacementScore", grade);  // ⭐ שדה חדש - שומר שעבר מבדק
 
-        // 2. ביצוע העדכון עם מאזין הצלחה וכישלון
         childRef.updateChildren(updates)
                 .addOnSuccessListener(aVoid -> {
-                    // עדכון האובייקט המקומי ו-SharedPreferences
+                    // עדכון האובייקט המקומי
                     selectedChild.setAgeGroup(level);
+                    selectedChild.setLastPlacementScore(grade);  // ⭐ עדכון השדה החדש
                     SharedPreferencesUtil.saveCurrentChild(this, selectedChild);
 
-                    // הצגת הדיאלוג המעוצב רק אחרי שהנתונים נשמרו בענן
-                    showResultDialog(grade, level, "כל הכבוד! סיימת את המבחן בהצלחה.");
+                    // ⭐⭐⭐ מעבר ל-MainActivity ⭐⭐⭐
+                    Toast.makeText(this, "כל הכבוד! בוא נתחיל לשחק 🎮", Toast.LENGTH_SHORT).show();
+                    Intent intent = new Intent(this, MainActivity.class);
+                    intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+                    startActivity(intent);
+                    finish();
                 })
                 .addOnFailureListener(e -> {
-                    // טיפול במקרה של שגיאת תקשורת
-                    Toast.makeText(this, "שגיאה בשמירת הנתונים" + e.getMessage(), Toast.LENGTH_LONG).show();
+                    Toast.makeText(this, "שגיאה בשמירת הנתונים: " + e.getMessage(), Toast.LENGTH_LONG).show();
                 });
     }
 
