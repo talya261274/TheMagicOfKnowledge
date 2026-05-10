@@ -2,33 +2,39 @@ package com.example.themagicofknowledge.screens;
 
 import android.annotation.SuppressLint;
 import android.content.Intent;
+import android.graphics.Color;
 import android.os.Bundle;
 import android.speech.tts.TextToSpeech;
 import android.view.View;
-import android.widget.Button;
-import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.cardview.widget.CardView;
 
 import com.example.themagicofknowledge.R;
 import com.example.themagicofknowledge.models.FlashCard;
 import com.example.themagicofknowledge.models.UserChild;
+import com.example.themagicofknowledge.models.UserParent;
 import com.example.themagicofknowledge.services.DatabaseService;
 import com.example.themagicofknowledge.utils.SharedPreferencesUtil;
+import com.google.android.material.button.MaterialButton;
+import com.google.android.material.card.MaterialCardView;
+import com.google.android.material.floatingactionbutton.FloatingActionButton;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.Locale;
+import java.util.Map;
 
 public class FlashCardMain extends AppCompatActivity {
 
-    private TextView tvTitle, tvCardText;
+    private TextView tvTitle, tvCardText, tvProgress;
     private ImageView imgCard;
-    private CardView card;
-    private Button btnStartGame;
-    private ImageButton btnNext, btnPrev, btnPlaySound;
+    private MaterialCardView card;
+    private MaterialButton btnStartGame;
+    private MaterialButton btnNext, btnPrev;
+    private FloatingActionButton btnPlaySound;
 
     private UserChild currentChild;
     private String subject;
@@ -42,6 +48,16 @@ public class FlashCardMain extends AppCompatActivity {
 
     private long startTime;
 
+    private static final Map<String, String> SUBJECT_COLORS = new HashMap<>();
+    static {
+        SUBJECT_COLORS.put("animals", "#29A6F0");      // כחול
+        SUBJECT_COLORS.put("colors", "#4CA621");       // ירוק
+        SUBJECT_COLORS.put("numbers", "#E097A4");      // ורוד
+        SUBJECT_COLORS.put("letters", "#F4D248");      // צהוב
+        SUBJECT_COLORS.put("shapes", "#FF914D");       // כתום
+        SUBJECT_COLORS.put("bodyparts", "#FF5757");    // אדום
+    }
+
     @SuppressLint("MissingInflatedId")
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -50,6 +66,8 @@ public class FlashCardMain extends AppCompatActivity {
 
         currentChild = SharedPreferencesUtil.getCurrentChild(this);
         subject = getIntent().getStringExtra("subject");
+
+        updateTitleColor();
 
         if (currentChild == null || subject == null) {
             finish();
@@ -61,6 +79,13 @@ public class FlashCardMain extends AppCompatActivity {
         initViews();
         initializeTTS();
         createCards(subject);
+
+        if (cards == null || cards.isEmpty()) {
+            Toast.makeText(this, "לא נמצאו כרטיסים לנושא זה", Toast.LENGTH_SHORT).show();
+            finish();
+            return;
+        }
+
         showImage();
 
         card.setOnClickListener(v -> flipCard());
@@ -84,11 +109,15 @@ public class FlashCardMain extends AppCompatActivity {
         btnStartGame.setOnClickListener(v -> handleStartGame());
 
         btnPlaySound.setOnClickListener(v -> speakWord(cards.get(currentIndex).getAnswer()));
+
+        MaterialButton btnBackToSubjects = findViewById(R.id.btnBackToSubjects);
+        btnBackToSubjects.setOnClickListener(v -> showBackConfirmationDialog());
     }
 
     private void initViews() {
         tvTitle = findViewById(R.id.tvTitle);
         tvCardText = findViewById(R.id.tvCardText);
+        tvProgress = findViewById(R.id.tvProgress);
         imgCard = findViewById(R.id.imgCard);
         card = findViewById(R.id.card);
         btnNext = findViewById(R.id.btnNext);
@@ -97,9 +126,70 @@ public class FlashCardMain extends AppCompatActivity {
         btnStartGame = findViewById(R.id.btnStartGame);
     }
 
+    private void updateTitleColor() {
+        TextView tvTitle = findViewById(R.id.tvTitle);
+
+        // קבלת הצבע של הנושא הנוכחי
+        String colorHex = SUBJECT_COLORS.get(subject);
+        if (colorHex != null) {
+            tvTitle.setTextColor(Color.parseColor(colorHex));
+            // גם הצל בצבע כהה יותר של אותו צבע
+            tvTitle.setShadowLayer(8, 3, 3, darkenColor(colorHex, 0.5f));
+        }
+    }
+
+    // פונקציית עזר להכהיית צבע (לצל)
+    private int darkenColor(String hexColor, float factor) {
+        int color = Color.parseColor(hexColor);
+        int r = (int) (Color.red(color) * factor);
+        int g = (int) (Color.green(color) * factor);
+        int b = (int) (Color.blue(color) * factor);
+        return Color.rgb(r, g, b);
+    }
+
+    private void showBackConfirmationDialog() {
+        // יצירת הדיאלוג
+        final android.app.Dialog dialog = new android.app.Dialog(this);
+        dialog.setContentView(R.layout.custom_action_dialog);  // ⚠️ תני שם נכון לקובץ
+
+        // רקע שקוף (כדי לראות את הקצוות העגולים)
+        if (dialog.getWindow() != null) {
+            dialog.getWindow().setBackgroundDrawableResource(android.R.color.transparent);
+        }
+
+        // חיבור רכיבי הדיאלוג
+        TextView tvTitle = dialog.findViewById(R.id.tvDialogTitle);
+        TextView tvMessage = dialog.findViewById(R.id.tvDialogMessage);
+        MaterialButton btnConfirm = dialog.findViewById(R.id.btnConfirm);
+        TextView btnCancel = dialog.findViewById(R.id.btnCancel);
+
+        // הגדרת התוכן
+        tvTitle.setText("לחזור לבחירת נושא?");
+        tvMessage.setText("ההתקדמות שלך תישמר");
+        btnConfirm.setText("כן, חזור");
+        btnCancel.setText("לא, הישאר");
+
+        // לחיצה על "אישור"
+        btnConfirm.setOnClickListener(v -> {
+            dialog.dismiss();
+            Intent intent = new Intent(FlashCardMain.this, SelectSubjectActivity.class);
+            intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+            startActivity(intent);
+            finish();
+        });
+
+        // לחיצה על "ביטול"
+        btnCancel.setOnClickListener(v -> dialog.dismiss());
+
+        // הצגת הדיאלוג
+        dialog.show();
+    }
+
     private void handleStartGame() {
         long timeSpent = (System.currentTimeMillis() - startTime) / 1000;
-        String parentId = SharedPreferencesUtil.getUser(this).getId();
+        UserParent user = SharedPreferencesUtil.getUser(this);
+        if (user == null) return;
+        String parentId = user.getId();
 
         DatabaseService.getInstance().updateDetailedProgress(
                 parentId,
@@ -282,17 +372,25 @@ public class FlashCardMain extends AppCompatActivity {
     }
 
     private void showImage() {
-        imgCard.setVisibility(ImageView.VISIBLE);
-        tvCardText.setVisibility(TextView.GONE);
-        btnPlaySound.setVisibility(Button.GONE);
+        imgCard.setVisibility(View.VISIBLE);
+        tvCardText.setVisibility(View.GONE);
+        btnPlaySound.setVisibility(View.GONE);
         imgCard.setImageResource(cards.get(currentIndex).getImageResId());
+        updateProgress();
     }
 
     private void showText() {
-        tvCardText.setVisibility(TextView.VISIBLE);
-        imgCard.setVisibility(ImageView.GONE);
-        btnPlaySound.setVisibility(Button.VISIBLE);
+        tvCardText.setVisibility(View.VISIBLE);
+        imgCard.setVisibility(View.GONE);
+        btnPlaySound.setVisibility(View.VISIBLE);
         tvCardText.setText(cards.get(currentIndex).getAnswer());
+        updateProgress();
+    }
+
+    private void updateProgress() {
+        if (tvProgress != null && cards != null) {
+            tvProgress.setText(String.format(Locale.getDefault(), "%d / %d", currentIndex + 1, cards.size()));
+        }
     }
 
     private void flipCard() {

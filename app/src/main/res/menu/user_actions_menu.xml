@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <item
+        android:id="@+id/action_make_admin"
+        android:icon="@android:drawable/btn_star"
+        android:title="הפוך למנהל" />
+
+    <item
+        android:id="@+id/action_remove_admin"
+        android:icon="@android:drawable/btn_star_big_off"
+        android:title="הסר הרשאת מנהל" />
+
+    <item
+        android:id="@+id/action_delete"
+        android:icon="@android:drawable/ic_menu_delete"
+        android:title="מחק משתמש" />
+
+</menu>

@@ -18,4 +18,5 @@
     <item name="confirmPasswordLayout" type="id" />
     <item name="etConfirmPassword" type="id" />
     <item name="btnRegister" type="id" />
+    <item name="tag_matched" type="id" />
 </resources>

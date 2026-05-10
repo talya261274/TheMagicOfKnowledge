@@ -6,6 +6,8 @@ import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
+import android.widget.EditText;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.activity.EdgeToEdge;
@@ -22,6 +24,7 @@ import com.google.android.material.textfield.TextInputLayout;
 
 import java.util.Calendar;
 import java.util.HashMap;
+import java.util.Locale;
 
 /// Activity for registering the user
 /// This activity is used to register the user
@@ -64,12 +67,22 @@ public class RegisterActivity extends BaseActivity implements View.OnClickListen
                 startActivity(intent);
             }
         });
+
+        // ===== כפתור "כבר יש לך חשבון? התחברו" =====
+        TextView tvSignIn = findViewById(R.id.tvSignIn);
+        tvSignIn.setOnClickListener(v -> {
+            Intent intent = new Intent(RegisterActivity.this, LoginActivity.class);
+            startActivity(intent);
+        });
         etBDate = findViewById(R.id.et_register_birth_date);
 
-        etBDate.getEditText().setFocusable(false);
-        etBDate.getEditText().setClickable(true);
+        EditText editTextBDate = etBDate.getEditText();
+        if (editTextBDate == null) return;
 
-        etBDate.getEditText().setOnClickListener(v -> {
+        editTextBDate.setFocusable(false);
+        editTextBDate.setClickable(true);
+
+        editTextBDate.setOnClickListener(v -> {
             final Calendar calendar = Calendar.getInstance();
             int year = calendar.get(Calendar.YEAR);
             int month = calendar.get(Calendar.MONTH);
@@ -78,11 +91,18 @@ public class RegisterActivity extends BaseActivity implements View.OnClickListen
             DatePickerDialog datePickerDialog = new DatePickerDialog(
                     RegisterActivity.this,
                     (view, selectedYear, selectedMonth, selectedDay) -> {
-                        String date = String.format("%02d/%02d/%04d", selectedDay, selectedMonth + 1, selectedYear);
-                        etBDate.getEditText().setText(date);
+                        String date = String.format(Locale.getDefault(),
+                                "%02d/%02d/%04d",
+                                selectedDay, selectedMonth + 1, selectedYear);
+                        editTextBDate.setText(date);
                     },
                     year, month, day
             );
+
+            Calendar maxDate = Calendar.getInstance();
+            maxDate.add(Calendar.YEAR, -16);
+            datePickerDialog.getDatePicker().setMaxDate(maxDate.getTimeInMillis());
+
             datePickerDialog.show();
         });
 

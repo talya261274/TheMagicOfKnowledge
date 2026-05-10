@@ -3,6 +3,9 @@ package com.example.themagicofknowledge.screens;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.Gravity;
+import android.view.LayoutInflater;
+import android.view.View;
+import android.widget.HorizontalScrollView;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
@@ -87,31 +90,52 @@ public class ParentTrackingActivity extends AppCompatActivity {
         if (findViewById(R.id.goBackBtnTracking) != null) {
             findViewById(R.id.goBackBtnTracking).setOnClickListener(v -> finish());
         }
+
+        LinearLayout headerExpandable = findViewById(R.id.headerExpandable);
+        HorizontalScrollView expandableContent = findViewById(R.id.expandableContent);
+        ImageView ivExpandArrow = findViewById(R.id.ivExpandArrow);
+
+        headerExpandable.setOnClickListener(v -> {
+            if (expandableContent.getVisibility() == View.VISIBLE) {
+                // סגירה
+                expandableContent.setVisibility(View.GONE);
+                ivExpandArrow.animate().rotation(0f).setDuration(200).start();
+            } else {
+                // פתיחה
+                expandableContent.setVisibility(View.VISIBLE);
+                ivExpandArrow.animate().rotation(180f).setDuration(200).start();
+            }
+        });
     }
 
     private void setupChildrenSelector() {
         containerChildrenSelector.removeAllViews();
+
+        LayoutInflater inflater = LayoutInflater.from(this);
+
         for (UserChild child : currentParent.getChildrenList().values()) {
-            LinearLayout itemLayout = new LinearLayout(this);
-            itemLayout.setOrientation(LinearLayout.VERTICAL);
-            itemLayout.setPadding(25, 10, 25, 10);
-            itemLayout.setGravity(Gravity.CENTER);
+            // יצירת view מהlayout שלנו
+            View childView = inflater.inflate(R.layout.item_child_carousel, containerChildrenSelector, false);
 
-            ImageView avatar = new ImageView(this);
-            avatar.setLayoutParams(new LinearLayout.LayoutParams(130, 130));
+            // חיבור הרכיבים
+            ImageView ivAvatar = childView.findViewById(R.id.iv_child_avatar);
+            TextView tvName = childView.findViewById(R.id.tv_child_name);
+            TextView tvAge = childView.findViewById(R.id.tv_child_age);
 
-            int resId = getResources().getIdentifier(child.getAvatar(), "drawable", getPackageName());
-            avatar.setImageResource(resId != 0 ? resId : R.drawable.logo);
+            // הצגת שם וגיל
+            tvName.setText(child.getName());
+            tvAge.setText("גיל " + child.getAge());
 
-            TextView name = new TextView(this);
-            name.setText(child.getName());
-            name.setGravity(Gravity.CENTER);
+            // הצגת אווטר
+            if (child.getAvatar() != null) {
+                int resId = getResources().getIdentifier(child.getAvatar(), "drawable", getPackageName());
+                ivAvatar.setImageResource(resId != 0 ? resId : R.drawable.logo);
+            }
 
-            itemLayout.addView(avatar);
-            itemLayout.addView(name);
-            itemLayout.setOnClickListener(v -> loadStatsForChild(child.getId()));
+            // לחיצה - טעינת נתוני הילד
+            childView.setOnClickListener(v -> loadStatsForChild(child.getId()));
 
-            containerChildrenSelector.addView(itemLayout);
+            containerChildrenSelector.addView(childView);
         }
     }
 

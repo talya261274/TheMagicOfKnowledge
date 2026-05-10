@@ -1,43 +1,212 @@
 <?xml version="1.0" encoding="utf-8"?>
-<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/main"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@drawable/main_background"
-    android:padding="16dp">
+    android:background="@drawable/main_background">
 
-    <TextView
-        android:id="@+id/tvSelectTitle"
-        android:layout_width="wrap_content"
+    <!-- כרטיס כותרת עליון -->
+    <androidx.cardview.widget.CardView
+        android:id="@+id/headerCard"
+        android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:layout_centerHorizontal="true"
-        android:layout_marginTop="30dp"
-        android:fontFamily="@font/gan"
-        android:text="מי משחק איתנו היום?"
-        android:textColor="@color/white"
-        android:textSize="27sp"
-        android:textStyle="bold" />
+        android:layout_marginStart="20dp"
+        android:layout_marginTop="40dp"
+        android:layout_marginEnd="20dp"
+        app:cardBackgroundColor="#FFFFFF"
+        app:cardCornerRadius="20dp"
+        app:cardElevation="8dp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent">
 
-    <androidx.recyclerview.widget.RecyclerView
-        android:id="@+id/rvChildren"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:layout_below="@id/tvSelectTitle"
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="center"
+            android:orientation="vertical"
+            android:padding="20dp">
+
+            <!-- כותרת ראשית -->
+            <TextView
+                android:id="@+id/tvSelectTitle"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="8dp"
+                android:fontFamily="@font/gan"
+                android:text="מי משחק איתנו היום?"
+                android:textColor="#1E5F8B"
+                android:textSize="26sp"
+                android:textStyle="bold" />
+
+            <!-- כותרת משנה -->
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="4dp"
+                android:fontFamily="@font/varelaround"
+                android:text="בחרו ילד כדי להתחיל בהרפתקה"
+                android:textColor="#5C6166"
+                android:textSize="16sp" />
+
+            <!-- אימוג'י -->
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="🪄"
+                android:textSize="40sp" />
+
+        </LinearLayout>
+    </androidx.cardview.widget.CardView>
+
+    <!-- ===== כרטיס עוטף לרשימת הילדים ===== -->
+    <androidx.cardview.widget.CardView
+        android:id="@+id/childrenCard"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="20dp"
         android:layout_marginTop="20dp"
-        android:layout_marginBottom="80dp"
-        android:clipToPadding="false"
-        android:padding="10dp" />
+        android:layout_marginEnd="20dp"
+        android:layout_marginBottom="20dp"
+        app:cardBackgroundColor="#F6EBF3"
+        app:cardCornerRadius="24dp"
+        app:cardElevation="12dp"
+        app:layout_constrainedHeight="true"
+        app:layout_constraintBottom_toTopOf="@id/fabAddChild"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHeight_max="wrap"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/headerCard"
+        app:layout_constraintVertical_bias="0">
 
+        <!-- ===== רשימת הילדים בתוך הכרטיס ===== -->
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/rvChildren"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:clipToPadding="false"
+            android:fadeScrollbars="false"
+            android:layoutDirection="ltr"
+            android:padding="12dp"
+            android:scrollbarStyle="insideOverlay"
+            android:scrollbarThumbVertical="@drawable/scrollbar_thumb"
+            android:scrollbars="vertical" />
+
+    </androidx.cardview.widget.CardView>
+
+    <!-- ===== מצב ריק - כשאין ילדים ===== -->
+    <LinearLayout
+        android:id="@+id/emptyStateLayout"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="20dp"
+        android:layout_marginTop="32dp"
+        android:layout_marginEnd="20dp"
+        android:gravity="center"
+        android:orientation="vertical"
+        android:visibility="gone"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/headerCard">
+
+        <!-- כרטיס עם תוכן המצב הריק -->
+        <androidx.cardview.widget.CardView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            app:cardBackgroundColor="#dafaff"
+            app:cardCornerRadius="24dp"
+            app:cardElevation="12dp">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:gravity="center"
+                android:orientation="vertical"
+                android:padding="32dp">
+
+                <!-- אייקון גדול -->
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="👶"
+                    android:textSize="80sp" />
+
+                <!-- כותרת -->
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="16dp"
+                    android:fontFamily="@font/gan"
+                    android:gravity="center"
+                    android:text="עדיין אין ילדים"
+                    android:textColor="#1E5F8B"
+                    android:textSize="24sp"
+                    android:textStyle="bold" />
+
+                <!-- הסבר -->
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="8dp"
+                    android:fontFamily="@font/varelaround"
+                    android:gravity="center"
+                    android:text="בואו נוסיף את הילד הראשון שלכם\nונתחיל את ההרפתקה הקסומה! ✨"
+                    android:textColor="#5C6166"
+                    android:textSize="15sp"
+                    android:lineSpacingExtra="4dp" />
+
+                <!-- כפתור הוספה גדול -->
+                <com.google.android.material.button.MaterialButton
+                    android:id="@+id/btnAddFirstChild"
+                    android:layout_width="match_parent"
+                    android:layout_height="56dp"
+                    android:layout_marginTop="24dp"
+                    android:fontFamily="@font/gan"
+                    android:text="הוסיפו ילד ראשון"
+                    android:textColor="#FFFFFF"
+                    android:textSize="18sp"
+                    android:textStyle="bold"
+                    app:backgroundTint="#FF9800"
+                    app:cornerRadius="28dp"
+                    app:elevation="6dp"
+                    app:icon="@android:drawable/ic_input_add"
+                    app:iconGravity="textStart"
+                    app:iconPadding="12dp"
+                    app:iconTint="#FFFFFF" />
+
+            </LinearLayout>
+        </androidx.cardview.widget.CardView>
+
+        <!-- טקסט עזר תחתון -->
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="25dp"
+            android:fontFamily="@font/varelaround"
+            android:gravity="center"
+            android:text="💡 ניתן להוסיף ילדים ולעקוב\nאחר ההתקדמות של כל אחד מהם"            android:textColor="#FFFFFF"
+            android:alpha="0.9"
+            android:textStyle="bold"
+            android:textSize="17sp"
+            android:lineSpacingExtra="2dp" />
+
+    </LinearLayout>
+
+    <!-- כפתור צף להוספת ילד -->
     <com.google.android.material.floatingactionbutton.FloatingActionButton
         android:id="@+id/fabAddChild"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_alignParentEnd="true"
-        android:layout_alignParentBottom="true"
-        android:layout_margin="20dp"
+        android:layout_marginEnd="20dp"
+        android:layout_marginBottom="20dp"
+        android:layoutDirection="rtl"
         android:contentDescription="הוספת ילד"
         android:src="@android:drawable/ic_input_add"
         app:backgroundTint="#FF9800"
+        app:elevation="12dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
         app:tint="@color/white" />
 
-</RelativeLayout>
+</androidx.constraintlayout.widget.ConstraintLayout>

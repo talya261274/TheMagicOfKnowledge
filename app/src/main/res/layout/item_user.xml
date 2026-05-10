@@ -4,138 +4,193 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:layout_marginHorizontal="8dp"
-    android:layout_marginVertical="4dp"
+    android:layout_marginHorizontal="4dp"
+    android:layout_marginVertical="6dp"
+    android:layoutDirection="rtl"
     android:clickable="true"
     android:focusable="true"
-    android:foreground="#000000"
-    app:cardCornerRadius="12dp"
-    app:cardElevation="2dp">
+    android:foreground="?attr/selectableItemBackground"
+    app:cardBackgroundColor="#FFFFFF"
+    app:cardCornerRadius="16dp"
+    app:cardElevation="4dp"
+    app:strokeColor="#E0E0E0"
+    app:strokeWidth="1dp">
 
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:gravity="center_vertical"
         android:orientation="horizontal"
-        android:padding="16dp"
-        app:cardBackgroundColor="#80FFFFFF">
+        android:padding="14dp">
 
-        <com.google.android.material.card.MaterialCardView
+        <!-- ===== עיגול ראשי תיבות ===== -->
+        <androidx.cardview.widget.CardView
             android:layout_width="56dp"
             android:layout_height="56dp"
-            app:cardBackgroundColor="#3F51B5"
+            app:cardBackgroundColor="#409EDE"
             app:cardCornerRadius="28dp"
-            app:cardElevation="0dp">
+            app:cardElevation="3dp">
 
             <TextView
                 android:id="@+id/tv_user_initials"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
+                android:fontFamily="@font/gan"
                 android:gravity="center"
-                android:text="JD"
-                android:textColor="#2196F3"
+                android:text="ת.כ"
+                android:textColor="#FFFFFF"
                 android:textSize="20sp"
-                android:textStyle="bold" />
+                android:textStyle="bold"
+                tools:text="י.כ" />
 
-        </com.google.android.material.card.MaterialCardView>
+        </androidx.cardview.widget.CardView>
 
+        <!-- ===== מידע על המשתמש ===== -->
         <LinearLayout
             android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:layout_marginStart="16dp"
-            android:layout_marginEnd="8dp"
+            android:layout_marginStart="14dp"
             android:layout_weight="1"
             android:orientation="vertical">
 
-            <TextView
-                android:id="@+id/tv_item_user_name"
-                android:layout_width="wrap_content"
+            <!-- שורה ראשונה: שם + תג מנהל -->
+            <LinearLayout
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginBottom="4dp"
-                android:text="John Doe"
-                android:textColor="#000000"
-                android:textSize="16sp"
-                android:textStyle="bold"
-                tools:text="@tools:sample/full_names" />
+                android:gravity="center_vertical"
+                android:orientation="horizontal">
 
+                <TextView
+                    android:id="@+id/tv_item_user_name"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:fontFamily="@font/gan"
+                    android:maxLines="1"
+                    android:ellipsize="end"
+                    android:text="שם המשתמש"
+                    android:textColor="#1E5F8B"
+                    android:textSize="17sp"
+                    android:textStyle="bold"
+                    tools:text="טליה כהן" />
+
+                <!-- תג מנהל -->
+                <androidx.cardview.widget.CardView
+                    android:id="@+id/chip_user_role"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="8dp"
+                    android:visibility="gone"
+                    app:cardBackgroundColor="#FF9800"
+                    app:cardCornerRadius="10dp"
+                    app:cardElevation="2dp"
+                    tools:visibility="visible">
+
+                    <LinearLayout
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:gravity="center_vertical"
+                        android:orientation="horizontal"
+                        android:paddingStart="8dp"
+                        android:paddingTop="3dp"
+                        android:paddingEnd="8dp"
+                        android:paddingBottom="3dp">
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:fontFamily="@font/gan"
+                            android:text="מנהל"
+                            android:textColor="#FFFFFF"
+                            android:textSize="11sp"
+                            android:textStyle="bold" />
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginEnd="3dp"
+                            android:text="👑"
+                            android:textSize="11sp" />
+
+                    </LinearLayout>
+                </androidx.cardview.widget.CardView>
+
+            </LinearLayout>
+
+            <!-- אימייל -->
             <LinearLayout
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginBottom="2dp"
+                android:layout_marginTop="4dp"
                 android:gravity="center_vertical"
                 android:orientation="horizontal">
 
                 <ImageView
-                    android:layout_width="14dp"
-                    android:layout_height="14dp"
+                    android:layout_width="13dp"
+                    android:layout_height="13dp"
                     android:layout_marginEnd="6dp"
                     android:src="@android:drawable/ic_dialog_email"
-                    app:tint="#666666" />
+                    app:tint="#9E9E9E" />
 
                 <TextView
                     android:id="@+id/tv_item_user_email"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="john.doe@example.com"
-                    android:textColor="#000000"
-                    android:textSize="14sp"
-                    tools:text="user@example.com" />
+                    android:fontFamily="@font/varelaround"
+                    android:maxLines="1"
+                    android:ellipsize="end"
+                    android:text="email@example.com"
+                    android:textColor="#5C6166"
+                    android:textSize="13sp"
+                    tools:text="talia@example.com" />
 
             </LinearLayout>
 
+            <!-- טלפון -->
             <LinearLayout
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:layout_marginTop="2dp"
                 android:gravity="center_vertical"
                 android:orientation="horizontal">
 
                 <ImageView
-                    android:layout_width="14dp"
-                    android:layout_height="14dp"
+                    android:layout_width="13dp"
+                    android:layout_height="13dp"
                     android:layout_marginEnd="6dp"
                     android:src="@android:drawable/sym_action_call"
-                    app:tint="#666666" />
+                    app:tint="#9E9E9E" />
 
                 <TextView
                     android:id="@+id/tv_item_user_phone"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="+1 234 567 8900"
-                    android:textColor="#000000"
-                    android:textSize="14sp"
-                    tools:text="@tools:sample/us_phones" />
+                    android:fontFamily="@font/varelaround"
+                    android:text="050-0000000"
+                    android:textColor="#5C6166"
+                    android:textSize="13sp"
+                    tools:text="050-1234567" />
 
             </LinearLayout>
 
         </LinearLayout>
 
-        <LinearLayout
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:gravity="center|end"
-            android:orientation="vertical">
-
-            <com.google.android.material.chip.Chip
-                android:id="@+id/chip_user_role"
-                android:layout_width="wrap_content"
-                android:layout_height="32dp"
-                android:text="Admin"
-                android:textSize="12sp"
-                android:visibility="gone"
-                app:chipBackgroundColor="#2196F3"
-                app:chipStrokeWidth="0dp"
-                tools:visibility="visible" />
-
-            <ImageView
-                android:layout_width="24dp"
-                android:layout_height="24dp"
-                android:layout_marginTop="8dp"
-                android:src="@android:drawable/ic_menu_more"
-                app:tint="#999999" />
-
-        </LinearLayout>
-
-
+        <!-- ===== כפתור תפריט (3 נקודות) ===== -->
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/btn_user_actions"
+            android:layout_width="40dp"
+            android:layout_height="40dp"
+            android:insetLeft="0dp"
+            android:insetTop="0dp"
+            android:insetRight="0dp"
+            android:insetBottom="0dp"
+            app:backgroundTint="#F5F5F5"
+            app:cornerRadius="20dp"
+            app:elevation="0dp"
+            app:icon="@android:drawable/ic_menu_more"
+            app:iconGravity="textStart"
+            app:iconPadding="0dp"
+            app:iconSize="20dp"
+            app:iconTint="#1E5F8B" />
 
     </LinearLayout>
 

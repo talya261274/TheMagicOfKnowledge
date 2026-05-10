@@ -4,50 +4,121 @@
     android:layout_width="320dp"
     android:layout_height="wrap_content"
     android:layout_gravity="center"
-    app:cardCornerRadius="24dp">
+    app:cardBackgroundColor="#FFFFFF"
+    app:cardCornerRadius="28dp"
+    app:cardElevation="16dp">
 
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:background="#E4CBDF"
         android:gravity="center"
         android:orientation="vertical"
-        android:padding="24dp">
+        android:padding="28dp">
 
-        <ImageView
-            android:layout_width="150dp"
-            android:layout_height="150dp"
-            android:src="@drawable/ic_trophy" />
+        <!-- ===== עיגול עם הגביע ===== -->
+        <androidx.cardview.widget.CardView
+            android:layout_width="140dp"
+            android:layout_height="140dp"
+            android:layout_marginBottom="16dp"
+            app:cardBackgroundColor="#FFF8E1"
+            app:cardCornerRadius="70dp"
+            app:cardElevation="8dp">
 
-        <TextView
+            <ImageView
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:contentDescription="גביע"
+                android:padding="20dp"
+                android:src="@drawable/ic_trophy" />
+
+        </androidx.cardview.widget.CardView>
+
+        <!-- ===== כוכבים מסביב לכותרת ===== -->
+        <LinearLayout
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginTop="10dp"
-            android:fontFamily="@font/gan"
-            android:text="כל הכבוד! סיימת הכל!"
-            android:textColor="#FFFFFF"
-            android:textSize="24sp"
-            android:textStyle="bold" />
-
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="8dp"
             android:gravity="center"
-            android:text="עברת על כל הנושאים בהצלחה.\nמוכן לעלות לרמה הבאה?"
-            android:textColor="#FFFFFF"
-            android:textSize="18sp"
+            android:orientation="horizontal">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginEnd="8dp"
+                android:text="⭐"
+                android:textSize="20sp" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:fontFamily="@font/gan"
+                android:gravity="center"
+                android:shadowColor="#FFD54F"
+                android:shadowDx="2"
+                android:shadowDy="2"
+                android:shadowRadius="4"
+                android:text="כל הכבוד!"
+                android:textColor="#FF9800"
+                android:textSize="28sp"
+                android:textStyle="bold" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="8dp"
+                android:text="⭐"
+                android:textSize="20sp" />
+
+        </LinearLayout>
+
+        <!-- ===== כותרת משנה ===== -->
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="4dp"
+            android:fontFamily="@font/gan"
+            android:gravity="center"
+            android:text="סיימת הכל! 🎉"
+            android:textColor="#1E5F8B"
+            android:textSize="20sp"
             android:textStyle="bold" />
 
+        <!-- ===== כרטיס הודעה ===== -->
+        <androidx.cardview.widget.CardView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="16dp"
+            app:cardBackgroundColor="#dafaff"
+            app:cardCornerRadius="16dp"
+            app:cardElevation="0dp">
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:fontFamily="@font/varelaround"
+                android:gravity="center"
+                android:lineSpacingExtra="4dp"
+                android:padding="16dp"
+                android:text="✨ עברת על כל הנושאים בהצלחה ✨\nמוכן לעלות לרמה הבאה?"
+                android:textColor="#1E5F8B"
+                android:textSize="14sp"
+                android:textStyle="bold" />
+
+        </androidx.cardview.widget.CardView>
+
+        <!-- ===== כפתור עלייה לרמה ===== -->
         <com.google.android.material.button.MaterialButton
             android:id="@+id/btnLevelUp"
-            android:layout_width="220dp"
-            android:layout_height="55dp"
-            android:layout_marginTop="24dp"
-            android:text="כן! בוא נעלה רמה"
+            android:layout_width="match_parent"
+            android:layout_height="56dp"
+            android:layout_marginTop="20dp"
+            android:fontFamily="@font/gan"
+            android:text="כן! בוא נעלה רמה 🚀"
+            android:textColor="#FFFFFF"
+            android:textSize="17sp"
             android:textStyle="bold"
-            app:backgroundTint="#4CAF50"
-            app:cornerRadius="30dp" />
+            app:backgroundTint="#FF9800"
+            app:cornerRadius="28dp"
+            app:elevation="6dp" />
 
     </LinearLayout>
 </androidx.cardview.widget.CardView>

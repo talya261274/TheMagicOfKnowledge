@@ -1,14 +1,21 @@
 package com.example.themagicofknowledge.screens;
 
+import android.app.Dialog;
 import android.content.Intent;
+import android.content.res.ColorStateList;
 import android.graphics.Color;
+import android.graphics.drawable.ColorDrawable;
 import android.os.Bundle;
 import android.view.Gravity;
+import android.view.LayoutInflater;
 import android.view.View;
+import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
+
+import androidx.cardview.widget.CardView;
 
 import com.example.themagicofknowledge.R;
 import com.example.themagicofknowledge.models.UserChild;
@@ -18,6 +25,7 @@ import com.example.themagicofknowledge.services.DatabaseService;
 import com.example.themagicofknowledge.utils.SharedPreferencesUtil;
 import com.example.themagicofknowledge.utils.Validator;
 import com.google.android.material.button.MaterialButton;
+import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.android.material.textfield.TextInputEditText;
 import com.google.firebase.database.FirebaseDatabase;
 
@@ -26,9 +34,12 @@ public class UserProfileActivity extends BaseActivity {
     private static final String TAG = "UserProfileActivity";
 
     private TextInputEditText etFirstName, etLastName, etEmail, etPhone, etBirthDate, etPassword;
-    private TextView tvUserName, tvId, btnUpdateAction;
+    private TextView tvUserName, tvId;
+    private FloatingActionButton btnUpdateAction;
     private LinearLayout containerChildrenLinks;
     private MaterialButton btnSignOut;
+    private FrameLayout backButtonContainer;
+    private CardView childrenTrackingCard;
 
     private UserParent currentUser;       // המשתמש שמוצג בפרופיל (אולי לא המחובר)
     private UserParent loggedInUser;      // המשתמש המחובר (לבדיקת הרשאות)
@@ -50,7 +61,6 @@ public class UserProfileActivity extends BaseActivity {
 
         initViews();
 
-        // 1. בדיקה אם הגיע USER_ID דרך ה-Intent (כלומר נכנסנו מרשימת משתמשים)
         String requestedUserId = getIntent().getStringExtra("USER_ID");
         loggedInUser = SharedPreferencesUtil.getUser(this);
 
@@ -66,12 +76,14 @@ public class UserProfileActivity extends BaseActivity {
             populateUI();
         }
 
-        btnSignOut.setOnClickListener(v -> {
-            SharedPreferencesUtil.signOutUser(this);
-            Intent intent = new Intent(UserProfileActivity.this, LandingActivity.class);
-            intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
-            startActivity(intent);
-        });
+        // ⭐ הכפתור מוצג רק למנהלים (בכל מקרה - שלהם או של אחרים)
+        if (loggedInUser != null && loggedInUser.isAdmin()) {
+            backButtonContainer.setVisibility(View.VISIBLE);
+        } else {
+            backButtonContainer.setVisibility(View.GONE);
+        }
+
+        btnSignOut.setOnClickListener(v -> showLogoutDialog());
 
         btnUpdateAction.setOnClickListener(v -> {
             if (!isEditMode) {
@@ -94,6 +106,11 @@ public class UserProfileActivity extends BaseActivity {
         btnSignOut = findViewById(R.id.btn_sign_out);
         btnUpdateAction = findViewById(R.id.et_update);
         containerChildrenLinks = findViewById(R.id.container_children_links);
+        childrenTrackingCard = findViewById(R.id.childrenTrackingCard);
+        backButtonContainer = findViewById(R.id.backButtonContainer);  // ← בדיקה!
+
+        findViewById(R.id.btnBackToUsersList).setOnClickListener(v -> finish());
+
     }
 
     private void loadUserFromFirebase(String userId) {
@@ -133,7 +150,23 @@ public class UserProfileActivity extends BaseActivity {
             btnSignOut.setVisibility(View.GONE);
         }
 
-        setupChildrenProgressLinks();
+        // ===== הצגת תג מנהל =====
+        androidx.cardview.widget.CardView adminBadge = findViewById(R.id.admin_badge);
+        if (currentUser.isAdmin()) {
+            adminBadge.setVisibility(View.VISIBLE);
+        } else {
+            adminBadge.setVisibility(View.GONE);
+        }
+
+        // ===== הסתרת מעקב ילדים למנהלים =====
+        if (currentUser.isAdmin()) {
+            // מנהל - מסתירים את הכרטיס לגמרי
+            childrenTrackingCard.setVisibility(View.GONE);
+        } else {
+            // הורה רגיל - מציגים ומאתחלים את הילדים
+            childrenTrackingCard.setVisibility(View.VISIBLE);
+            setupChildrenProgressLinks();
+        }
     }
 
     private void setEditMode(boolean enable) {
@@ -146,12 +179,12 @@ public class UserProfileActivity extends BaseActivity {
         etPassword.setEnabled(enable);
 
         if (enable) {
-            btnUpdateAction.setText("שמור שינויים");
-            btnUpdateAction.setTextColor(getResources().getColor(android.R.color.holo_green_dark));
+            btnUpdateAction.setImageResource(R.drawable.ic_check_circle);
+            btnUpdateAction.setBackgroundTintList(android.content.res.ColorStateList.valueOf(Color.parseColor("#4CAF50")));
             etFirstName.requestFocus();
         } else {
-            btnUpdateAction.setText("עדכון פרטים");
-            btnUpdateAction.setTextColor(getResources().getColor(R.color.update));
+            btnUpdateAction.setImageResource(R.drawable.ic_edit_square);
+            btnUpdateAction.setBackgroundTintList(android.content.res.ColorStateList.valueOf(Color.parseColor("#FF9800")));
         }
     }
 
@@ -202,32 +235,33 @@ public class UserProfileActivity extends BaseActivity {
     private void setupChildrenProgressLinks() {
         if (currentUser.getChildrenList() == null) return;
         containerChildrenLinks.removeAllViews();
-        containerChildrenLinks.setOrientation(LinearLayout.HORIZONTAL);
+
+        LayoutInflater inflater = LayoutInflater.from(this);
 
         for (UserChild child : currentUser.getChildrenList().values()) {
-            LinearLayout childLayout = new LinearLayout(this);
-            childLayout.setOrientation(LinearLayout.VERTICAL);
-            childLayout.setPadding(20, 20, 20, 20);
-            childLayout.setGravity(Gravity.CENTER);
+            // יצירת view מהlayout שיצרנו
+            View childView = inflater.inflate(R.layout.item_child_carousel, containerChildrenLinks, false);
 
-            ImageView ivAvatar = new ImageView(this);
-            ivAvatar.setLayoutParams(new LinearLayout.LayoutParams(150, 150));
+            // חיבור הרכיבים
+            ImageView ivAvatar = childView.findViewById(R.id.iv_child_avatar);
+            TextView tvName = childView.findViewById(R.id.tv_child_name);
+            TextView tvAge = childView.findViewById(R.id.tv_child_age);
 
-            int resId = getResources().getIdentifier(child.getAvatar(), "drawable", getPackageName());
-            ivAvatar.setImageResource(resId != 0 ? resId : R.drawable.logo);
-
-            TextView tvName = new TextView(this);
+            // הצגת שם וגיל
             tvName.setText(child.getName());
-            tvName.setGravity(Gravity.CENTER);
-            tvName.setTextColor(Color.BLACK);
-            tvName.setTextSize(16);
+            tvAge.setText("גיל " + child.getAge());
 
-            childLayout.addView(ivAvatar);
-            childLayout.addView(tvName);
+            // הצגת אווטר
+            if (child.getAvatar() != null) {
+                int resId = getResources().getIdentifier(child.getAvatar(), "drawable", getPackageName());
+                ivAvatar.setImageResource(resId != 0 ? resId : R.drawable.logo);
+            }
 
-            childLayout.setOnClickListener(v -> {
+            // לחיצה - מעבר למסך מעקב הילד
+            childView.setOnClickListener(v -> {
                 Intent intent = new Intent(UserProfileActivity.this, ParentTrackingActivity.class);
                 intent.putExtra("SELECTED_CHILD_ID", child.getId());
+
                 // אם צופים בפרופיל של משתמש אחר - שולחים גם את ה-parentId
                 if (!isViewingOwnProfile) {
                     intent.putExtra("PARENT_ID", currentUser.getId());
@@ -235,7 +269,52 @@ public class UserProfileActivity extends BaseActivity {
                 startActivity(intent);
             });
 
-            containerChildrenLinks.addView(childLayout);
+            containerChildrenLinks.addView(childView);
         }
+    }
+
+    // ===== דיאלוג מותאם אישית =====
+    public void showCustomDialog(String title, String message, String confirmText, int confirmColor, Runnable onConfirm) {
+        Dialog dialog = new Dialog(this);
+        dialog.setContentView(R.layout.custom_action_dialog);
+
+        if (dialog.getWindow() != null) {
+            dialog.getWindow().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
+        }
+
+        TextView tvTitle = dialog.findViewById(R.id.tvDialogTitle);
+        TextView tvMessage = dialog.findViewById(R.id.tvDialogMessage);
+        MaterialButton btnConfirm = dialog.findViewById(R.id.btnConfirm);
+        TextView btnCancel = dialog.findViewById(R.id.btnCancel);
+
+        tvTitle.setText(title);
+        tvMessage.setText(message);
+        btnConfirm.setText(confirmText);
+        btnConfirm.setBackgroundTintList(ColorStateList.valueOf(confirmColor));
+
+        btnConfirm.setOnClickListener(v -> {
+            onConfirm.run();
+            dialog.dismiss();
+        });
+
+        btnCancel.setOnClickListener(v -> dialog.dismiss());
+        dialog.show();
+    }
+
+
+    // ===== דיאלוג התנתקות =====
+    private void showLogoutDialog() {
+        showCustomDialog(
+                "התנתקות",
+                "האם אתה בטוח שברצונך לצאת?",
+                "התנתק",
+                Color.parseColor("#FF5252"),
+                () -> {
+                    SharedPreferencesUtil.signOutUser(this);
+                    Intent intent = new Intent(this, LandingActivity.class);
+                    intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+                    startActivity(intent);
+                }
+        );
     }
 }

@@ -16,8 +16,6 @@ import com.example.themagicofknowledge.utils.SharedPreferencesUtil;
 
 public class LandingActivity extends AppCompatActivity {
 
-    UserParent UserParent;
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -29,15 +27,6 @@ public class LandingActivity extends AppCompatActivity {
             v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom);
             return insets;
         });
-
-        UserParent = SharedPreferencesUtil.getUser(LandingActivity.this);
-        if (SharedPreferencesUtil.isUserLoggedIn(LandingActivity.this)) {
-            Intent intent = new Intent(LandingActivity.this, Total.class);
-            intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
-            startActivity(intent);
-            finish();
-            return;
-        }
 
         Button button = findViewById(R.id.btn_Main_toLogin);
         button.setOnClickListener(view -> {

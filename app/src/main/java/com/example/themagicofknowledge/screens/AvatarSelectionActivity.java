@@ -49,6 +49,25 @@ public class AvatarSelectionActivity extends BaseActivity {
             String selectedAvatar = avatarNames.get(position);
             updateChildAvatarInFirebase(selectedAvatar);
         });
+
+        gvAvatars.setOnItemClickListener((parent, view, position, id) -> {
+            String selectedAvatar = avatarNames.get(position);
+
+            // ===== אנימציית "פעימה" יפה =====
+            view.animate()
+                    .scaleX(1.15f)
+                    .scaleY(1.15f)
+                    .setDuration(120)
+                    .withEndAction(() ->
+                            view.animate()
+                                    .scaleX(1.0f)
+                                    .scaleY(1.0f)
+                                    .setDuration(120)
+                                    .withEndAction(() -> updateChildAvatarInFirebase(selectedAvatar))
+                                    .start()
+                    )
+                    .start();
+        });
     }
 
     private void initAvatarList() {

@@ -4,76 +4,141 @@
     android:layout_width="320dp"
     android:layout_height="wrap_content"
     android:layout_gravity="center"
-    app:cardCornerRadius="24dp"
-    app:cardElevation="8dp">
+    app:cardBackgroundColor="#FFFFFF"
+    app:cardCornerRadius="28dp"
+    app:cardElevation="16dp">
 
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:background="@color/white"
         android:gravity="center"
         android:orientation="vertical"
-        android:padding="24dp">
+        android:padding="28dp">
 
-        <ImageView
-            android:id="@+id/ivStatusIcon"
-            android:layout_width="120dp"
-            android:layout_height="120dp"
+        <!-- ===== עיגול עם הגביע ===== -->
+        <androidx.cardview.widget.CardView
+            android:layout_width="130dp"
+            android:layout_height="130dp"
             android:layout_marginBottom="16dp"
-            android:src="@drawable/ic_trophy" />
+            app:cardBackgroundColor="#FFF8E1"
+            app:cardCornerRadius="65dp"
+            app:cardElevation="8dp">
 
-        <TextView
-            android:id="@+id/tvDialogTitle"
+            <ImageView
+                android:id="@+id/ivStatusIcon"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:contentDescription="גביע"
+                android:padding="20dp"
+                android:src="@drawable/ic_trophy" />
+
+        </androidx.cardview.widget.CardView>
+
+        <!-- ===== כותרת עם כוכבים ===== -->
+        <LinearLayout
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:fontFamily="@font/gan"
-            android:text="כל הכבוד!"
-            android:textColor="#FFFFFF"
-            android:textSize="26sp"
-            android:textStyle="bold" />
+            android:gravity="center"
+            android:orientation="horizontal">
 
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginEnd="8dp"
+                android:text="⭐"
+                android:textSize="20sp" />
+
+            <TextView
+                android:id="@+id/tvDialogTitle"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:fontFamily="@font/gan"
+                android:gravity="center"
+                android:shadowColor="#FFD54F"
+                android:shadowDx="2"
+                android:shadowDy="2"
+                android:shadowRadius="4"
+                android:text="כל הכבוד!"
+                android:textColor="#FF9800"
+                android:textSize="26sp"
+                android:textStyle="bold" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="8dp"
+                android:text="⭐"
+                android:textSize="20sp" />
+
+        </LinearLayout>
+
+        <!-- ===== הודעה ===== -->
         <TextView
             android:id="@+id/tvDialogMessage"
-            android:layout_width="wrap_content"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginTop="8dp"
+            android:layout_marginTop="6dp"
+            android:fontFamily="@font/varelaround"
             android:gravity="center"
+            android:lineSpacingExtra="2dp"
             android:text="סיימת את המבדק בהצלחה!"
-            android:textColor="#FFFFFF"
-            android:textSize="18sp" />
+            android:textColor="#5C6166"
+            android:textSize="15sp" />
 
-        <RatingBar
-            android:id="@+id/dialogRatingBar"
-            style="?android:attr/ratingBarStyleIndicator"
+        <!-- ===== כרטיס דירוג ===== -->
+        <androidx.cardview.widget.CardView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginTop="16dp"
-            android:numStars="5"
-            android:progressTint="#FFD700"
-            android:stepSize="1.0" />
+            app:cardBackgroundColor="#FFF8E1"
+            app:cardCornerRadius="20dp"
+            app:cardElevation="0dp">
 
+            <RatingBar
+                android:id="@+id/dialogRatingBar"
+                style="?android:attr/ratingBarStyleIndicator"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="12dp"
+                android:layout_marginTop="8dp"
+                android:layout_marginEnd="12dp"
+                android:layout_marginBottom="8dp"
+                android:numStars="5"
+                android:progressTint="#FF9800"
+                android:stepSize="1.0" />
+
+        </androidx.cardview.widget.CardView>
+
+        <!-- ===== כפתור ראשי - התחל לשחק ===== -->
         <com.google.android.material.button.MaterialButton
             android:id="@+id/btnDialogAction"
             android:layout_width="match_parent"
-            android:layout_height="60dp"
-            android:layout_marginTop="24dp"
-            android:text="התחל לשחק!"
-            android:textSize="18sp"
+            android:layout_height="56dp"
+            android:layout_marginTop="20dp"
+            android:fontFamily="@font/gan"
+            android:text="בוא נשחק! 🎮"
+            android:textColor="#FFFFFF"
+            android:textSize="17sp"
             android:textStyle="bold"
-            app:backgroundTint="#4CAF50"
-            app:cornerRadius="30dp" />
+            app:backgroundTint="#FF9800"
+            app:cornerRadius="28dp"
+            app:elevation="6dp" />
 
+        <!-- ===== כפתור משני - הישאר ברמה ===== -->
         <com.google.android.material.button.MaterialButton
             android:id="@+id/btnStayAtCurrentLevel"
             style="@style/Widget.MaterialComponents.Button.OutlinedButton"
             android:layout_width="match_parent"
-            android:layout_height="50dp"
-            android:layout_marginTop="12dp"
+            android:layout_height="48dp"
+            android:layout_marginTop="10dp"
+            android:fontFamily="@font/varelaround"
             android:text="אני רוצה להישאר ברמה שלי"
-            android:textColor="#4CAF50"
-            android:textSize="16sp"
-            app:cornerRadius="30dp"
-            app:strokeColor="#4CAF50" />
+            android:textColor="#1E5F8B"
+            android:textSize="14sp"
+            android:textStyle="bold"
+            app:cornerRadius="24dp"
+            app:strokeColor="#1E5F8B"
+            app:strokeWidth="1.5dp" />
 
     </LinearLayout>
 </androidx.cardview.widget.CardView>

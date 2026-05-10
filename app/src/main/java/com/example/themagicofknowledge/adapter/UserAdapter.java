@@ -1,8 +1,10 @@
 package com.example.themagicofknowledge.adapter;
 
 import android.view.LayoutInflater;
+import android.view.Menu;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.PopupMenu;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
@@ -11,15 +13,17 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.themagicofknowledge.R;
 import com.example.themagicofknowledge.models.UserParent;
-import com.google.android.material.chip.Chip;
+import com.google.android.material.button.MaterialButton;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 public class UserAdapter extends RecyclerView.Adapter<UserAdapter.ViewHolder> {
 
     private final List<UserParent> userList;
     private final OnUserClickListener onUserClickListener;
+
     public UserAdapter(@Nullable final OnUserClickListener onUserClickListener) {
         userList = new ArrayList<>();
         this.onUserClickListener = onUserClickListener;
@@ -37,11 +41,12 @@ public class UserAdapter extends RecyclerView.Adapter<UserAdapter.ViewHolder> {
         UserParent user = userList.get(position);
         if (user == null) return;
 
+        // שם מלא
         holder.tvName.setText(user.getFirstName() + " " + user.getLastName());
         holder.tvEmail.setText(user.getEmail());
         holder.tvPhone.setText(user.getPhone());
 
-        // Set initials
+        // ראשי תיבות
         String initials = "";
         if (user.getFirstName() != null && !user.getFirstName().isEmpty()) {
             initials += user.getFirstName().charAt(0);
@@ -49,22 +54,23 @@ public class UserAdapter extends RecyclerView.Adapter<UserAdapter.ViewHolder> {
         if (user.getLastName() != null && !user.getLastName().isEmpty()) {
             initials += user.getLastName().charAt(0);
         }
-        holder.tvInitials.setText(initials.toUpperCase());
+        holder.tvInitials.setText(initials);
 
-        // Show admin chip if user is admin
+        // הצגת תג "מנהל" אם המשתמש מנהל
         if (user.isAdmin()) {
             holder.chipRole.setVisibility(View.VISIBLE);
-            holder.chipRole.setText("Admin");
         } else {
             holder.chipRole.setVisibility(View.GONE);
         }
 
+        // לחיצה על הכרטיס
         holder.itemView.setOnClickListener(v -> {
             if (onUserClickListener != null) {
                 onUserClickListener.onUserClick(user);
             }
         });
 
+        // לחיצה ארוכה
         holder.itemView.setOnLongClickListener(v -> {
             if (onUserClickListener != null) {
                 onUserClickListener.onLongUserClick(user);
@@ -72,6 +78,45 @@ public class UserAdapter extends RecyclerView.Adapter<UserAdapter.ViewHolder> {
             return true;
         });
 
+        // ===== כפתור 3 הנקודות - תפריט פעולות =====
+        holder.btnUserActions.setOnClickListener(v -> {
+            PopupMenu popupMenu = new PopupMenu(v.getContext(), v);
+            popupMenu.inflate(R.menu.user_actions_menu);
+
+            // הסתרת אפשרויות לפי המצב
+            Menu menu = popupMenu.getMenu();
+            if (user.isAdmin()) {
+                // משתמש מנהל - מסתירים "הפוך למנהל"
+                menu.findItem(R.id.action_make_admin).setVisible(false);
+            } else {
+                // משתמש רגיל - מסתירים "הסר הרשאת מנהל"
+                menu.findItem(R.id.action_remove_admin).setVisible(false);
+            }
+
+            popupMenu.setOnMenuItemClickListener(item -> {
+                int id = item.getItemId();
+
+                if (id == R.id.action_make_admin) {
+                    if (onUserClickListener != null) {
+                        onUserClickListener.onMakeAdmin(user);
+                    }
+                    return true;
+                } else if (id == R.id.action_remove_admin) {
+                    if (onUserClickListener != null) {
+                        onUserClickListener.onRemoveAdmin(user);
+                    }
+                    return true;
+                } else if (id == R.id.action_delete) {
+                    if (onUserClickListener != null) {
+                        onUserClickListener.onDeleteUser(user);
+                    }
+                    return true;
+                }
+                return false;
+            });
+
+            popupMenu.show();
+        });
     }
 
     @Override
@@ -91,28 +136,41 @@ public class UserAdapter extends RecyclerView.Adapter<UserAdapter.ViewHolder> {
     }
 
     public void updateUser(UserParent user) {
-        int index = userList.indexOf(user);
-        if (index == -1) return;
-        userList.set(index, user);
-        notifyItemChanged(index);
+        if (user == null || user.getId() == null) return;
+        for (int i = 0; i < userList.size(); i++) {
+            if (Objects.equals(userList.get(i).getId(), user.getId())) {
+                userList.set(i, user);
+                notifyItemChanged(i);
+                return;
+            }
+        }
     }
 
     public void removeUser(UserParent user) {
-        int index = userList.indexOf(user);
-        if (index == -1) return;
-        userList.remove(index);
-        notifyItemRemoved(index);
+        if (user == null || user.getId() == null) return;
+        for (int i = 0; i < userList.size(); i++) {
+            if (Objects.equals(userList.get(i).getId(), user.getId())) {
+                userList.remove(i);
+                notifyItemRemoved(i);
+                return;
+            }
+        }
     }
 
+    // ===== Interface עם 5 פעולות =====
     public interface OnUserClickListener {
         void onUserClick(UserParent user);
-
         void onLongUserClick(UserParent user);
+        void onMakeAdmin(UserParent user);
+        void onRemoveAdmin(UserParent user);
+        void onDeleteUser(UserParent user);
     }
 
+    // ===== ViewHolder עם הכפתור החדש =====
     public static class ViewHolder extends RecyclerView.ViewHolder {
         TextView tvName, tvEmail, tvPhone, tvInitials;
-        Chip chipRole;
+        View chipRole;
+        MaterialButton btnUserActions;
 
         public ViewHolder(@NonNull View itemView) {
             super(itemView);
@@ -121,6 +179,7 @@ public class UserAdapter extends RecyclerView.Adapter<UserAdapter.ViewHolder> {
             tvPhone = itemView.findViewById(R.id.tv_item_user_phone);
             tvInitials = itemView.findViewById(R.id.tv_user_initials);
             chipRole = itemView.findViewById(R.id.chip_user_role);
+            btnUserActions = itemView.findViewById(R.id.btn_user_actions);
         }
     }
 }

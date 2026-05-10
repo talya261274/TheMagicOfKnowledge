@@ -98,14 +98,12 @@ public abstract class BaseActivity extends AppCompatActivity
             hideMenuItem(menu, R.id.nav_subjects);
             hideMenuItem(menu, R.id.nav_profile);
             hideMenuItem(menu, R.id.nav_progress);
-            hideMenuItem(menu, R.id.nav_change_child);
             hideMenuItem(menu, R.id.nav_mix);
             hideMenuItem(menu, R.id.nav_back_to_parent);
         } else if (currentChild != null) {
             // ילד - הוא נכנס למצב משחק (יש currentChild)
             hideMenuItem(menu, R.id.nav_profile);
             hideMenuItem(menu, R.id.nav_progress);
-            hideMenuItem(menu, R.id.nav_change_child);
             hideMenuItem(menu, R.id.nav_admin_users);
             hideMenuItem(menu, R.id.nav_logout);
             // nav_back_to_parent נשאר גלוי - הילד צריך אותו!
@@ -248,12 +246,17 @@ public abstract class BaseActivity extends AppCompatActivity
         // ניווט לדף הבית (Main)
         if (id == R.id.nav_home) {
             UserParent user = SharedPreferencesUtil.getUser(this);
+            UserChild currentChild = SharedPreferencesUtil.getCurrentChild(this);
             if (user != null && user.isAdmin()) {
                 navigateTo(AdminDashboardActivity.class);
-            } else {
+            }
+            else  if (currentChild != null) {
                 navigateTo(MainActivity.class);
             }
+            else
+                navigateTo(SelectChildActivity.class);
         }
+
         // ניווט לפרופיל הורה/משתמש
         else if (id == R.id.nav_subjects) {
             navigateTo(SelectSubjectActivity.class);
@@ -265,9 +268,6 @@ public abstract class BaseActivity extends AppCompatActivity
 
         } else if (id == R.id.nav_progress) {
             navigateTo(ParentTrackingActivity.class);
-
-        } else if (id == R.id.nav_change_child) {
-            navigateTo(SelectChildActivity.class);
 
         } else if (id == R.id.nav_mix) {
             navigateTo(MixedGameActivity.class);

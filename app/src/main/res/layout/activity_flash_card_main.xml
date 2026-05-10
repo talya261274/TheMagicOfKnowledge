@@ -1,127 +1,215 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@drawable/main_background"
-    android:gravity="center"
-    android:orientation="vertical"
-    android:padding="24dp">
+    android:background="@drawable/main_background">
 
-    <!-- כותרת עליונה -->
+    <!-- כפתור חזרה - בצד ימין -->
+    <com.google.android.material.button.MaterialButton
+        android:id="@+id/btnBackToSubjects"
+        style="@style/Widget.MaterialComponents.Button.Icon"
+        android:layout_width="50dp"
+        android:layout_height="50dp"
+        android:layout_marginEnd="25dp"
+        android:layout_marginTop="60dp"
+        android:insetLeft="0dp"
+        android:insetTop="0dp"
+        android:insetRight="0dp"
+        android:insetBottom="0dp"
+        android:text="➜"
+        android:gravity="center"
+        android:textColor="#1E5F8B"
+        android:textSize="24sp"
+        android:textStyle="bold"
+        app:backgroundTint="#FFFFFF"
+        app:cornerRadius="24dp"
+        app:elevation="6dp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <!-- מונה התקדמות - בצד שמאל -->
+    <androidx.cardview.widget.CardView
+        android:id="@+id/progressCard"
+        android:layout_width="wrap_content"
+        android:layout_height="50dp"
+        android:layout_marginStart="20dp"
+        android:layout_marginTop="60dp"
+        app:cardBackgroundColor="#FFFFFF"
+        app:cardCornerRadius="24dp"
+        app:cardElevation="6dp"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent">
+
+        <TextView
+            android:id="@+id/tvProgress"
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:fontFamily="@font/gan"
+            android:gravity="center"
+            android:paddingStart="16dp"
+            android:paddingEnd="16dp"
+            android:text="1 / 10"
+            android:textColor="#1E5F8B"
+            android:textSize="18sp"
+            android:textStyle="bold" />
+
+    </androidx.cardview.widget.CardView>
+
+    <!-- כותרת -->
+
+    <!-- כרטיס פלאשקארד -->
+
     <TextView
         android:id="@+id/tvTitle"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginBottom="70dp"
         android:fontFamily="@font/gan"
         android:gravity="center"
-        android:shadowColor="@android:color/holo_blue_light"
-        android:shadowDx="4"
-        android:shadowDy="4"
+        android:shadowColor="#65A2B8"
+        android:shadowDx="3"
+        android:shadowDy="3"
         android:shadowRadius="8"
         android:text="מי אני?"
         android:textColor="@color/white"
-        android:textSize="50sp"
-        android:textStyle="bold" />
+        android:textSize="44sp"
+        android:textStyle="bold"
+        app:layout_constraintBottom_toTopOf="@+id/card"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/btnBackToSubjects" />
 
-    <!-- כרטיס -->
     <com.google.android.material.card.MaterialCardView
         android:id="@+id/card"
-        android:layout_width="280dp"
-        android:layout_height="360dp"
-        android:layout_marginBottom="24dp"
+        android:layout_width="320dp"
+        android:layout_height="0dp"
+        android:layout_marginStart="24dp"
+        android:layout_marginEnd="24dp"
         android:clickable="true"
         android:focusable="true"
-        app:cardCornerRadius="20dp"
-        app:cardElevation="8dp">
+        app:cardBackgroundColor="#FFFFFF"
+        app:cardCornerRadius="32dp"
+        app:cardElevation="16dp"
+        app:layout_constraintBottom_toTopOf="@id/navigationLayout"
+        app:layout_constraintDimensionRatio="1:1.2"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/tvTitle">
 
         <FrameLayout
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:background="#80FFFFFF"
             android:padding="24dp">
 
-            <!-- תמונה -->
             <ImageView
                 android:id="@+id/imgCard"
-                android:layout_width="200dp"
-                android:layout_height="200dp"
-                android:layout_gravity="center"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:contentDescription="תמונת כרטיס"
+                android:scaleType="fitCenter"
                 android:visibility="visible" />
 
-            <!-- טקסט -->
             <TextView
                 android:id="@+id/tvCardText"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_gravity="center"
+                android:fontFamily="@font/gan"
                 android:gravity="center"
-                android:textColor="#000000"
-                android:textSize="40sp"
+                android:textColor="#1E5F8B"
+                android:textSize="48sp"
                 android:textStyle="bold"
                 android:visibility="gone" />
+
+            <com.google.android.material.floatingactionbutton.FloatingActionButton
+                android:id="@+id/btnPlaySound"
+                android:layout_width="56dp"
+                android:layout_height="56dp"
+                android:layout_gravity="bottom|center_horizontal"
+                android:contentDescription="השמע קול"
+                android:src="@drawable/ic_volume_up"
+                app:backgroundTint="#FF9800"
+                app:elevation="8dp"
+                app:tint="#FFFFFF" />
 
         </FrameLayout>
     </com.google.android.material.card.MaterialCardView>
 
     <!-- כפתורי ניווט -->
-
     <LinearLayout
-        android:layout_width="match_parent"
+        android:id="@+id/navigationLayout"
+        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginTop="10dp"
-        android:layout_marginBottom="20dp"
+        android:layout_marginTop="8dp"
+        android:layout_marginBottom="24dp"
         android:gravity="center"
-        android:orientation="horizontal">
+        android:orientation="horizontal"
+        app:layout_constraintBottom_toTopOf="@id/btnStartGame"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/card">
 
-        <ImageButton
+        <com.google.android.material.button.MaterialButton
             android:id="@+id/btnPrev"
-            android:layout_width="60dp"
-            android:layout_height="60dp"
-            android:background="@drawable/btn_movesides"
-            android:shadowColor="@android:color/holo_blue_light"
-            android:shadowDx="4"
-            android:shadowDy="4"
-            android:shadowRadius="8"
-            android:src="@drawable/ic_arrow_back" />
+            style="@style/Widget.MaterialComponents.Button.Icon"
+            android:layout_width="64dp"
+            android:layout_height="64dp"
+            android:insetLeft="0dp"
+            android:insetTop="0dp"
+            android:insetRight="0dp"
+            android:insetBottom="0dp"
+            app:backgroundTint="#FFFFFF"
+            app:cornerRadius="32dp"
+            app:elevation="8dp"
+            app:icon="@drawable/ic_arrow_back"
+            app:iconGravity="textStart"
+            app:iconPadding="0dp"
+            app:iconSize="32dp"
+            app:iconTint="#1E5F8B" />
 
         <View
-            android:layout_width="70dp"
-            android:layout_height="10dp" />
+            android:layout_width="40dp"
+            android:layout_height="1dp" />
 
-        <ImageButton
+        <com.google.android.material.button.MaterialButton
             android:id="@+id/btnNext"
-            android:layout_width="60dp"
-            android:layout_height="60dp"
-            android:background="@drawable/btn_movesides"
-            android:src="@drawable/ic_arrow_forward" />
+            style="@style/Widget.MaterialComponents.Button.Icon"
+            android:layout_width="64dp"
+            android:layout_height="64dp"
+            android:insetLeft="0dp"
+            android:insetTop="0dp"
+            android:insetRight="0dp"
+            android:insetBottom="0dp"
+            app:backgroundTint="#FFFFFF"
+            app:cornerRadius="32dp"
+            app:elevation="8dp"
+            app:icon="@drawable/ic_arrow_forward"
+            app:iconGravity="textStart"
+            app:iconPadding="0dp"
+            app:iconSize="32dp"
+            app:iconTint="#1E5F8B" />
+
     </LinearLayout>
 
-    <ImageButton
-        android:id="@+id/btnPlaySound"
-        android:layout_width="60dp"
-        android:layout_height="60dp"
-        android:layout_gravity="bottom|center_horizontal"
-        android:layout_marginBottom="16dp"
-        android:background="@drawable/btn_orange_selector"
-        android:contentDescription="Play Sound"
-        android:scaleType="centerInside"
-        android:src="@drawable/ic_volume_up"
-        android:visibility="gone" />
-
+    <!-- כפתור התחלת המשחק -->
     <com.google.android.material.button.MaterialButton
         android:id="@+id/btnStartGame"
-        android:layout_width="250dp"
-        android:layout_height="55dp"
-        android:layout_marginTop="10dp"
-        android:backgroundTint="#03A9F4"
+        android:layout_width="230dp"
+        android:layout_height="64dp"
+        android:layout_marginStart="24dp"
+        android:layout_marginEnd="24dp"
+        android:layout_marginBottom="80dp"
         android:fontFamily="@font/gan"
         android:text="בואו נשחק! 🎮"
-        android:textColor="@color/white"
+        android:textColor="#FFFFFF"
         android:textSize="22sp"
         android:textStyle="bold"
         android:visibility="gone"
-        app:cornerRadius="30dp" />
+        app:backgroundTint="#FF9800"
+        app:cornerRadius="32dp"
+        app:elevation="8dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent" />
 
-</LinearLayout>
+</androidx.constraintlayout.widget.ConstraintLayout>

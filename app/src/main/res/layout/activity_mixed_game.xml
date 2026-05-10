@@ -3,208 +3,487 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@drawable/main_background"
-    android:padding="12dp">
+    android:background="@drawable/main_background">
 
-    <ProgressBar
-        android:id="@+id/globalProgress"
-        style="@style/Widget.AppCompat.ProgressBar.Horizontal"
-        android:layout_width="match_parent"
+    <!-- ===== כרטיס פס התקדמות עם אייקון ===== -->
+    <androidx.cardview.widget.CardView
+        android:id="@+id/progressCard"
+        android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:layout_margin="16dp"
-        android:progressTint="#4CAF50"
-        app:layout_constraintTop_toTopOf="parent" />
+        android:layout_marginStart="20dp"
+        android:layout_marginTop="50dp"
+        android:layout_marginEnd="20dp"
+        app:cardBackgroundColor="#FFFFFF"
+        app:cardCornerRadius="20dp"
+        app:cardElevation="6dp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent">
 
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="center_vertical"
+            android:orientation="horizontal"
+            android:padding="12dp">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginEnd="10dp"
+                android:text="🎯"
+                android:textSize="22sp" />
+
+            <ProgressBar
+                android:id="@+id/globalProgress"
+                style="@android:style/Widget.ProgressBar.Horizontal"
+                android:layout_width="0dp"
+                android:layout_height="10dp"
+                android:layout_weight="1"
+                android:max="100"
+                android:progress="0"
+                android:progressDrawable="@drawable/progress_bar_colorful" />
+
+            <TextView
+                android:id="@+id/tvProgressText"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="10dp"
+                android:fontFamily="@font/gan"
+                android:text="0%"
+                android:textColor="#FF9800"
+                android:textSize="14sp"
+                android:textStyle="bold" />
+
+        </LinearLayout>
+    </androidx.cardview.widget.CardView>
+
+    <!-- ===== כותרת השאלה ===== -->
     <TextView
         android:id="@+id/tvMixedQuestionTitle"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginTop="10dp"
+        android:layout_marginTop="20dp"
         android:fontFamily="@font/gan"
         android:gravity="center"
-        android:textColor="@color/white"
-        android:textSize="26sp"
+        android:shadowColor="#65A2B8"
+        android:shadowDx="3"
+        android:shadowDy="3"
+        android:shadowRadius="8"
+        android:text="האזינו לשאלה 🎧"
+        android:textColor="#FFFFFF"
+        android:textSize="30sp"
         android:textStyle="bold"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/globalProgress" />
+        app:layout_constraintTop_toBottomOf="@id/progressCard" />
 
-    <LinearLayout
-        android:id="@+id/containerSelection"
-        android:layout_width="match_parent"
+    <!-- ===== מחזיק לתצוגות השונות ===== -->
+    <FrameLayout
+        android:id="@+id/contentArea"
+        android:layout_width="0dp"
         android:layout_height="0dp"
-        android:orientation="vertical"
-        android:visibility="gone"
+        android:layout_marginStart="20dp"
+        android:layout_marginTop="20dp"
+        android:layout_marginEnd="20dp"
+        android:layout_marginBottom="24dp"
         app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/tvMixedQuestionTitle">
 
-        <FrameLayout
+        <!-- ============================================== -->
+        <!-- ===== מצב 1: בחירה (אודיו/תמונה) ===== -->
+        <!-- ============================================== -->
+        <LinearLayout
+            android:id="@+id/containerSelection"
             android:layout_width="match_parent"
-            android:layout_height="200dp">
+            android:layout_height="match_parent"
+            android:orientation="vertical"
+            android:visibility="gone">
 
-            <com.google.android.material.button.MaterialButton
-                android:id="@+id/btnMixedPlayAudio"
-                android:layout_width="100dp"
-                android:layout_height="100dp"
-                android:layout_gravity="center"
-                app:cornerRadius="50dp"
-                app:icon="@drawable/ic_volume_up"
-                app:iconSize="50dp" />
+            <!-- אזור התמונה/כפתור אודיו -->
+            <FrameLayout
+                android:layout_width="match_parent"
+                android:layout_height="180dp"
+                android:layout_marginBottom="20dp">
 
-            <ImageView
-                android:id="@+id/ivMixedImage"
+                <!-- עיגול רקע מאחורי כפתור האודיו (אפקט הילה) -->
+                <View
+                    android:layout_width="160dp"
+                    android:layout_height="160dp"
+                    android:layout_gravity="center"
+                    android:alpha="0.3"
+                    android:background="@drawable/circle_glow" />
+
+                <!-- כפתור אודיו - גדול וצף -->
+                <com.google.android.material.button.MaterialButton
+                    android:id="@+id/btnMixedPlayAudio"
+                    android:layout_width="140dp"
+                    android:layout_height="140dp"
+                    android:layout_gravity="center"
+                    android:insetLeft="0dp"
+                    android:insetTop="0dp"
+                    android:insetRight="0dp"
+                    android:insetBottom="0dp"
+                    app:backgroundTint="#FFFFFF"
+                    app:cornerRadius="70dp"
+                    app:elevation="20dp"
+                    app:icon="@drawable/ic_volume_up"
+                    app:iconGravity="textStart"
+                    app:iconPadding="0dp"
+                    app:iconSize="70dp"
+                    app:iconTint="#FF9800"
+                    app:rippleColor="#FFE0B2" />
+
+                <!-- תמונה (כשמצב IMAGE) -->
+                <androidx.cardview.widget.CardView
+                    android:id="@+id/imageCardContainer"
+                    android:layout_width="180dp"
+                    android:layout_height="180dp"
+                    android:layout_gravity="center"
+                    android:visibility="gone"
+                    app:cardBackgroundColor="#FFFFFF"
+                    app:cardCornerRadius="24dp"
+                    app:cardElevation="12dp">
+
+                    <ImageView
+                        android:id="@+id/ivMixedImage"
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:contentDescription="תמונת שאלה"
+                        android:padding="16dp"
+                        android:scaleType="fitCenter" />
+
+                </androidx.cardview.widget.CardView>
+
+            </FrameLayout>
+
+            <!-- 4 כפתורי תשובה -->
+            <GridLayout
+                android:layout_width="match_parent"
+                android:layout_height="0dp"
+                android:layout_weight="1"
+                android:columnCount="2"
+                android:rowCount="2">
+
+                <!-- תשובה 1 - כתום -->
+                <com.google.android.material.card.MaterialCardView
+                    android:layout_width="0dp"
+                    android:layout_height="0dp"
+                    android:layout_columnWeight="1"
+                    android:layout_margin="6dp"
+                    android:layout_rowWeight="1"
+                    app:cardBackgroundColor="@android:color/transparent"
+                    app:cardCornerRadius="24dp"
+                    app:cardElevation="10dp">
+
+                    <com.google.android.material.button.MaterialButton
+                        android:id="@+id/btnAns1"
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:fontFamily="@font/gan"
+                        android:insetLeft="0dp"
+                        android:insetTop="0dp"
+                        android:insetRight="0dp"
+                        android:insetBottom="0dp"
+                        android:padding="8dp"
+                        android:textColor="#FFFFFF"
+                        android:textSize="22sp"
+                        android:textStyle="bold"
+                        app:backgroundTint="@color/answer_orange"
+                        app:cornerRadius="24dp"
+                        app:iconGravity="top"
+                        app:iconPadding="0dp"
+                        app:iconSize="80dp"
+                        app:iconTint="@null"
+                        app:rippleColor="#FFE0B2" />
+
+                </com.google.android.material.card.MaterialCardView>
+
+                <!-- תשובה 2 - ירוק -->
+                <com.google.android.material.card.MaterialCardView
+                    android:layout_width="0dp"
+                    android:layout_height="0dp"
+                    android:layout_columnWeight="1"
+                    android:layout_margin="6dp"
+                    android:layout_rowWeight="1"
+                    app:cardBackgroundColor="@android:color/transparent"
+                    app:cardCornerRadius="24dp"
+                    app:cardElevation="10dp">
+
+                    <com.google.android.material.button.MaterialButton
+                        android:id="@+id/btnAns2"
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:fontFamily="@font/gan"
+                        android:insetLeft="0dp"
+                        android:insetTop="0dp"
+                        android:insetRight="0dp"
+                        android:insetBottom="0dp"
+                        android:padding="8dp"
+                        android:textColor="#FFFFFF"
+                        android:textSize="22sp"
+                        android:textStyle="bold"
+                        app:backgroundTint="@color/answer_green"
+                        app:cornerRadius="24dp"
+                        app:iconGravity="top"
+                        app:iconPadding="0dp"
+                        app:iconSize="80dp"
+                        app:iconTint="@null"
+                        app:rippleColor="#C8E6C9" />
+
+                </com.google.android.material.card.MaterialCardView>
+
+                <!-- תשובה 3 - כחול -->
+                <com.google.android.material.card.MaterialCardView
+                    android:layout_width="0dp"
+                    android:layout_height="0dp"
+                    android:layout_columnWeight="1"
+                    android:layout_margin="6dp"
+                    android:layout_rowWeight="1"
+                    app:cardBackgroundColor="@android:color/transparent"
+                    app:cardCornerRadius="24dp"
+                    app:cardElevation="10dp">
+
+                    <com.google.android.material.button.MaterialButton
+                        android:id="@+id/btnAns3"
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:fontFamily="@font/gan"
+                        android:insetLeft="0dp"
+                        android:insetTop="0dp"
+                        android:insetRight="0dp"
+                        android:insetBottom="0dp"
+                        android:padding="8dp"
+                        android:textColor="#FFFFFF"
+                        android:textSize="22sp"
+                        android:textStyle="bold"
+                        app:backgroundTint="@color/answer_blue"
+                        app:cornerRadius="24dp"
+                        app:iconGravity="top"
+                        app:iconPadding="0dp"
+                        app:iconSize="80dp"
+                        app:iconTint="@null"
+                        app:rippleColor="#BBDEFB" />
+
+                </com.google.android.material.card.MaterialCardView>
+
+                <!-- תשובה 4 - ורוד -->
+                <com.google.android.material.card.MaterialCardView
+                    android:layout_width="0dp"
+                    android:layout_height="0dp"
+                    android:layout_columnWeight="1"
+                    android:layout_margin="6dp"
+                    android:layout_rowWeight="1"
+                    app:cardBackgroundColor="@android:color/transparent"
+                    app:cardCornerRadius="24dp"
+                    app:cardElevation="10dp">
+
+                    <com.google.android.material.button.MaterialButton
+                        android:id="@+id/btnAns4"
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:fontFamily="@font/gan"
+                        android:insetLeft="0dp"
+                        android:insetTop="0dp"
+                        android:insetRight="0dp"
+                        android:insetBottom="0dp"
+                        android:padding="8dp"
+                        android:textColor="#FFFFFF"
+                        android:textSize="22sp"
+                        android:textStyle="bold"
+                        app:backgroundTint="@color/answer_pink"
+                        app:cornerRadius="24dp"
+                        app:iconGravity="top"
+                        app:iconPadding="0dp"
+                        app:iconSize="80dp"
+                        app:iconTint="@null"
+                        app:rippleColor="#F8BBD0" />
+
+                </com.google.android.material.card.MaterialCardView>
+
+            </GridLayout>
+
+        </LinearLayout>
+
+        <!-- ============================================== -->
+        <!-- ===== מצב 2: התאמת זוגות ===== -->
+        <!-- ============================================== -->
+        <androidx.cardview.widget.CardView
+            android:id="@+id/containerMatching"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:visibility="gone"
+            app:cardBackgroundColor="#FFFFFF"
+            app:cardCornerRadius="24dp"
+            app:cardElevation="10dp">
+
+            <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
-                android:scaleType="centerInside"
-                android:visibility="gone" />
-        </FrameLayout>
+                android:orientation="horizontal"
+                android:padding="16dp">
 
-        <GridLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:alignmentMode="alignMargins"
-            android:columnCount="2"
-            android:rowCount="2">
+                <LinearLayout
+                    android:id="@+id/mixedLeftColumn"
+                    android:layout_width="0dp"
+                    android:layout_height="match_parent"
+                    android:layout_weight="1"
+                    android:gravity="center"
+                    android:orientation="vertical"
+                    android:padding="6dp" />
 
-            <com.google.android.material.button.MaterialButton
-                android:id="@+id/btnAns1"
-                style="@style/Widget.MaterialComponents.Button.OutlinedButton"
-                android:layout_width="0dp"
-                android:layout_height="140dp"
-                android:layout_columnWeight="1"
-                android:layout_margin="8dp"
-                app:strokeColor="@color/white"
-                app:strokeWidth="2dp" />
+                <View
+                    android:layout_width="2dp"
+                    android:layout_height="match_parent"
+                    android:background="#dafaff" />
 
-            <com.google.android.material.button.MaterialButton
-                android:id="@+id/btnAns2"
-                style="@style/Widget.MaterialComponents.Button.OutlinedButton"
-                android:layout_width="0dp"
-                android:layout_height="140dp"
-                android:layout_columnWeight="1"
-                android:layout_margin="8dp"
-                app:strokeColor="@color/white"
-                app:strokeWidth="2dp" />
+                <LinearLayout
+                    android:id="@+id/mixedRightColumn"
+                    android:layout_width="0dp"
+                    android:layout_height="match_parent"
+                    android:layout_weight="1"
+                    android:gravity="center"
+                    android:orientation="vertical"
+                    android:padding="6dp" />
 
-            <com.google.android.material.button.MaterialButton
-                android:id="@+id/btnAns3"
-                style="@style/Widget.MaterialComponents.Button.OutlinedButton"
-                android:layout_width="0dp"
-                android:layout_height="140dp"
-                android:layout_columnWeight="1"
-                android:layout_margin="8dp"
-                app:strokeColor="@color/white"
-                app:strokeWidth="2dp" />
+            </LinearLayout>
+        </androidx.cardview.widget.CardView>
 
-            <com.google.android.material.button.MaterialButton
-                android:id="@+id/btnAns4"
-                style="@style/Widget.MaterialComponents.Button.OutlinedButton"
-                android:layout_width="0dp"
-                android:layout_height="140dp"
-                android:layout_columnWeight="1"
-                android:layout_margin="8dp"
-                app:strokeColor="@color/white"
-                app:strokeWidth="2dp" />
-        </GridLayout>
-    </LinearLayout>
-
-    <LinearLayout
-        android:id="@+id/containerMatching"
-        android:layout_width="match_parent"
-        android:layout_height="0dp"
-        android:orientation="horizontal"
-        android:padding="8dp"
-        android:visibility="gone"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/tvMixedQuestionTitle">
-
+        <!-- ============================================== -->
+        <!-- ===== מצב 3: השלמת משפט ===== -->
+        <!-- ============================================== -->
         <LinearLayout
-            android:id="@+id/mixedLeftColumn"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:gravity="center"
-            android:orientation="vertical" />
-
-        <LinearLayout
-            android:id="@+id/mixedRightColumn"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:gravity="center"
-            android:orientation="vertical" />
-    </LinearLayout>
-
-    <LinearLayout
-        android:id="@+id/containerSentence"
-        android:layout_width="match_parent"
-        android:layout_height="0dp"
-        android:gravity="center_horizontal"
-        android:orientation="vertical"
-        android:visibility="gone"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/tvMixedQuestionTitle">
-
-        <ImageView
-            android:id="@+id/ivMixedSentenceHint"
-            android:layout_width="160dp"
-            android:layout_height="120dp"
-            android:layout_marginTop="10dp" />
-
-        <TextView
-            android:id="@+id/tvMixedSentenceText"
+            android:id="@+id/containerSentence"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_margin="10dp"
-            android:gravity="center"
-            android:textColor="@color/white"
-            android:textSize="24sp" />
+            android:layout_height="match_parent"
+            android:orientation="vertical"
+            android:visibility="gone">
 
-        <EditText
-            android:id="@+id/etMixedAnswer"
-            android:layout_width="250dp"
-            android:layout_height="wrap_content"
-            android:backgroundTint="@color/white"
-            android:focusable="false"
-            android:gravity="center"
-            android:hint="הקלד כאן..."
-            android:textColor="@color/white" />
+            <!-- כרטיס למעלה - תמונה ומשפט -->
+            <androidx.cardview.widget.CardView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                app:cardBackgroundColor="#FFFFFF"
+                app:cardCornerRadius="24dp"
+                app:cardElevation="10dp">
 
-        <Button
-            android:id="@+id/btnCheck"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_margin="5dp"
-            android:backgroundTint="#4CAF50"
-            android:text="בדוק תשובה" />
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:gravity="center"
+                    android:orientation="vertical"
+                    android:padding="16dp">
 
-        <GridView
-            android:id="@+id/mixedKeyboard"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="10dp"
-            android:gravity="center"
-            android:numColumns="7" />
-    </LinearLayout>
+                    <!-- תמונת רמז בעיגול תכלת -->
+                    <androidx.cardview.widget.CardView
+                        android:layout_width="120dp"
+                        android:layout_height="120dp"
+                        app:cardBackgroundColor="#dafaff"
+                        app:cardCornerRadius="60dp"
+                        app:cardElevation="6dp">
 
-    <LinearLayout
-        android:id="@+id/containerMemory"
-        android:layout_width="match_parent"
-        android:layout_height="0dp"
-        android:orientation="vertical"
-        android:visibility="gone"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/tvMixedQuestionTitle">
+                        <ImageView
+                            android:id="@+id/ivMixedSentenceHint"
+                            android:layout_width="match_parent"
+                            android:layout_height="match_parent"
+                            android:contentDescription="רמז"
+                            android:padding="14dp"
+                            android:scaleType="centerInside" />
 
+                    </androidx.cardview.widget.CardView>
+
+                    <!-- המשפט להשלמה -->
+                    <TextView
+                        android:id="@+id/tvMixedSentenceText"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="14dp"
+                        android:fontFamily="@font/gan"
+                        android:gravity="center"
+                        android:textColor="#1E5F8B"
+                        android:textSize="22sp"
+                        android:textStyle="bold" />
+
+                </LinearLayout>
+            </androidx.cardview.widget.CardView>
+
+            <!-- שדה תשובה -->
+            <com.google.android.material.card.MaterialCardView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="12dp"
+                app:cardBackgroundColor="#FFFFFF"
+                app:cardCornerRadius="20dp"
+                app:cardElevation="8dp"
+                app:strokeColor="#FF9800"
+                app:strokeWidth="2dp">
+
+                <EditText
+                    android:id="@+id/etMixedAnswer"
+                    android:layout_width="match_parent"
+                    android:layout_height="60dp"
+                    android:background="@android:color/transparent"
+                    android:focusable="false"
+                    android:fontFamily="@font/gan"
+                    android:gravity="center"
+                    android:hint="הקלידו כאן..."
+                    android:textColor="#1E5F8B"
+                    android:textColorHint="#9E9E9E"
+                    android:textSize="22sp"
+                    android:textStyle="bold" />
+
+            </com.google.android.material.card.MaterialCardView>
+
+            <!-- כפתור בדיקה -->
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/btnCheck"
+                android:layout_width="match_parent"
+                android:layout_height="54dp"
+                android:layout_marginTop="12dp"
+                android:fontFamily="@font/gan"
+                android:text="בדקו תשובה ✓"
+                android:textColor="#FFFFFF"
+                android:textSize="18sp"
+                android:textStyle="bold"
+                app:backgroundTint="#4CAF50"
+                app:cornerRadius="27dp"
+                app:elevation="8dp" />
+
+            <!-- מקלדת -->
+            <GridView
+                android:id="@+id/mixedKeyboard"
+                android:layout_width="match_parent"
+                android:layout_height="0dp"
+                android:layout_marginTop="12dp"
+                android:layout_weight="1"
+                android:gravity="center"
+                android:numColumns="7" />
+
+        </LinearLayout>
+
+        <!-- ============================================== -->
+        <!-- ===== מצב 4: משחק זיכרון ===== -->
+        <!-- ============================================== -->
         <GridView
             android:id="@+id/gvMemoryBoard"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:gravity="center"
-            android:horizontalSpacing="8dp"
+            android:horizontalSpacing="12dp"
             android:numColumns="3"
-            android:padding="5dp"
-            android:verticalSpacing="8dp" />
-    </LinearLayout>
+            android:stretchMode="columnWidth"
+            android:verticalSpacing="12dp"
+            android:visibility="gone" />
+
+        <LinearLayout
+            android:id="@+id/containerMemory"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:orientation="vertical"
+            android:visibility="gone" />
+
+    </FrameLayout>
 
 </androidx.constraintlayout.widget.ConstraintLayout>

@@ -141,14 +141,23 @@ public class LoginActivity extends BaseActivity implements View.OnClickListener 
         });
 
         // ===== כפתור "שכחתי סיסמה" =====
-        // TextView - טקסט שניתן ללחוץ עליו (כמו קישור)
         TextView tvForgotPassword = findViewById(R.id.tvForgotPassword);
 
         tvForgotPassword.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                // מעבר למסך השחזור סיסמה
                 Intent intent = new Intent(LoginActivity.this, ForgotPasswordActivity.class);
+                startActivity(intent);
+            }
+        });
+
+        // ===== כפתור "הירשמו עכשיו" =====
+        TextView tvSignUp = findViewById(R.id.tvSignUp);
+
+        tvSignUp.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Intent intent = new Intent(LoginActivity.this, RegisterActivity.class);
                 startActivity(intent);
             }
         });

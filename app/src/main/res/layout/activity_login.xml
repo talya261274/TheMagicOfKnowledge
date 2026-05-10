@@ -4,131 +4,228 @@
     android:id="@+id/login"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@drawable/main_background"
-    android:padding="24dp">
+    android:background="@drawable/main_background">
 
-    <Button
+    <!-- כפתור חזרה  -->
+    <com.google.android.material.button.MaterialButton
         android:id="@+id/goBackBtn"
         android:layout_width="81dp"
         android:layout_height="56dp"
+        android:layout_marginStart="20dp"
+        android:layout_marginTop="16dp"
+        android:layoutDirection="rtl"
         android:backgroundTint="@android:color/transparent"
         android:text="➜"
-        android:textColor="@color/white"
-        android:textSize="22dp"
+        android:textColor="#1E5F8B"
+        android:textSize="24dp"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
+
+    <!-- אייקון/לוגו עגול עם רקע לבן -->
+    <androidx.cardview.widget.CardView
+        android:id="@+id/logoCard"
+        android:layout_width="100dp"
+        android:layout_height="100dp"
+        android:layout_marginTop="60dp"
+        app:cardBackgroundColor="#FFFFFF"
+        app:cardCornerRadius="50dp"
+        app:cardElevation="12dp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent">
+
+        <ImageView
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:src="@drawable/logo"
+            android:contentDescription="לוגו" />
+    </androidx.cardview.widget.CardView>
 
     <!-- כותרת -->
     <TextView
         android:id="@+id/tvLoginTitle"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginTop="60dp"
+        android:layout_marginTop="20dp"
         android:fontFamily="@font/gan"
         android:shadowColor="#65A2B8"
-        android:shadowDx="5"
-        android:shadowDy="5"
-        android:shadowRadius="10"
-        android:text="התחברות"
+        android:shadowDx="3"
+        android:shadowDy="3"
+        android:shadowRadius="8"
+        android:text="ברוכים השבים!"
         android:textColor="@color/white"
-        android:textSize="40sp"
+        android:textSize="36sp"
         android:textStyle="bold"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+        app:layout_constraintTop_toBottomOf="@id/logoCard" />
 
-    <!-- שם משתמש -->
-
-    <!-- סיסמה -->
-
-    <!-- כפתור התחברות -->
-    <com.google.android.material.textfield.TextInputLayout
-        android:id="@+id/usernameLogin"
-        style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
-        android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        android:layout_marginStart="16dp"
-        android:layout_marginTop="44dp"
-        android:layout_marginEnd="16dp"
-        android:hint="שם משתמש"
-        app:boxBackgroundColor="#66FFFFFF"
-        app:boxBackgroundMode="outline"
-        app:hintTextColor="#5C6166"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.0"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/tvLoginTitle">
-
-        <com.google.android.material.textfield.TextInputEditText
-            android:id="@+id/et_login_user_name"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:inputType="text" />
-    </com.google.android.material.textfield.TextInputLayout>
-
-    <!-- שכחתי סיסמה -->
-    <com.google.android.material.textfield.TextInputLayout
-        android:id="@+id/passwordLogin"
-        style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
-        android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        android:layout_marginStart="16dp"
-        android:layout_marginTop="36dp"
-        android:layout_marginEnd="16dp"
-        android:hint="סיסמה"
-        app:boxBackgroundColor="#66FFFFFF"
-        app:boxBackgroundMode="outline"
-        app:endIconMode="password_toggle"
-        app:hintTextColor="#5C6166"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="1.0"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/usernameLogin">
-
-        <com.google.android.material.textfield.TextInputEditText
-            android:id="@+id/et_login_password"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:inputType="textPassword" />
-    </com.google.android.material.textfield.TextInputLayout>
-
-    <!-- כפתור חזרה -->
-
-    <com.google.android.material.button.MaterialButton
-        android:id="@+id/btn_login_login"
-        android:layout_width="206dp"
-        android:layout_height="49dp"
-        android:layout_marginTop="72dp"
-        android:background="@drawable/btn_blue_selector"
-        android:elevation="8dp"
-        android:maxWidth="488dp"
-        android:text="התחבר"
-        android:textColor="#FFFFFF"
-        android:textSize="18sp"
-        android:textStyle="bold"
-        app:backgroundTint="@null"
-        app:cornerRadius="50dp"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.496"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/passwordLogin" />
-
+    <!-- כותרת משנה -->
     <TextView
-        android:id="@+id/tvForgotPassword"
+        android:id="@+id/tvLoginSubtitle"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginTop="56dp"
-        android:clickable="true"
-        android:focusable="true"
-        android:gravity="center"
-        android:padding="8dp"
-        android:text="שכחתי סיסמה?"
-        android:textColor="@color/black"
+        android:layout_marginTop="4dp"
+        android:fontFamily="@font/varelaround"
+        android:text="שמחים לראות אתכם שוב 🪄"
+        android:textColor="#FFFFFF"
         android:textSize="16sp"
-        android:textStyle="bold"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.497"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/btn_login_login" />
+        app:layout_constraintTop_toBottomOf="@id/tvLoginTitle" />
+
+    <!-- כרטיס לבן עם השדות -->
+    <androidx.cardview.widget.CardView
+        android:id="@+id/loginCard"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="20dp"
+        android:layout_marginTop="32dp"
+        android:layout_marginEnd="20dp"
+        app:cardBackgroundColor="#FFFFFF"
+        app:cardCornerRadius="24dp"
+        app:cardElevation="12dp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/tvLoginSubtitle">
+
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:padding="24dp">
+
+            <!-- שם משתמש -->
+            <com.google.android.material.textfield.TextInputLayout
+                android:id="@+id/usernameLogin"
+                style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:hint="שם משתמש"
+                app:boxBackgroundColor="#F8F9FB"
+                app:boxCornerRadiusBottomEnd="16dp"
+                app:boxCornerRadiusBottomStart="16dp"
+                app:boxCornerRadiusTopEnd="16dp"
+                app:boxCornerRadiusTopStart="16dp"
+                app:boxStrokeColor="#1E5F8B"
+                app:boxStrokeWidth="1.5dp"
+                app:hintTextColor="#1E5F8B"
+                app:startIconTint="#1E5F8B"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent">
+
+                <com.google.android.material.textfield.TextInputEditText
+                    android:id="@+id/et_login_user_name"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:fontFamily="@font/varelaround"
+                    android:inputType="text"
+                    android:textColor="#2C3E50"
+                    android:textSize="16sp" />
+            </com.google.android.material.textfield.TextInputLayout>
+
+            <!-- סיסמה -->
+            <com.google.android.material.textfield.TextInputLayout
+                android:id="@+id/passwordLogin"
+                style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="16dp"
+                android:hint="סיסמה"
+                app:boxBackgroundColor="#F8F9FB"
+                app:boxCornerRadiusBottomEnd="16dp"
+                app:boxCornerRadiusBottomStart="16dp"
+                app:boxCornerRadiusTopEnd="16dp"
+                app:boxCornerRadiusTopStart="16dp"
+                app:boxStrokeColor="#1E5F8B"
+                app:boxStrokeWidth="1.5dp"
+                app:endIconMode="password_toggle"
+                app:endIconTint="#1E5F8B"
+                app:hintTextColor="#1E5F8B"
+                app:startIconTint="#1E5F8B"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/usernameLogin">
+
+                <com.google.android.material.textfield.TextInputEditText
+                    android:id="@+id/et_login_password"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:fontFamily="@font/varelaround"
+                    android:inputType="textPassword"
+                    android:textColor="#2C3E50"
+                    android:textSize="16sp" />
+            </com.google.android.material.textfield.TextInputLayout>
+
+            <!-- שכחתי סיסמה -->
+            <TextView
+                android:id="@+id/tvForgotPassword"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="12dp"
+                android:clickable="true"
+                android:focusable="true"
+                android:gravity="start"
+                android:fontFamily="@font/varelaround"
+                android:padding="8dp"
+                android:text="שכחתי סיסמה?"
+                android:textColor="#1E5F8B"
+                android:textSize="14sp"
+                android:textStyle="bold"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/passwordLogin" />
+
+            <!-- כפתור התחברות -->
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/btn_login_login"
+                android:layout_width="match_parent"
+                android:layout_height="56dp"
+                android:layout_marginTop="20dp"
+                android:fontFamily="@font/gan"
+                android:text="התחבר"
+                android:textColor="#FFFFFF"
+                android:textSize="20sp"
+                android:textStyle="bold"
+                app:backgroundTint="#1E5F8B"
+                app:cornerRadius="28dp"
+                app:elevation="6dp"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/tvForgotPassword" />
+
+        </androidx.constraintlayout.widget.ConstraintLayout>
+    </androidx.cardview.widget.CardView>
+
+    <!-- שורה תחתונה - אין לך חשבון? -->
+    <LinearLayout
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="32dp"
+        android:gravity="center"
+        android:orientation="horizontal"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent">
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:fontFamily="@font/varelaround"
+            android:text="עדיין לא נרשמת? "
+            android:textColor="#FFFFFF"
+            android:textSize="14sp" />
+
+        <TextView
+            android:id="@+id/tvSignUp"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:clickable="true"
+            android:focusable="true"
+            android:fontFamily="@font/varelaround"
+            android:text="הירשמו עכשיו"
+            android:textColor="#FFE082"
+            android:textSize="14sp"
+            android:textStyle="bold" />
+    </LinearLayout>
 
 </androidx.constraintlayout.widget.ConstraintLayout>

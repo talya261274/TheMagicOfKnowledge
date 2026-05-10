@@ -4,40 +4,46 @@
     android:id="@+id/cardContainer"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    app:cardCornerRadius="12dp"
-    app:cardElevation="3dp"
+    app:cardCornerRadius="20dp"
+    app:cardElevation="8dp"
     app:cardUseCompatPadding="true">
 
     <FrameLayout
         android:id="@+id/cardBackground"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:background="#7091AF">
+        android:background="@drawable/card_back_gradient">
 
-        <ImageView
+        <!-- גב הקלף - אייקון ✨ במרכז -->
+        <TextView
             android:id="@+id/ivCardBack"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:scaleType="centerCrop"
-            android:src="@drawable/ss_card_back" />
+            android:gravity="center"
+            android:text="✨"
+            android:textSize="40sp" />
 
+        <!-- תמונה -->
         <ImageView
             android:id="@+id/cardImage"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:padding="12dp"
+            android:background="#FFFFFF"
+            android:padding="14dp"
             android:scaleType="centerInside"
             android:visibility="gone" />
 
+        <!-- טקסט -->
         <TextView
             android:id="@+id/cardText"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
+            android:background="#FFFFFF"
             android:fontFamily="@font/gan"
             android:gravity="center"
-            android:padding="4dp"
-            android:textColor="#333333"
-            android:textSize="18sp"
+            android:padding="8dp"
+            android:textColor="#1E5F8B"
+            android:textSize="22sp"
             android:textStyle="bold"
             android:visibility="gone" />
 

@@ -6,70 +6,149 @@
     android:layout_height="match_parent"
     android:layoutDirection="rtl">
 
-    <TextView
-        android:id="@+id/textView"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="android:background=&quot;#E0F7FA&quot;" />
-
-    <LinearLayout
+    <!-- ===== המסך הראשי ===== -->
+    <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:background="@drawable/main_background"
-        android:gravity="center"
-        android:orientation="vertical"
-        android:padding="20dp">
+        android:background="@drawable/main_background">
 
-        <Space
-            android:layout_width="match_parent"
-            android:layout_height="0dp"
-            android:layout_weight="1" />
+        <!-- כוכב נוצץ למעלה משמאל -->
+        <TextView
+            android:id="@+id/star1"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="40dp"
+            android:layout_marginTop="100dp"
+            android:alpha="0.8"
+            android:text="✨"
+            android:textSize="32sp"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
 
-        <ImageView
-            android:id="@+id/ivWelcomeAvatar"
-            android:layout_width="150dp"
-            android:layout_height="150dp"
-            android:layout_marginBottom="20dp"
-            android:src="@drawable/wizard_placeholder" />
+        <!-- כוכב נוצץ למעלה ימין -->
+        <TextView
+            android:id="@+id/star2"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="80dp"
+            android:layout_marginEnd="50dp"
+            android:alpha="0.7"
+            android:text="⭐"
+            android:textSize="28sp"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
 
+        <!-- אווטר עם כרטיס לבן וצל -->
+        <androidx.cardview.widget.CardView
+            android:id="@+id/avatarCard"
+            android:layout_width="180dp"
+            android:layout_height="180dp"
+            app:cardBackgroundColor="#F6EBF3"
+            app:cardCornerRadius="32dp"
+            app:cardElevation="16dp"
+            app:layout_constraintBottom_toTopOf="@+id/tvWelcomeChild"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintVertical_chainStyle="packed">
+
+            <ImageView
+                android:id="@+id/ivWelcomeAvatar"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:padding="12dp"
+                android:scaleType="centerCrop"
+                android:src="@drawable/wizard_placeholder"
+                android:contentDescription="אווטאר" />
+
+        </androidx.cardview.widget.CardView>
+
+        <!-- ברכה אישית -->
         <TextView
             android:id="@+id/tvWelcomeChild"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginBottom="10dp"
+            android:layout_marginTop="32dp"
+            android:fontFamily="@font/gan"
+            android:shadowColor="#65A2B8"
+            android:shadowDx="3"
+            android:shadowDy="3"
+            android:shadowRadius="8"
             android:text="שלום יהלי!"
-            android:fontFamily="@font/yehudaclm"
-            android:textColor="#4B0082"
-            android:textSize="32sp"
-            android:textStyle="bold" />
+            android:textColor="#FFFFFF"
+            android:textSize="40sp"
+            android:textStyle="bold"
+            app:layout_constraintBottom_toTopOf="@+id/tvWelcomeMessage"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/avatarCard" />
 
+        <!-- הודעה -->
         <TextView
+            android:id="@+id/tvWelcomeMessage"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginBottom="40dp"
-            android:text="איזה כיף שבאת! מוכנים ללמוד?"
-            android:fontFamily="@font/yehudaclm"
-            android:textColor="#546E7A"
-            android:textSize="20sp" />
+            android:layout_marginTop="12dp"
+            android:fontFamily="@font/varelaround"
+            android:text="איזה כיף שבאת! 🪄\nמוכנים להתחיל בהרפתקה?"
+            android:gravity="center"
+            android:textColor="#FFFFFF"
+            android:alpha="0.95"
+            android:textSize="20sp"
+            android:lineSpacingExtra="6dp"
+            app:layout_constraintBottom_toTopOf="@+id/btnStartJourney"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/tvWelcomeChild" />
 
-        <Button
+        <!-- כפתור "בואו נתחיל!" -->
+        <com.google.android.material.button.MaterialButton
             android:id="@+id/btnStartJourney"
-            android:layout_width="250dp"
-            android:layout_height="70dp"
-            android:backgroundTint="#3F51B5"
-            android:elevation="8dp"
-            android:text="בואו נתחיל!"
-            android:fontFamily="@font/yehudaclm"
-            android:textColor="@android:color/white"
-            android:textSize="22sp" />
+            android:layout_width="280dp"
+            android:layout_height="72dp"
+            android:layout_marginTop="40dp"
+            android:fontFamily="@font/gan"
+            android:text="בואו נתחיל! 🚀"
+            android:textColor="#FFFFFF"
+            android:textSize="24sp"
+            android:textStyle="bold"
+            app:backgroundTint="#FF9800"
+            app:cornerRadius="36dp"
+            app:elevation="12dp"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/tvWelcomeMessage" />
 
-        <Space
-            android:layout_width="match_parent"
-            android:layout_height="0dp"
-            android:layout_weight="1" />
+        <!-- כוכב נוצץ למטה משמאל -->
+        <TextView
+            android:id="@+id/star3"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="60dp"
+            android:layout_marginBottom="100dp"
+            android:alpha="0.7"
+            android:text="⭐"
+            android:textSize="24sp"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintStart_toStartOf="parent" />
 
-    </LinearLayout>
+        <!-- כוכב נוצץ למטה ימין -->
+        <TextView
+            android:id="@+id/star4"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginEnd="40dp"
+            android:layout_marginBottom="60dp"
+            android:alpha="0.6"
+            android:text="✨"
+            android:textSize="28sp"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent" />
 
+    </androidx.constraintlayout.widget.ConstraintLayout>
+
+    <!-- ===== תפריט צד ===== -->
     <com.google.android.material.navigation.NavigationView
         android:id="@+id/nav_view"
         android:layout_width="wrap_content"

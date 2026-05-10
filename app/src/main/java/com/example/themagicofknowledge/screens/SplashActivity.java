@@ -26,68 +26,41 @@ public class SplashActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_splash);
 
+        // טיפול ב-Insets
         ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.main), (v, insets) -> {
             Insets systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars());
             v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom);
             return insets;
         });
 
-        new Handler(Looper.getMainLooper()).postDelayed(() -> {
-            Intent intent;
-            if (SharedPreferencesUtil.isUserLoggedIn(this)) {
-                UserParent user = SharedPreferencesUtil.getUser(this);
-                if (user != null && user.isAdmin()) {
-                    intent = new Intent(SplashActivity.this, AdminDashboardActivity.class);
-                } else {
-                    intent = new Intent(SplashActivity.this, SelectChildActivity.class);
-                }
-            } else {
-                intent = new Intent(SplashActivity.this, LandingActivity.class);
-            }
-            intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
-            startActivity(intent);
-            finish();
-        }, SPLASH_DISPLAY_TIME);    }
+        // המתנה של 2 שניות ואז ניווט
+        new Handler(Looper.getMainLooper()).postDelayed(this::navigateToCorrectScreen, SPLASH_DISPLAY_TIME);
+    }
 
-    private void checkUserAndNavigate() {
+
+    // ===== בחירת המסך הנכון לפי המשתמש =====
+    private void navigateToCorrectScreen() {
+        Intent intent;
+
         if (SharedPreferencesUtil.isUserLoggedIn(this)) {
-            // משתמש מחובר - נרענן את הנתונים מ-Firebase
-            UserParent localUser = SharedPreferencesUtil.getUser(this);
+            // יש משתמש מחובר - בודקים אם הוא מנהל
+            UserParent user = SharedPreferencesUtil.getUser(this);
 
-            DatabaseService.getInstance().getUser(localUser.getId(),
-                    new DatabaseService.DatabaseCallback<UserParent>() {
-                        @Override
-                        public void onCompleted(UserParent freshUser) {
-                            if (freshUser != null) {
-                                // עדכון הנתונים המקומיים עם הגרסה העדכנית
-                                SharedPreferencesUtil.saveUser(SplashActivity.this, freshUser);
-                                Log.d(TAG, "User refreshed: " + freshUser.getUserName()
-                                        + ", isAdmin=" + freshUser.isAdmin());
-                            }
-                            navigateToHome();
-                        }
-
-                        @Override
-                        public void onFailed(Exception e) {
-                            Log.e(TAG, "Failed to refresh user", e);
-                            // גם אם הרענון נכשל - נמשיך עם הנתונים הקיימים
-                            navigateToHome();
-                        }
-                    });
+            if (user != null && user.isAdmin()) {
+                // מנהל - שולחים למסך ניהול
+                Log.d(TAG, "Admin user detected: " + user.getUserName());
+                intent = new Intent(SplashActivity.this, AdminDashboardActivity.class);
+            } else {
+                // הורה רגיל - שולחים לבחירת ילד
+                Log.d(TAG, "Regular user detected");
+                intent = new Intent(SplashActivity.this, SelectChildActivity.class);
+            }
         } else {
-            navigateToLanding();
+            // אין משתמש מחובר - מסך פתיחה
+            Log.d(TAG, "No user logged in");
+            intent = new Intent(SplashActivity.this, LandingActivity.class);
         }
-    }
 
-    private void navigateToHome() {
-        Intent intent = new Intent(SplashActivity.this, SelectChildActivity.class);
-        intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
-        startActivity(intent);
-        finish();
-    }
-
-    private void navigateToLanding() {
-        Intent intent = new Intent(SplashActivity.this, LandingActivity.class);
         intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
         startActivity(intent);
         finish();

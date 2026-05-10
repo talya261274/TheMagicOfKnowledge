@@ -12,90 +12,171 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="vertical"
-        android:padding="20dp">
+        android:paddingStart="20dp"
+        android:paddingTop="40dp"
+        android:paddingEnd="20dp"
+        android:paddingBottom="24dp">
 
-        <Button
-            android:id="@+id/goBackBtnTracking"
-            android:layout_width="70dp"
-            android:layout_height="56dp"
-            android:layout_gravity="right"
-            android:layout_marginTop="10dp"
-            android:backgroundTint="@android:color/transparent"
-            android:text="➜"
-            android:textColor="@color/white"
-            android:textSize="22dp"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintTop_toTopOf="parent"
-            tools:ignore="MissingConstraints" />
+        <!-- ===== כפתור חזרה - בFrameLayout כדי שיתפוס מקום נכון ===== -->
+        <FrameLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
 
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/goBackBtnTracking"
+                android:layout_width="81dp"
+                android:layout_height="56dp"
+                android:backgroundTint="@android:color/transparent"
+                android:text="➜"
+                android:textColor="#1E5F8B"
+                android:textSize="24dp"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent"  />
+
+        </FrameLayout>
+
+        <!-- ===== כותרת ===== -->
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_gravity="center"
+            android:layout_marginTop="16dp"
             android:fontFamily="@font/gan"
-            android:shadowColor="@android:color/holo_blue_light"
-            android:shadowDx="5"
-            android:shadowDy="5"
-            android:shadowRadius="10"
+            android:shadowColor="#65A2B8"
+            android:shadowDx="3"
+            android:shadowDy="3"
+            android:shadowRadius="8"
             android:text="מעקב הורים"
             android:textColor="@color/white"
-            android:textSize="45sp"
+            android:textSize="40sp"
             android:textStyle="bold" />
 
+        <!-- ===== כותרת משנה ===== -->
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginTop="16dp"
-            android:fontFamily="@font/gveretlevin"
-            android:text="החלף ילד:"
-            android:textColor="#000000"
-            android:textSize="20sp" />
+            android:layout_gravity="center"
+            android:layout_marginTop="4dp"
+            android:fontFamily="@font/varelaround"
+            android:text="עקבו אחרי ההתקדמות של הילדים 📊"
+            android:textColor="#FFFFFF"
+            android:alpha="0.95"
+            android:textSize="16sp" />
 
-        <HorizontalScrollView
+        <!-- ===== כרטיס בחירת ילד עם קרוסלה (מתקפל) ===== -->
+        <androidx.cardview.widget.CardView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginTop="8dp"
-            android:scrollbars="none">
-
-            <LinearLayout
-                android:id="@+id/container_children_selector"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:gravity="center"
-                android:orientation="horizontal" />
-        </HorizontalScrollView>
-
-        <com.google.android.material.card.MaterialCardView
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="30dp"
-            app:cardBackgroundColor="#80E0E9E9"
-            app:cardCornerRadius="20dp"
-            app:cardElevation="0dp">
+            android:layout_marginTop="24dp"
+            app:cardBackgroundColor="#F6EBF3"
+            app:cardCornerRadius="24dp"
+            app:cardElevation="10dp">
 
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="15dp"
-                android:layout_marginBottom="15dp"
+                android:orientation="vertical">
+
+                <!-- ===== הכותרת הלחיצה (תמיד מוצגת) ===== -->
+                <LinearLayout
+                    android:id="@+id/headerExpandable"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:background="?attr/selectableItemBackground"
+                    android:clickable="true"
+                    android:focusable="true"
+                    android:gravity="center_vertical"
+                    android:orientation="horizontal"
+                    android:padding="20dp">
+
+                    <!-- כותרת -->
+                    <TextView
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:fontFamily="@font/gan"
+                        android:text="החליפו ילד"
+                        android:textColor="#1E5F8B"
+                        android:textSize="18sp"
+                        android:textStyle="bold" />
+
+                    <!-- חץ -->
+                    <ImageView
+                        android:id="@+id/ivExpandArrow"
+                        android:layout_width="20dp"
+                        android:layout_height="20dp"
+                        android:contentDescription="פתח"
+                        android:src="@android:drawable/arrow_down_float"
+                        app:tint="#1E5F8B" />
+
+                </LinearLayout>
+
+                <!-- ===== התוכן המתקפל (מוסתר בהתחלה) ===== -->
+                <HorizontalScrollView
+                    android:id="@+id/expandableContent"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:clipToPadding="false"
+                    android:paddingStart="16dp"
+                    android:paddingEnd="16dp"
+                    android:paddingBottom="20dp"
+                    android:scrollbars="none"
+                    android:visibility="gone">
+
+                    <LinearLayout
+                        android:id="@+id/container_children_selector"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:gravity="center"
+                        android:orientation="horizontal" />
+
+                </HorizontalScrollView>
+
+            </LinearLayout>
+        </androidx.cardview.widget.CardView>
+
+        <!-- ===== כרטיס פרטי הילד (תכלת בהיר #dafaff) ===== -->
+        <androidx.cardview.widget.CardView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="16dp"
+            app:cardBackgroundColor="#F6EBF3"
+            app:cardCornerRadius="24dp"
+            app:cardElevation="10dp">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
                 android:gravity="center"
                 android:orientation="vertical"
-                android:padding="16dp">
+                android:padding="24dp">
 
-                <ImageView
-                    android:id="@+id/iv_selected_child_avatar"
+                <androidx.cardview.widget.CardView
                     android:layout_width="100dp"
                     android:layout_height="100dp"
-                    android:src="@drawable/logo" />
+                    app:cardBackgroundColor="#FFFFFF"
+                    app:cardCornerRadius="50dp"
+                    app:cardElevation="6dp">
+
+                    <ImageView
+                        android:id="@+id/iv_selected_child_avatar"
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:scaleType="centerCrop"
+                        android:padding="6dp"
+                        android:src="@drawable/logo"
+                        android:contentDescription="אווטר ילד" />
+
+                </androidx.cardview.widget.CardView>
 
                 <TextView
                     android:id="@+id/tv_selected_child_name"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_marginTop="10dp"
+                    android:layout_marginTop="12dp"
                     android:fontFamily="@font/gan"
                     android:text="שם הילד"
-                    android:textColor="#000000"
+                    android:textColor="#1E5F8B"
                     android:textSize="24sp"
                     android:textStyle="bold" />
 
@@ -103,60 +184,123 @@
                     android:id="@+id/tv_selected_child_age"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="גיל: 5"
-                    android:textColor="#333333"
-                    android:textSize="16sp" />
-            </LinearLayout>
-        </com.google.android.material.card.MaterialCardView>
+                    android:layout_marginTop="2dp"
+                    android:fontFamily="@font/varelaround"
+                    android:text="גיל 5"
+                    android:textStyle="bold"
+                    android:textColor="#5C6166"
+                    android:textSize="18sp" />
 
-        <androidx.cardview.widget.CardView
-            android:layout_width="match_parent"
-            android:layout_height="120dp"
-            android:layout_marginTop="20dp"
-            app:cardBackgroundColor="#A2C9FF"
-            app:cardCornerRadius="25dp">
-
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:gravity="center"
-                android:orientation="vertical">
-
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="נושאים שהושלמו"
-                    android:textColor="#FFFFFF"
-                    android:textSize="18sp"
-                    android:textStyle="bold" />
-
-                <TextView
-                    android:id="@+id/tvCompletedCount"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="0"
-                    android:textColor="#FFFFFF"
-                    android:textSize="45sp"
-                    android:textStyle="bold" />
             </LinearLayout>
         </androidx.cardview.widget.CardView>
 
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="30dp"
-            android:fontFamily="@font/gveretlevin"
-            android:text="פירוט ביצועים לפי נושאים:"
-            android:textColor="#000000"
-            android:textSize="20sp"
-            android:textStyle="bold" />
-
-        <androidx.recyclerview.widget.RecyclerView
-            android:id="@+id/rvSubjectsProgress"
+        <!-- ===== כרטיס נושאים שהושלמו (כתום) ===== -->
+        <androidx.cardview.widget.CardView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginTop="12dp"
-            android:layout_marginBottom="20dp" />
+            android:layout_marginTop="16dp"
+            app:cardBackgroundColor="#FF9800"
+            app:cardCornerRadius="24dp"
+            app:cardElevation="10dp">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:gravity="center"
+                android:orientation="horizontal"
+                android:padding="20dp">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:gravity="center"
+                    android:text="🏆"
+                    android:textSize="48sp" />
+
+                <LinearLayout
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="16dp"
+                    android:layout_weight="1"
+                    android:gravity="start"
+                    android:orientation="vertical">
+
+                    <TextView
+                        android:layout_width="200dp"
+                        android:layout_height="wrap_content"
+                        android:fontFamily="@font/gan"
+                        android:text="נושאים שהושלמו"
+                        android:gravity="center"
+                        android:textColor="#FFFFFF"
+                        android:textSize="16sp"
+                        android:textStyle="bold" />
+
+                    <TextView
+                        android:id="@+id/tvCompletedCount"
+                        android:layout_width="200dp"
+                        android:layout_height="wrap_content"
+                        android:fontFamily="@font/gan"
+                        android:layout_marginTop="10dp"
+                        android:text="0"
+                        android:gravity="center"
+                        android:textColor="#FFFFFF"
+                        android:textSize="42sp"
+                        android:textStyle="bold" />
+
+                </LinearLayout>
+
+            </LinearLayout>
+        </androidx.cardview.widget.CardView>
+
+        <!-- ===== כרטיס פירוט ביצועים (לבן) ===== -->
+        <androidx.cardview.widget.CardView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="16dp"
+            android:layout_marginBottom="20dp"
+            app:cardBackgroundColor="#F6EBF3"
+            app:cardCornerRadius="24dp"
+            app:cardElevation="10dp">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:padding="20dp">
+
+                <LinearLayout
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginBottom="12dp"
+                    android:gravity="center_vertical"
+                    android:orientation="horizontal">
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginEnd="8dp"
+                        android:text="📊"
+                        android:textSize="24sp" />
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:fontFamily="@font/gan"
+                        android:text="ביצועים לפי נושאים"
+                        android:textColor="#1E5F8B"
+                        android:textSize="18sp"
+                        android:textStyle="bold" />
+
+                </LinearLayout>
+
+                <androidx.recyclerview.widget.RecyclerView
+                    android:id="@+id/rvSubjectsProgress"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:nestedScrollingEnabled="false" />
+
+            </LinearLayout>
+        </androidx.cardview.widget.CardView>
 
     </LinearLayout>
 </androidx.core.widget.NestedScrollView>

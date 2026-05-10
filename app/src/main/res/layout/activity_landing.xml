@@ -1,85 +1,123 @@
 <androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/main"
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
-    <!-- רקע -->
-    <ImageView
-        android:id="@+id/main_img_background"
-        android:layout_width="0dp"
-        android:layout_height="0dp"
-        android:scaleType="centerCrop"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        app:srcCompat="@drawable/main_background" />
+    <FrameLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
 
-    <!-- לוגו -->
-    <ImageView
-        android:id="@+id/main_img_logo"
-        android:layout_width="280dp"
-        android:layout_height="280dp"
-        android:layout_marginTop="90dp"
-        android:scaleType="centerCrop"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        app:srcCompat="@drawable/logo" />
+        <!-- רקע -->
+        <ImageView
+            android:id="@+id/main_img_background"
+            android:layout_width="0dp"
+            android:layout_height="0dp"
+            android:scaleType="centerCrop"
+            app:srcCompat="@drawable/main_background" />
 
-    <!-- כותרת -->
-    <TextView
-        android:id="@+id/tvLandindTitle"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="30dp"
-        android:fontFamily="@font/gveretlevin"
-        android:text="הקסם שבידע"
-        android:textColor="@color/white"
-        android:textSize="60sp"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/main_img_logo" />
+        <!--מידע-->
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:orientation="vertical"
+            android:layout_gravity="center">
+
+            <!-- לוגו עם כרטיס לבן עגול -->
+            <androidx.cardview.widget.CardView
+                android:id="@+id/logoCard"
+                android:layout_width="220dp"
+                android:layout_height="220dp"
+                android:layout_marginTop="100dp"
+                android:layout_gravity="center"
+                app:cardBackgroundColor="#FFFFFF"
+                app:cardCornerRadius="110dp"
+                app:cardElevation="16dp"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent">
+
+                <ImageView
+                    android:id="@+id/main_img_logo"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:scaleType="centerCrop"
+                    android:src="@drawable/logo"
+                    android:contentDescription="לוגו" />
+            </androidx.cardview.widget.CardView>
+
+            <!-- כותרת ראשית -->
+            <TextView
+                android:id="@+id/tvLandingTitle"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="32dp"
+                android:fontFamily="@font/gveretlevin"
+                android:shadowColor="#65A2B8"
+                android:shadowDx="4"
+                android:shadowDy="4"
+                android:shadowRadius="12"
+                android:text="הקסם שבידע"
+                android:textColor="@color/white"
+                android:textSize="56sp"
+                android:textStyle="bold"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/logoCard" />
+
+            <!-- כותרת משנה -->
+            <TextView
+                android:id="@+id/tvLandingSubtitle"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="8dp"
+                android:fontFamily="@font/varelaround"
+                android:text="ללמוד בקסם, בקצב שלי 🪄"
+                android:textColor="#FFFFFF"
+                android:textStyle="bold"
+                android:layout_gravity="center"
+                android:textSize="20sp"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/tvLandingTitle" />
+
+            <!-- הרשמה -->
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/btn_Main_toregister"
+                android:layout_width="294dp"
+                android:layout_height="74dp"
+                android:layout_marginTop="54dp"
+                android:background="@drawable/btn_orange_selector"
+                android:fontFamily="@font/varelaround"
+                android:text="הרשמה"
+                android:textColor="@android:color/white"
+                android:textSize="27sp"
+                android:textStyle="bold"
+                app:backgroundTint="@null"
+                app:cornerRadius="40dp"
+                android:layout_gravity="center"/>
+
+            <!-- התחברות -->
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/btn_Main_toLogin"
+                android:layout_width="294dp"
+                android:layout_height="74dp"
+                android:layout_marginTop="20dp"
+                android:layout_marginBottom="200dp"
+                android:background="@drawable/btn_blue_selector"
+                android:fontFamily="@font/varelaround"
+                android:text="התחברות"
+                android:textColor="@android:color/white"
+                android:textSize="27sp"
+                android:textStyle="bold"
+                app:backgroundTint="@null"
+                app:cornerRadius="40dp"
+                android:layout_gravity="center"/>
+        </LinearLayout>
+    </FrameLayout>
 
 
-    <com.google.android.material.button.MaterialButton
-        android:id="@+id/btn_Main_toregister"
-        android:layout_width="294dp"
-        android:layout_height="74dp"
-        android:layout_marginTop="54dp"
-        android:background="@drawable/btn_orange_selector"
-        android:fontFamily="@font/varelaround"
-        android:text="הרשמה"
-        android:textColor="@android:color/white"
-        android:textSize="27sp"
-        android:textStyle="bold"
-        app:backgroundTint="@null"
-        app:cornerRadius="40dp"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.494"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/tvLandindTitle" />
 
-    <com.google.android.material.button.MaterialButton
-        android:id="@+id/btn_Main_toLogin"
-        android:layout_width="294dp"
-        android:layout_height="74dp"
-        android:layout_marginTop="20dp"
-        android:layout_marginBottom="200dp"
-        android:background="@drawable/btn_blue_selector"
-        android:fontFamily="@font/varelaround"
-        android:text="התחברות"
-        android:textColor="@android:color/white"
-        android:textSize="27sp"
-        android:textStyle="bold"
-        app:backgroundTint="@null"
-        app:cornerRadius="40dp"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.494"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/btn_Main_toregister"
-        app:layout_constraintVertical_bias="0.0" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>
