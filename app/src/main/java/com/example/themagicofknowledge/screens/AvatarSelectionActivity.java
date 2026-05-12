@@ -117,11 +117,7 @@ public class AvatarSelectionActivity extends BaseActivity {
                         }
                     }
 
-                    Intent intent = new Intent(AvatarSelectionActivity.this, PlacementTestActivity.class);
-                    intent.putExtra("isNewChild", true);
-                    intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
-                    startActivity(intent);
-                    finish();
+                    showPlacementTestIntroDialog();
 
                     Toast.makeText(AvatarSelectionActivity.this, "בחירה נהדרת! עכשיו נבדוק את הרמה שלך 🎯", Toast.LENGTH_SHORT).show();
                 })
@@ -173,5 +169,34 @@ public class AvatarSelectionActivity extends BaseActivity {
 
             return convertView;
         }
+    }
+
+    private void showPlacementTestIntroDialog() {
+        final android.app.Dialog dialog = new android.app.Dialog(this);
+        dialog.setContentView(R.layout.dialog_placement_intro);
+        dialog.setCancelable(false);
+
+        if (dialog.getWindow() != null) {
+            dialog.getWindow().setBackgroundDrawableResource(android.R.color.transparent);
+        }
+
+        dialog.findViewById(R.id.btnStartTest).setOnClickListener(v -> {
+            dialog.dismiss();
+            Intent intent = new Intent(AvatarSelectionActivity.this, PlacementTestActivity.class);
+            intent.putExtra("isNewChild", true);
+            intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+            startActivity(intent);
+            finish();
+        });
+
+        dialog.findViewById(R.id.btnLater).setOnClickListener(v -> {
+            dialog.dismiss();
+            Intent intent = new Intent(AvatarSelectionActivity.this, SelectChildActivity.class);
+            intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+            startActivity(intent);
+            finish();
+        });
+
+        dialog.show();
     }
 }

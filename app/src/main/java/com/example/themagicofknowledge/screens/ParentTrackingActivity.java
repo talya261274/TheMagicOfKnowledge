@@ -33,7 +33,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-public class ParentTrackingActivity extends AppCompatActivity {
+public class ParentTrackingActivity extends BaseActivity {
 
     private ImageView ivSelectedChildAvatar;
     private TextView tvSelectedChildName, tvSelectedChildAge, tvCompletedCount, tvCurrentLevel;
@@ -86,10 +86,6 @@ public class ParentTrackingActivity extends AppCompatActivity {
         rvLevels.setLayoutManager(new LinearLayoutManager(this));
         levelAdapter = new LevelProgressAdapter(levelsList);
         rvLevels.setAdapter(levelAdapter);
-
-        if (findViewById(R.id.goBackBtnTracking) != null) {
-            findViewById(R.id.goBackBtnTracking).setOnClickListener(v -> finish());
-        }
 
         LinearLayout headerExpandable = findViewById(R.id.headerExpandable);
         HorizontalScrollView expandableContent = findViewById(R.id.expandableContent);
@@ -171,7 +167,6 @@ public class ParentTrackingActivity extends AppCompatActivity {
         levelsList.clear();
         int totalCompletedSubjects = 0;
 
-        // ⭐ מציאת הרמה הנוכחית של הילד
         String currentAgeGroup = selectedChild != null ? selectedChild.getAgeGroup() : null;
         int currentLevelIndex = -1;
         if (currentAgeGroup != null) {
@@ -180,31 +175,36 @@ public class ParentTrackingActivity extends AppCompatActivity {
 
         DataSnapshot progressSnapshot = snapshot.child("progress");
 
-        // ⭐ עוברים על כל הרמות בסדר קבוע
-        for (int i = 0; i < AGE_GROUPS.length; i++) {
-            String ageGroup = AGE_GROUPS[i];
-            LevelProgress level = new LevelProgress(ageGroup);
+        String startingLevel = snapshot.child("startingLevel").getValue(String.class);
+        int startingLevelIndex;
 
-            // ⭐ קביעת מצב הרמה
-            if (currentLevelIndex == -1) {
-                // אין רמה נוכחית - נחשב הכל כנעול
-                level.setLocked(true);
-            } else if (i > currentLevelIndex) {
-                // רמה עתידית - נעולה
+        if (startingLevel != null) {
+            startingLevelIndex = Arrays.asList(AGE_GROUPS).indexOf(startingLevel);
+        } else {
+            startingLevelIndex = 0; // ← ברירת מחדל - הצג מהרמה הראשונה
+        }
+
+        for (int i = 0; i < AGE_GROUPS.length; i++) {
+            if (i < startingLevelIndex) continue; // הסתר רמות לפני רמת ההתחלה
+
+            String ageGroup = AGE_GROUPS[i]; // ← חסר!
+            LevelProgress level = new LevelProgress(ageGroup); // ← חסר!
+
+            if (i > currentLevelIndex) {
                 level.setLocked(true);
             } else if (i == currentLevelIndex) {
-                // הרמה הנוכחית
                 level.setCurrent(true);
+                level.setExpanded(true);
+            } else {
+                level.setCompleted(true);
             }
 
-            // ⭐ טעינת הנושאים של הרמה
             List<SubjectStat> subjects = new ArrayList<>();
             int completedInLevel = 0;
 
             if (progressSnapshot.hasChild(ageGroup)) {
                 DataSnapshot levelSnapshot = progressSnapshot.child(ageGroup);
 
-                // עוברים על כל 6 הנושאים
                 for (String subjectKey : ALL_SUBJECTS) {
                     boolean isCompleted = false;
                     int attempts = 0;
@@ -238,7 +238,6 @@ public class ParentTrackingActivity extends AppCompatActivity {
                     ));
                 }
             } else {
-                // אין נתונים - יוצרים רשימה ריקה של 6 נושאים
                 for (String subjectKey : ALL_SUBJECTS) {
                     subjects.add(new SubjectStat(translateSubject(subjectKey), 0, 0, false, 0));
                 }
@@ -246,20 +245,8 @@ public class ParentTrackingActivity extends AppCompatActivity {
 
             level.setSubjects(subjects);
 
-            // ⭐ אם כל 6 הנושאים הושלמו - הרמה הושלמה
-            if (completedInLevel >= 6) {
-                level.setCompleted(true);
-            }
-
-            // ⭐ פתיחה אוטומטית של הרמה הנוכחית
-            if (level.isCurrent()) {
-                level.setExpanded(true);
-            }
-
-            // ⭐ סופרים סך הכל הנושאים שהושלמו (רק ברמה הנוכחית!)
-            if (level.isCurrent()) {
-                totalCompletedSubjects = completedInLevel;
-            }
+            if (completedInLevel >= 6) level.setCompleted(true);
+            if (level.isCurrent()) totalCompletedSubjects = completedInLevel;
 
             levelsList.add(level);
         }

@@ -1,6 +1,7 @@
 package com.example.themagicofknowledge.screens;
 
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
@@ -25,6 +26,7 @@ public class SelectSubjectActivity extends BaseActivity {
     private CardView btnAnimals, btnColors, btnNumbers, btnLetters, btnShapes, btnBodyParts;
     private ImageView ivVAnimals, ivVColors, ivVNumbers, ivVLetters, ivVShapes, ivVBodyParts;
     private UserChild currentChild;
+    private boolean levelUpDialogShown = false;
 
     @Override
     protected boolean hasSideMenu() {
@@ -68,9 +70,22 @@ public class SelectSubjectActivity extends BaseActivity {
             else if (id == R.id.btnShapes) subject = "shapes";
             else if (id == R.id.btnBodyParts) subject = "bodyparts";
 
-            Intent intent = new Intent(SelectSubjectActivity.this, FlashCardMain.class);
-            intent.putExtra("subject", subject);
-            startActivity(intent);
+            final String finalSubject = subject;
+
+            // בדוק אם כבר ראה את הכרטיסיות
+            SharedPreferences prefs = getSharedPreferences("flashcard_prefs", MODE_PRIVATE);
+            boolean seenFlashCards = prefs.getBoolean(
+                    "seen_" + currentChild.getId() + "_" + finalSubject, false);
+
+            if (!seenFlashCards) {
+                // פעם ראשונה - פתח כרטיסיות
+                Intent intent = new Intent(SelectSubjectActivity.this, FlashCardMain.class);
+                intent.putExtra("subject", finalSubject);
+                startActivity(intent);
+            } else {
+                // כבר ראה - ישר למשחק, עם אפשרות לכרטיסיות
+                showPlayOrFlashDialog(finalSubject);
+            }
         };
 
         btnAnimals.setOnClickListener(listener);
@@ -79,6 +94,30 @@ public class SelectSubjectActivity extends BaseActivity {
         btnLetters.setOnClickListener(listener);
         btnShapes.setOnClickListener(listener);
         btnBodyParts.setOnClickListener(listener);
+    }
+
+    private void showPlayOrFlashDialog(String subject) {
+        final android.app.Dialog dialog = new android.app.Dialog(this);
+        dialog.setContentView(R.layout.dialog_play_or_flash);
+        if (dialog.getWindow() != null)
+            dialog.getWindow().setBackgroundDrawableResource(android.R.color.transparent);
+
+        dialog.findViewById(R.id.btnPlayNow).setOnClickListener(v -> {
+            dialog.dismiss();
+            Intent intent = new Intent(this, MixedGameActivity.class);
+            intent.putExtra("subject", subject);
+            startActivity(intent);
+        });
+
+        dialog.findViewById(R.id.btnShowCards).setOnClickListener(v -> {
+            dialog.dismiss();
+            Intent intent = new Intent(this, FlashCardMain.class);
+            intent.putExtra("subject", subject);
+            startActivity(intent);
+        });
+
+        dialog.setCancelable(true);
+        dialog.show();
     }
 
     private void checkCompletedSubjects() {
@@ -126,7 +165,8 @@ public class SelectSubjectActivity extends BaseActivity {
                 }
 
                 // ⭐ אם סיים את כל 6 הנושאים - דיאלוג מתאים
-                if (completedCount >= 6) {
+                if (completedCount >= 6 && !levelUpDialogShown) { // ← הוסף את הבדיקה
+                    levelUpDialogShown = true;
                     new android.os.Handler().postDelayed(() -> handleAllSubjectsCompleted(), 500);
                 }
             }
@@ -145,17 +185,19 @@ public class SelectSubjectActivity extends BaseActivity {
     private void handleAllSubjectsCompleted() {
         if (currentChild == null) return;
 
-        String currentLevel = currentChild.getAgeGroup();
+        // בדוק אם כבר הראינו את הדיאלוג והמשתמש בחר "אחר כך"
+        SharedPreferences prefs = getSharedPreferences("level_up_prefs", MODE_PRIVATE);
+        boolean postponed = prefs.getBoolean("postponed_" + currentChild.getId() + "_" + currentChild.getAgeGroup(), false);
 
+        if (postponed) return; // אל תציג שוב
+
+        String currentLevel = currentChild.getAgeGroup();
         if (currentLevel.equals("7-8")) {
-            // ⭐ רמה אחרונה - דיאלוג מיוחד
             showFinalAchievementDialog();
         } else {
-            // ⭐ יש רמה הבאה - דיאלוג עליית רמה רגיל
             showLevelUpDialog();
         }
     }
-
     /**
      * דיאלוג עליית רמה רגיל (לרמות 3-4 ו-5-6)
      */
@@ -168,12 +210,26 @@ public class SelectSubjectActivity extends BaseActivity {
         }
 
         Button btnAction = dialog.findViewById(R.id.btnLevelUp);
+        TextView btnNotNow = dialog.findViewById(R.id.btnNotNow);
+
         if (btnAction != null) {
             btnAction.setOnClickListener(v -> {
                 dialog.dismiss();
                 handleLevelUpgrade();
             });
         }
+
+        if (btnNotNow != null) {
+            btnNotNow.setOnClickListener(v -> {
+                // שמור שבחר "אחר כך"
+                getSharedPreferences("level_up_prefs", MODE_PRIVATE)
+                        .edit()
+                        .putBoolean("postponed_" + currentChild.getId() + "_" + currentChild.getAgeGroup(), true)
+                        .apply();
+                dialog.dismiss();
+            });
+        }
+
         dialog.setCancelable(false);
         dialog.show();
     }
@@ -255,33 +311,21 @@ public class SelectSubjectActivity extends BaseActivity {
      * עליית רמה רגילה (3-4 → 5-6 או 5-6 → 7-8)
      */
     private void handleLevelUpgrade() {
+        // מחק את הדגל של "אחר כך"
+        getSharedPreferences("level_up_prefs", MODE_PRIVATE)
+                .edit()
+                .remove("postponed_" + currentChild.getId() + "_" + currentChild.getAgeGroup())
+                .apply();
+
         String currentLevel = currentChild.getAgeGroup();
         String nextLevel;
-
         if (currentLevel.equals("3-4")) nextLevel = "5-6";
         else if (currentLevel.equals("5-6")) nextLevel = "7-8";
-        else {
-            return;
-        }
+        else return;
 
-        final String finalNextLevel = nextLevel;
-
-        DatabaseReference childRef = FirebaseDatabase.getInstance().getReference("users")
-                .child(currentChild.getParentId())
-                .child("childrenList")
-                .child(currentChild.getId());
-
-        // ⭐ רק מעדכן את ageGroup - לא צריך למחוק כלום
-        // כי הנושאים של הרמה הבאה עוד לא קיימים, אז ממילא יראו ריקים
-        childRef.child("ageGroup").setValue(finalNextLevel).addOnSuccessListener(aVoid -> {
-            currentChild.setAgeGroup(finalNextLevel);
-            SharedPreferencesUtil.saveCurrentChild(SelectSubjectActivity.this, currentChild);
-
-            Intent intent = new Intent(SelectSubjectActivity.this, PlacementTestActivity.class);
-            intent.putExtra("isUpgrade", true);
-            intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-            startActivity(intent);
-            finish();
-        });
+        Intent intent = new Intent(SelectSubjectActivity.this, PlacementTestActivity.class);
+        intent.putExtra("isUpgrade", true);
+        intent.putExtra("targetLevel", nextLevel);
+        startActivity(intent);
     }
 }

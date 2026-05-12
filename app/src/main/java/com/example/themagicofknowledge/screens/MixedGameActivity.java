@@ -1,5 +1,6 @@
 package com.example.themagicofknowledge.screens;
 
+import android.content.SharedPreferences;
 import android.content.res.ColorStateList;
 import android.graphics.Color;
 import android.os.Bundle;
@@ -21,7 +22,6 @@ import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AlertDialog;
-import androidx.appcompat.app.AppCompatActivity;
 
 import com.example.themagicofknowledge.R;
 import com.example.themagicofknowledge.adapter.KeyboardAdapter;
@@ -33,7 +33,6 @@ import com.example.themagicofknowledge.models.SentenceQuestion;
 import com.example.themagicofknowledge.models.UnifiedQuestion;
 import com.example.themagicofknowledge.models.UserChild;
 import com.example.themagicofknowledge.services.DatabaseService;
-import com.example.themagicofknowledge.utils.GameProgressManager;
 import com.example.themagicofknowledge.utils.SharedPreferencesUtil;
 import com.google.android.material.button.MaterialButton;
 import com.google.firebase.database.DataSnapshot;
@@ -43,9 +42,14 @@ import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.Query;
 import com.google.firebase.database.ValueEventListener;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Locale;
+import java.util.Map;
 
-public class MixedGameActivity extends AppCompatActivity {
+public class MixedGameActivity extends BaseActivity {
 
     private static final String TAG = "MixedGameActivity";
 
@@ -55,6 +59,8 @@ public class MixedGameActivity extends AppCompatActivity {
             "ר", "ק", "צ", "פ", "ע", "ס", "נ",
             "ץ", "ף", "ן", "ם", "ך", "ת", "ש",
     };
+    private EditText etAnswer;
+
 
     // ===== נתוני המשחק =====
     private List<UnifiedQuestion> allQuestions = new ArrayList<>();
@@ -77,10 +83,11 @@ public class MixedGameActivity extends AppCompatActivity {
     private View containerSelection, containerMatching, containerSentence, containerMemory;
 
     // ===== רכיבים לשאלות בחירה =====
-    private MaterialButton btnPlayAudio;
+    private LinearLayout btnPlayAudio;
     private ImageView ivQuestionImage;
     private View imageCardContainer;
-    private final MaterialButton[] selectionButtons = new MaterialButton[4];
+    private final ImageView[] selectionButtons = new ImageView[4];
+    private final TextView[] selectionTextViews = new TextView[4];
     private final String[] buttonColors = {"#FF9800", "#4CAF50", "#2196F3", "#E91E63"};
 
     // ===== רכיבים למשחק ההתאמה =====
@@ -99,6 +106,16 @@ public class MixedGameActivity extends AppCompatActivity {
     private MemoryCard firstMemorySelected = null;
     private MemoryCard secondMemorySelected = null;
     private boolean isMemoryBusy = false;
+
+    @Override
+    protected boolean hasSideMenu() {
+        return false;
+    }
+
+    @Override
+    protected boolean showToolbar() {
+        return false;
+    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -135,12 +152,19 @@ public class MixedGameActivity extends AppCompatActivity {
         imageCardContainer = findViewById(R.id.imageCardContainer);
 
         btnPlayAudio = findViewById(R.id.btnMixedPlayAudio);
+        findViewById(R.id.btnExit).setOnClickListener(v -> showExitDialog());
+
         ivQuestionImage = findViewById(R.id.ivMixedImage);
 
         selectionButtons[0] = findViewById(R.id.btnAns1);
         selectionButtons[1] = findViewById(R.id.btnAns2);
         selectionButtons[2] = findViewById(R.id.btnAns3);
         selectionButtons[3] = findViewById(R.id.btnAns4);
+
+        selectionTextViews[0] = findViewById(R.id.tvAns1);
+        selectionTextViews[1] = findViewById(R.id.tvAns2);
+        selectionTextViews[2] = findViewById(R.id.tvAns3);
+        selectionTextViews[3] = findViewById(R.id.tvAns4);
 
         leftColumn = findViewById(R.id.mixedLeftColumn);
         rightColumn = findViewById(R.id.mixedRightColumn);
@@ -162,12 +186,6 @@ public class MixedGameActivity extends AppCompatActivity {
         String level = currentChild.getAgeGroup().replace("-", "_");
         DatabaseReference rootRef = FirebaseDatabase.getInstance().getReference("Games");
 
-        Log.d(TAG, "==========================================");
-        Log.d(TAG, "🎮 התחלת טעינת נתונים");
-        Log.d(TAG, "📚 נושא: " + subject);
-        Log.d(TAG, "🎯 רמה: " + level);
-        Log.d(TAG, "==========================================");
-
         tasksCompleted = 0;
         allQuestions.clear();
 
@@ -177,10 +195,6 @@ public class MixedGameActivity extends AppCompatActivity {
             String audioPath = "Games/audioRecognition/level_" + level + "/" + subject;
             String matchingPath = "Games/matching/level_" + level + "/" + subject + "/pairs";
             String memoryPath = "Games/memoryGame/level_" + level + "/" + subject;
-
-            Log.d(TAG, "🔊 נתיב audio: " + audioPath);
-            Log.d(TAG, "🔗 נתיב matching: " + matchingPath);
-            Log.d(TAG, "🎴 נתיב memory: " + memoryPath);
 
             loadCategory(rootRef.child("audioRecognition").child("level_" + level).child(subject),
                     UnifiedQuestion.Type.AUDIO, Question.class);
@@ -196,10 +210,6 @@ public class MixedGameActivity extends AppCompatActivity {
             String sentencePath = "Games/sentenceCompletion/level_" + level + "/" + subject;
             String memoryPath = "Games/memoryGame/level_" + level + "/" + subject;
 
-            Log.d(TAG, "🖼️ נתיב image: " + imagePath);
-            Log.d(TAG, "✏️ נתיב sentence: " + sentencePath);
-            Log.d(TAG, "🎴 נתיב memory: " + memoryPath);
-
             loadCategory(rootRef.child("imageRecognition").child("level_" + level).child(subject),
                     UnifiedQuestion.Type.IMAGE, Question.class);
             loadCategory(rootRef.child("sentenceCompletion").child("level_" + level).child(subject),
@@ -213,10 +223,6 @@ public class MixedGameActivity extends AppCompatActivity {
         query.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
-                Log.d(TAG, "==========================================");
-                Log.d(TAG, "📦 קיבלתי נתונים מ-" + type);
-                Log.d(TAG, "📦 snapshot.exists(): " + snapshot.exists());
-                Log.d(TAG, "📦 מספר items: " + snapshot.getChildrenCount());
 
                 // 🔍 הדפסת כל המפתחות
                 for (DataSnapshot child : snapshot.getChildren()) {
@@ -282,7 +288,7 @@ public class MixedGameActivity extends AppCompatActivity {
                         Log.d(TAG, "✅ נטענו " + count + " שאלות מסוג " + type);
                     }
                 } catch (Exception e) {
-                    Log.e(TAG, "❌ שגיאה בעיבוד " + type + ": " + e.getMessage(), e);
+                    Log.e(TAG, "Error loading data for type=" + type + " msg=" + e.getMessage(), e);
                 }
 
                 checkIfLoadingFinished();
@@ -312,6 +318,12 @@ public class MixedGameActivity extends AppCompatActivity {
             }
 
             allQuestions = interleaveQuestions(allQuestions);
+
+            Log.d(TAG, "📋 סה\"כ שאלות: " + allQuestions.size());
+            for (int i = 0; i < allQuestions.size(); i++) {
+                Log.d(TAG, "   [" + i + "] " + allQuestions.get(i).getType()
+                        + " - data: " + (allQuestions.get(i).getData() == null ? "NULL!" : allQuestions.get(i).getData().getClass().getSimpleName()));
+            }
             checkSavedProgress();
         }
     }
@@ -352,50 +364,57 @@ public class MixedGameActivity extends AppCompatActivity {
         return interleaved;
     }
 
+    private void saveProgressLocally() {
+        if (currentIndex == 0) return;
+        getSharedPreferences("game_progress", MODE_PRIVATE)
+                .edit()
+                .putInt(subject + "_index", currentIndex)
+                .putString(subject + "_child", currentChild.getId())
+                .apply();
+    }
+
+    private void clearProgressLocally() {
+        getSharedPreferences("game_progress", MODE_PRIVATE)
+                .edit()
+                .remove(subject + "_index")
+                .remove(subject + "_child")
+                .apply();
+    }
+
     private void checkSavedProgress() {
-        if (SharedPreferencesUtil.getUser(this) == null) {
+        SharedPreferences prefs = getSharedPreferences("game_progress", MODE_PRIVATE);
+        int savedIdx = prefs.getInt(subject + "_index", 0);
+        String savedChild = prefs.getString(subject + "_child", "");
+
+        if (savedIdx > 0 && currentChild.getId().equals(savedChild)
+                && savedIdx < allQuestions.size()) {
+            showContinueDialog(savedIdx);
+        } else {
             showCurrentQuestion();
-            return;
         }
-
-        String pId = SharedPreferencesUtil.getUser(this).getId();
-
-        DatabaseReference ref = FirebaseDatabase.getInstance().getReference("users")
-                .child(pId).child("childrenList").child(currentChild.getId())
-                .child("progress").child(currentChild.getAgeGroup()).child(subject);
-
-        ref.child("lastQuestionIndex").addListenerForSingleValueEvent(new ValueEventListener() {
-            @Override
-            public void onDataChange(@NonNull DataSnapshot snapshot) {
-                if (snapshot.exists()) {
-                    Integer savedIdx = snapshot.getValue(Integer.class);
-                    if (savedIdx != null && savedIdx > 0 && savedIdx < allQuestions.size()) {
-                        showContinueDialog(savedIdx);
-                        return;
-                    }
-                }
-                showCurrentQuestion();
-            }
-            @Override
-            public void onCancelled(@NonNull DatabaseError error) {
-                showCurrentQuestion();
-            }
-        });
     }
 
     private void showContinueDialog(int savedIdx) {
-        new AlertDialog.Builder(this)
-                .setTitle("להמשיך מאיפה שעצרנו?")
-                .setMessage("נראה שכבר התחלת לתרגל נושא זה.")
-                .setPositiveButton("כן", (d, w) -> {
-                    currentIndex = savedIdx;
-                    showCurrentQuestion();
-                })
-                .setNegativeButton("מהתחלה", (d, w) -> {
-                    currentIndex = 0;
-                    showCurrentQuestion();
-                })
-                .setCancelable(false).show();
+        final android.app.Dialog dialog = new android.app.Dialog(this);
+        dialog.setContentView(R.layout.dialog_continue_progress);
+        if (dialog.getWindow() != null)
+            dialog.getWindow().setBackgroundDrawableResource(android.R.color.transparent);
+
+        dialog.findViewById(R.id.btnContinue).setOnClickListener(v -> {
+            dialog.dismiss();
+            currentIndex = savedIdx;
+            showCurrentQuestion();
+        });
+
+        dialog.findViewById(R.id.btnRestart).setOnClickListener(v -> {
+            dialog.dismiss();
+            clearProgressLocally();
+            currentIndex = 0;
+            showCurrentQuestion();
+        });
+
+        dialog.setCancelable(false);
+        dialog.show();
     }
 
     private void showCurrentQuestion() {
@@ -407,9 +426,18 @@ public class MixedGameActivity extends AppCompatActivity {
         }
 
         hideAllLayouts();
-        updateProgressInFirebase();
+        updateProgressBar();
 
         UnifiedQuestion uq = allQuestions.get(currentIndex);
+
+        // הוסף בדיקה
+        if (uq == null || uq.getData() == null || uq.getType() == null) {
+            Log.e(TAG, "❌ uq is null or invalid at index " + currentIndex);
+            currentIndex++;
+            showCurrentQuestion();
+            return;
+        }
+
         Log.d(TAG, "Showing question " + currentIndex + " type: " + uq.getType());
 
         try {
@@ -435,6 +463,13 @@ public class MixedGameActivity extends AppCompatActivity {
             currentIndex++;
             showCurrentQuestion();
         }
+    }
+
+    private void updateProgressBar() {
+        if (allQuestions.isEmpty()) return;
+        int percent = 15 + (int) (((double) currentIndex / allQuestions.size()) * 85);
+        globalProgress.setProgress(percent);
+        if (tvProgressText != null) tvProgressText.setText(percent + "%");
     }
 
     private void displayAudioQuestion(Question q) {
@@ -472,7 +507,7 @@ public class MixedGameActivity extends AppCompatActivity {
         int resId = getResources().getIdentifier(q.getMediaUrl(), "drawable", getPackageName());
         Log.d(TAG, "   - resId: " + resId + (resId == 0 ? " ❌ לא נמצא!" : " ✅"));
 
-        ivQuestionImage.setImageResource(resId != 0 ? resId : R.drawable.wizard_placeholder);
+        ivQuestionImage.setImageResource(resId != 0 ? resId : R.drawable.wizard_placeholder1);
 
         setupSelectionButtons(q);
     }
@@ -488,11 +523,11 @@ public class MixedGameActivity extends AppCompatActivity {
         Button btnCheck = findViewById(R.id.btnCheck);
 
         int resId = getResources().getIdentifier(sq.getHintImage(), "drawable", getPackageName());
-        ivHint.setImageResource(resId != 0 ? resId : R.drawable.wizard_placeholder);
+        ivHint.setImageResource(resId != 0 ? resId : R.drawable.wizard_placeholder1);
 
         tvSentence.setText(sq.getSentence());
         etAnswer.setText("");
-        etAnswer.setBackgroundTintList(null);
+        etAnswer.setTextColor(Color.parseColor("#1E5F8B"));
 
         KeyboardAdapter adapter = new KeyboardAdapter(this, hebrewLetters, letter -> {
             if (letter.equals("DEL")) {
@@ -511,18 +546,42 @@ public class MixedGameActivity extends AppCompatActivity {
 
             if (userAns.equalsIgnoreCase(sq.getCorrectAnswer())) {
                 isProcessingAnswer = true;
-                etAnswer.setBackgroundTintList(ColorStateList.valueOf(Color.GREEN));
-                handleCorrect();
+                shakeAndColorAnswer(etAnswer, true);
+                new Handler(Looper.getMainLooper()).postDelayed(() -> handleCorrect(), 800);
             } else {
-                handleWrong(etAnswer);
+                shakeAndColorAnswer(etAnswer, false);
             }
         });
     }
 
+    private void shakeAndColorAnswer(EditText etAnswer, boolean isCorrect) {
+        int color = isCorrect ? Color.parseColor("#4CAF50") : Color.parseColor("#F44336");
+        etAnswer.setTextColor(color);
+
+        if (!isCorrect) {
+            etAnswer.animate()
+                    .translationX(16).setDuration(50).withEndAction(() ->
+                            etAnswer.animate()
+                                    .translationX(-16).setDuration(50).withEndAction(() ->
+                                            etAnswer.animate()
+                                                    .translationX(10).setDuration(50).withEndAction(() ->
+                                                            etAnswer.animate()
+                                                                    .translationX(-10).setDuration(50).withEndAction(() ->
+                                                                            etAnswer.animate()
+                                                                                    .translationX(0).setDuration(50).start()
+                                                                    ).start()).start()).start()).start();
+
+            etAnswer.postDelayed(() -> {
+                etAnswer.setTextColor(Color.parseColor("#1E5F8B"));
+                etAnswer.setText("");
+            }, 800);
+        } else {
+            etAnswer.postDelayed(() ->
+                    etAnswer.setTextColor(Color.parseColor("#1E5F8B")), 600);
+        }
+    }
+
     private void displayMemoryGame(List<DataSnapshot> items) {
-        Log.d(TAG, "🎴 displayMemoryGame - מתחיל");
-        Log.d(TAG, "🎴 מספר items: " + items.size());
-        Log.d(TAG, "🎴 cardSize: " + cardSize);
 
         containerMemory.setVisibility(View.VISIBLE);
         tvQuestionTitle.setText("מצאו את הזוגות 🎴");
@@ -532,23 +591,17 @@ public class MixedGameActivity extends AppCompatActivity {
             String imageName = ds.child("image").getValue(String.class);
             String displayName = ds.child("name").getValue(String.class);
 
-            Log.d(TAG, "   🎴 image=" + imageName + ", name=" + displayName);
 
             if (imageName != null && displayName != null) {
                 int resId = getResources().getIdentifier(imageName, "drawable", getPackageName());
-                Log.d(TAG, "      → resId=" + resId + (resId == 0 ? " ❌ לא נמצא!" : " ✅ נמצא"));
                 addPairToMemoryList(resId, displayName);
             }
         }
 
-        Log.d(TAG, "🎴 סה\"כ memoryCards: " + memoryCards.size());
         Collections.shuffle(memoryCards);
 
         memoryAdapter = new MemoryAdapter(this, memoryCards, cardSize);
         gvMemoryBoard.setAdapter(memoryAdapter);
-
-        Log.d(TAG, "🎴 gvMemoryBoard visibility: " + gvMemoryBoard.getVisibility());
-        Log.d(TAG, "🎴 containerMemory visibility: " + containerMemory.getVisibility());
 
         gvMemoryBoard.setOnItemClickListener((parent, view, position, id) -> {
             if (isMemoryBusy) return;
@@ -584,19 +637,24 @@ public class MixedGameActivity extends AppCompatActivity {
             if (firstMemorySelected.getMatchId().equals(secondMemorySelected.getMatchId())) {
                 firstMemorySelected.setMatched(true);
                 secondMemorySelected.setMatched(true);
+                firstMemorySelected.setFlipped(false);
+                secondMemorySelected.setFlipped(false);
+
+                firstMemorySelected = null;
+                secondMemorySelected = null;
+                memoryAdapter.notifyDataSetChanged();
+                isMemoryBusy = false;
 
                 if (checkAllMemoryMatched()) handleCorrect();
             } else {
                 firstMemorySelected.setFlipped(false);
                 secondMemorySelected.setFlipped(false);
-                attempts++;
+                firstMemorySelected = null;
+                secondMemorySelected = null;
+                memoryAdapter.notifyDataSetChanged();
+                isMemoryBusy = false;
             }
-
-            firstMemorySelected = null;
-            secondMemorySelected = null;
-            memoryAdapter.notifyDataSetChanged();
-            isMemoryBusy = false;
-        }, 800);
+        }, 1000);
     }
 
     private boolean checkAllMemoryMatched() {
@@ -626,228 +684,247 @@ public class MixedGameActivity extends AppCompatActivity {
     }
 
     private void setupMatchingView(String content, String id, LinearLayout column) {
-        MaterialButton btn = (MaterialButton) getLayoutInflater().inflate(R.layout.item_matching_button, column, false);
-        btn.setTag(id);
+        com.google.android.material.card.MaterialCardView card =
+                (com.google.android.material.card.MaterialCardView) getLayoutInflater()
+                        .inflate(R.layout.item_matching_button, column, false);
+
+        card.setTag(id);
+
+        TextView answerText = card.findViewById(R.id.answerText);
+        ImageView answerImage = card.findViewById(R.id.answerImage);
 
         if (content != null) {
             if (content.startsWith("ss_")) {
                 int resId = getResources().getIdentifier(content, "drawable", getPackageName());
-                btn.setIconResource(resId != 0 ? resId : R.drawable.wizard_placeholder);
-                btn.setText("");
-                btn.setIconSize(180);
-                btn.setIconTint(null);
-
+                answerImage.setImageResource(resId != 0 ? resId : R.drawable.wizard_placeholder1);
+                answerImage.setVisibility(View.VISIBLE);
+                answerText.setVisibility(View.GONE);
             } else if (content.equalsIgnoreCase("audio") || content.equalsIgnoreCase("speaker")) {
-                btn.setIconResource(R.drawable.ic_volume_up);
-                btn.setText("");
-                btn.setIconSize(150);
-                btn.setIconTint(ColorStateList.valueOf(Color.parseColor("#2196F3")));
-
-                btn.setOnClickListener(v -> playTTS(id));
-
+                answerText.setText("🔊");
+                answerText.setTextSize(32);
+                answerImage.setVisibility(View.GONE);
+                card.setOnClickListener(v -> playTTS(id));
             } else {
-                btn.setText(content);
-                btn.setIconResource(0);
+                answerText.setText(content);
+                answerText.setVisibility(View.VISIBLE);
+                answerImage.setVisibility(View.GONE);
             }
         }
 
-        btn.setOnLongClickListener(v -> {
+        card.setOnLongClickListener(v -> {
             if (Boolean.TRUE.equals(v.getTag(R.id.tag_matched))) {
                 return false;
             }
-
             View.DragShadowBuilder shadowBuilder = new View.DragShadowBuilder(v);
             v.startDragAndDrop(null, shadowBuilder, v, 0);
             v.setVisibility(View.INVISIBLE);
             return true;
         });
 
-        btn.setOnDragListener((v, event) -> {
+        card.setOnDragListener((v, event) -> {
             switch (event.getAction()) {
                 case DragEvent.ACTION_DRAG_STARTED:
                     return true;
 
                 case DragEvent.ACTION_DRAG_ENTERED:
                     if (!Boolean.TRUE.equals(v.getTag(R.id.tag_matched))) {
-                        v.setBackgroundTintList(ColorStateList.valueOf(Color.parseColor("#FFE082")));
+                        ((com.google.android.material.card.MaterialCardView) v)
+                                .setCardBackgroundColor(Color.parseColor("#ffe4e1"));
                     }
                     return true;
 
                 case DragEvent.ACTION_DRAG_EXITED:
                     if (!Boolean.TRUE.equals(v.getTag(R.id.tag_matched))) {
-                        v.setBackgroundTintList(ColorStateList.valueOf(Color.WHITE));
+                        ((com.google.android.material.card.MaterialCardView) v)
+                                .setCardBackgroundColor(Color.WHITE);
                     }
                     return true;
 
                 case DragEvent.ACTION_DROP:
                     View draggedView = (View) event.getLocalState();
-
                     if (draggedView != null && draggedView.getParent() != v.getParent()
                             && draggedView.getTag().equals(v.getTag())
                             && !Boolean.TRUE.equals(v.getTag(R.id.tag_matched))) {
-
                         markCardAsMatched(v);
                         markCardAsMatched(draggedView);
-
                         matchesFound++;
-
                         if (matchesFound == totalPairs) handleCorrect();
                     } else {
-                        if (!Boolean.TRUE.equals(v.getTag(R.id.tag_matched))) {
-                            handleWrong(v);
-                        }
+                        if (!Boolean.TRUE.equals(v.getTag(R.id.tag_matched))) handleWrong(v);
                         if (draggedView != null) draggedView.setVisibility(View.VISIBLE);
                     }
                     return true;
 
                 case DragEvent.ACTION_DRAG_ENDED:
-                    if (!event.getResult()) btn.setVisibility(View.VISIBLE);
+                    if (!event.getResult()) card.setVisibility(View.VISIBLE);
                     return true;
             }
             return false;
         });
 
-        column.addView(btn);
+        card.setOnClickListener(v -> {
+            if (Boolean.TRUE.equals(v.getTag(R.id.tag_matched))) return;
+            ((com.google.android.material.card.MaterialCardView) v)
+                    .setCardBackgroundColor(Color.parseColor("#B3E5FC"));
+            new Handler(Looper.getMainLooper()).postDelayed(() ->
+                    ((com.google.android.material.card.MaterialCardView) v)
+                            .setCardBackgroundColor(Color.WHITE), 300);
+        });
+        column.addView(card);
     }
 
     private void markCardAsMatched(View view) {
         view.setTag(R.id.tag_matched, true);
         view.setVisibility(View.VISIBLE);
-        view.setBackgroundTintList(ColorStateList.valueOf(Color.parseColor("#A5D6A7")));
-        view.setAlpha(0.5f);
+        view.setAlpha(1f);
         view.setEnabled(false);
         view.setClickable(false);
         view.setLongClickable(false);
 
-        view.animate()
-                .scaleX(0.95f).scaleY(0.95f)
-                .setDuration(200)
-                .withEndAction(() -> view.animate()
-                        .scaleX(1f).scaleY(1f)
-                        .setDuration(200)
-                        .start())
-                .start();
+        if (view instanceof com.google.android.material.card.MaterialCardView) {
+            ((com.google.android.material.card.MaterialCardView) view)
+                    .setCardBackgroundColor(Color.parseColor("#c8f5c8"));
+        } else {
+            view.setBackgroundTintList(ColorStateList.valueOf(Color.parseColor("#c8f5c8")));
+        }
+
+        view.animate().scaleX(0.95f).scaleY(0.95f).setDuration(200)
+                .withEndAction(() -> view.animate().scaleX(1f).scaleY(1f).setDuration(200).start()).start();
     }
 
     private void setupSelectionButtons(Question q) {
         List<String> options = q.getOptions();
-        Log.d(TAG, "🔘 הגדרת כפתורי בחירה:");
-
-        if (options == null || options.size() < 4) {
-            Log.e(TAG, "❌ אין מספיק אפשרויות! options=" + options);
-            return;
-        }
+        if (options == null || options.size() < 4) return;
 
         for (int i = 0; i < 4; i++) {
             final int index = i;
             String item = options.get(i);
-
             int resId = getResources().getIdentifier(item, "drawable", getPackageName());
-            Log.d(TAG, "   כפתור " + i + ": '" + item + "' → resId=" + resId
-                    + (resId == 0 ? " ❌ אין תמונה" : " ✅ יש תמונה"));
 
             if (resId != 0) {
-                selectionButtons[i].setIconResource(resId);
-                selectionButtons[i].setIconTint(null);
-                selectionButtons[i].setText("");
-                selectionButtons[i].setIconSize(220);
-                selectionButtons[i].setIconGravity(MaterialButton.ICON_GRAVITY_TEXT_START);
+                selectionButtons[i].setImageResource(resId);
+                selectionButtons[i].setVisibility(View.VISIBLE);
+                selectionTextViews[i].setVisibility(View.GONE);
             } else {
-                selectionButtons[i].setIconResource(0);
-                selectionButtons[i].setText(item);
+                selectionButtons[i].setVisibility(View.GONE);
+                selectionTextViews[i].setText(item);
+                selectionTextViews[i].setVisibility(View.VISIBLE);
             }
 
-            selectionButtons[i].setOnClickListener(v -> {
+            View.OnClickListener listener = v -> {
                 if (isProcessingAnswer) return;
                 isProcessingAnswer = true;
-
                 if (index == q.getCorrectAnswerIndex()) {
-                    handleCorrect();
+                    shakeAndColorCard(index, true);
+                    new Handler(Looper.getMainLooper()).postDelayed(() -> handleCorrect(), 600);
                 } else {
                     isProcessingAnswer = false;
-                    handleWrong(selectionButtons[index]);
+                    shakeAndColorCard(index, false);
                 }
-            });
+            };
+
+            selectionButtons[i].setOnClickListener(listener);
+            selectionTextViews[i].setOnClickListener(listener);
         }
+    }
+
+    private void shakeAndColorCard(int index, boolean isCorrect) {
+        int[] cardIds = {R.id.cardAns1, R.id.cardAns2, R.id.cardAns3, R.id.cardAns4};
+        View card = findViewById(cardIds[index]);
+        if (!(card instanceof com.google.android.material.card.MaterialCardView)) return;
+
+        com.google.android.material.card.MaterialCardView cardView =
+                (com.google.android.material.card.MaterialCardView) card;
+
+        int feedbackColor = isCorrect ? Color.parseColor("#00ff00") : Color.parseColor("#F44336");
+        cardView.setCardBackgroundColor(feedbackColor);
+
+        if (!isCorrect) {
+            card.animate()
+                    .translationX(16).setDuration(50).withEndAction(() ->
+                            card.animate()
+                                    .translationX(-16).setDuration(50).withEndAction(() ->
+                                            card.animate()
+                                                    .translationX(10).setDuration(50).withEndAction(() ->
+                                                            card.animate()
+                                                                    .translationX(-10).setDuration(50).withEndAction(() ->
+                                                                            card.animate()
+                                                                                    .translationX(0).setDuration(50).start()
+                                                                    ).start()).start()).start()).start();
+        }
+
+        // החזרת הצבע המקורי
+        card.postDelayed(() ->
+                        cardView.setCardBackgroundColor(Color.parseColor(buttonColors[index])),
+                isCorrect ? 600 : 800
+        );
     }
 
     private void handleCorrect() {
         currentIndex++;
+        saveProgressLocally(); // מיידי!
+        updateProgressInFirebase(); // לסטטיסטיקות
         new Handler(Looper.getMainLooper()).postDelayed(this::showCurrentQuestion, 1000);
     }
 
     private void handleWrong(View view) {
         attempts++;
 
-        final ColorStateList originalTint = view.getBackgroundTintList();
-
         view.setBackgroundTintList(ColorStateList.valueOf(Color.RED));
-
         view.animate().translationX(20).setDuration(50).withEndAction(() ->
                 view.animate().translationX(-20).setDuration(50).withEndAction(() ->
                         view.animate().translationX(0).setDuration(50).start()
                 ).start()
         ).start();
 
-        new Handler(Looper.getMainLooper()).postDelayed(() -> {
-            boolean restored = false;
-
-            for (int i = 0; i < selectionButtons.length; i++) {
-                if (view == selectionButtons[i]) {
-                    view.setBackgroundTintList(ColorStateList.valueOf(Color.parseColor(buttonColors[i])));
-                    restored = true;
-                    break;
-                }
+        view.postDelayed(() -> {
+            if (view instanceof EditText) {
+                view.setBackgroundTintList(null);
+            } else {
+                view.setBackgroundTintList(ColorStateList.valueOf(Color.WHITE));
             }
-
-            if (!restored) view.setBackgroundTintList(originalTint);
-        }, 1000);
+        }, 800);
     }
 
-    // ⭐⭐⭐ הפונקציה המעודכנת ⭐⭐⭐
     private void updateProgressInFirebase() {
-        if (allQuestions.isEmpty()) return;
+        if (allQuestions.isEmpty() || currentIndex == 0) return; // אל תשמור index=0
 
         int percent = 15 + (int) (((double) currentIndex / allQuestions.size()) * 85);
-
         if (SharedPreferencesUtil.getUser(this) == null) return;
         String pId = SharedPreferencesUtil.getUser(this).getId();
 
-        // ⭐ חישוב הזמן שעבר מאז העדכון האחרון
         long timeSpent = (System.currentTimeMillis() - gameStartTime) / 1000;
 
-        DatabaseService.getInstance().updateDetailedProgress(
-                pId, currentChild.getId(), currentChild.getAgeGroup(),
-                subject,
-                attempts,    // ⭐ שולחים את הטעויות שנצברו
-                timeSpent,   // ⭐ שולחים את הזמן שעבר
-                percent,
-                currentIndex
-        );
+        DatabaseReference ref = FirebaseDatabase.getInstance().getReference("users")
+                .child(pId).child("childrenList").child(currentChild.getId())
+                .child("progress").child(currentChild.getAgeGroup()).child(subject);
 
-        // ⭐ עדכון totalTimeSeconds של הילד (סה"כ זמן באפליקציה)
-        if (timeSpent > 0) {
-            GameProgressManager.updateTotalTime(pId, currentChild.getId(), timeSpent);
-        }
+        // עדכון ישיר בלי לקרוא קודם - מהיר יותר
+        Map<String, Object> updates = new HashMap<>();
+        updates.put("lastQuestionIndex", currentIndex);
+        updates.put("progressPercent", percent);
+        updates.put("completed", percent >= 100);
+        // timeSeconds - נעדכן בנפרד עם increment
+        ref.updateChildren(updates);
 
-        globalProgress.setProgress(percent);
+        // זמן ונסיונות - נצבור עם transactions
+        ref.child("timeSeconds").setValue(
+                com.google.firebase.database.ServerValue.increment(timeSpent));
+        ref.child("attempts").setValue(
+                com.google.firebase.database.ServerValue.increment(attempts));
 
-        if (tvProgressText != null) {
-            tvProgressText.setText(percent + "%");
-        }
-
-        // ⭐ מאפסים אחרי שליחה - כדי שלא יוכפלו בעדכון הבא
+        updateProgressBar();
         gameStartTime = System.currentTimeMillis();
         attempts = 0;
     }
 
     private void resetSelectionButtonColors() {
-        for (int i = 0; i < selectionButtons.length; i++) {
-            if (selectionButtons[i] != null) {
-                selectionButtons[i].setBackgroundTintList(
-                        ColorStateList.valueOf(Color.parseColor(buttonColors[i]))
-                );
-                selectionButtons[i].setTextColor(Color.WHITE);
+        int[] cardIds = {R.id.cardAns1, R.id.cardAns2, R.id.cardAns3, R.id.cardAns4};
+        for (int i = 0; i < 4; i++) {
+            View card = findViewById(cardIds[i]);
+            if (card instanceof com.google.android.material.card.MaterialCardView) {
+                ((com.google.android.material.card.MaterialCardView) card)
+                        .setCardBackgroundColor(Color.parseColor(buttonColors[i]));
             }
         }
     }
@@ -866,7 +943,7 @@ public class MixedGameActivity extends AppCompatActivity {
     }
 
     private void finishGame() {
-        // ⭐ עדכון אחרון של הזמן והטעויות לפני סיום
+        //  עדכון אחרון של הזמן והטעויות לפני סיום
         updateProgressInFirebase();
 
         double score = ((double) allQuestions.size() / (allQuestions.size() + attempts)) * 100;
@@ -877,6 +954,19 @@ public class MixedGameActivity extends AppCompatActivity {
         } else {
             showTryAgainDialog(score);
         }
+    }
+
+    private void showExitDialog() {
+        showCustomDialog(
+                "לצאת מהמשחק?",
+                "אל דאגה! ההתקדמות שלך נשמרת ותוכל להמשיך בפעם הבאה 🌟",
+                "יציאה",
+                Color.parseColor("#FF9800"),
+                () -> {
+                    updateProgressInFirebase(); // שומר התקדמות
+                    finish();
+                }
+        );
     }
 
     private void showTryAgainDialog(double score) {
@@ -970,11 +1060,7 @@ public class MixedGameActivity extends AppCompatActivity {
 
     @Override
     protected void onDestroy() {
-        // ⭐ עדכון אחרון לפני סגירת המסך
-        if (currentChild != null && SharedPreferencesUtil.getUser(this) != null && allQuestions != null && !allQuestions.isEmpty()) {
-            updateProgressInFirebase();
-        }
-
+        // הסר את updateProgressInFirebase מכאן!
         if (tts != null) {
             tts.stop();
             tts.shutdown();

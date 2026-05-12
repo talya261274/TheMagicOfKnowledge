@@ -72,26 +72,12 @@
         app:layout_constraintStart_toStartOf="@+id/log"
         app:layout_constraintTop_toTopOf="@+id/log" />
 
-    <!-- הלוגו המרכזי -->
-    <ImageView
-        android:id="@+id/log"
-        android:layout_width="280dp"
-        android:layout_height="280dp"
-        android:layout_marginTop="120dp"
-        android:contentDescription="לוגו הקוסם"
-        android:src="@drawable/wizard_placeholder"
-        app:layout_constraintBottom_toTopOf="@+id/appName"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_chainStyle="packed" />
-
     <!-- שם האפליקציה -->
     <TextView
         android:id="@+id/appName"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginTop="20dp"
+        android:layout_marginTop="40dp"
         android:fontFamily="@font/gan"
         android:shadowColor="#65A2B8"
         android:shadowDx="4"
@@ -123,12 +109,26 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/appName" />
 
+    <!-- הלוגו המרכזי -->
+    <ImageView
+        android:id="@+id/log"
+        android:layout_width="280dp"
+        android:layout_height="280dp"
+        android:layout_marginTop="120dp"
+        android:contentDescription="לוגו הקוסם"
+        android:src="@drawable/wizard_placeholder1"
+        app:layout_constraintBottom_toTopOf="@+id/appName"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_chainStyle="packed" />
+
     <!-- שורת טעינה -->
     <ProgressBar
         android:id="@+id/progressBar"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginBottom="80dp"
+        android:layout_marginBottom="60dp"
         android:indeterminateTint="#FFFFFF"
         app:layout_constraintBottom_toTopOf="@+id/loadingText"
         app:layout_constraintEnd_toEndOf="parent"

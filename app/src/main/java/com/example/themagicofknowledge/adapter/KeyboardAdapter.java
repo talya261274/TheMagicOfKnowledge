@@ -35,9 +35,9 @@ public class KeyboardAdapter extends ArrayAdapter<String> {
                     ViewGroup.LayoutParams.MATCH_PARENT, 140);
             btn.setLayoutParams(params);
 
-            btn.setTextSize(20);
-            btn.setTextColor(Color.BLACK);
-            btn.setAllCaps(false);
+            btn.setTextSize(18);
+            btn.setTextColor(Color.parseColor("#1E5F8B")); // כחול כמו שאר האפליקציה
+            btn.setTypeface(android.graphics.Typeface.DEFAULT_BOLD);
 
             btn.setBackgroundResource(R.drawable.keyboard_key_selector);
 

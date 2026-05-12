@@ -15,85 +15,99 @@
         android:orientation="vertical"
         android:padding="28dp">
 
-        <!-- ===== אייקון אזהרה בעיגול ===== -->
+        <!-- עיגול אייקון -->
         <androidx.cardview.widget.CardView
-            android:layout_width="80dp"
-            android:layout_height="80dp"
-            android:layout_marginBottom="16dp"
-            app:cardBackgroundColor="#FFEBEE"
-            app:cardCornerRadius="40dp"
-            app:cardElevation="0dp">
+            android:layout_width="100dp"
+            android:layout_height="100dp"
+            android:layout_marginBottom="20dp"
+            app:cardBackgroundColor="#E3F2FD"
+            app:cardCornerRadius="50dp"
+            app:cardElevation="6dp">
 
             <TextView
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
                 android:gravity="center"
                 android:text="⚠️"
-                android:textSize="40sp" />
+                android:textSize="48sp" />
 
         </androidx.cardview.widget.CardView>
 
-        <!-- ===== כותרת ===== -->
-        <TextView
-            android:id="@+id/tvDialogTitle"
+        <!-- כותרת עם כוכבים -->
+        <LinearLayout
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginBottom="8dp"
-            android:fontFamily="@font/gan"
             android:gravity="center"
-            android:text="כותרת"
-            android:textColor="#1E5F8B"
-            android:textSize="22sp"
-            android:textStyle="bold" />
+            android:orientation="horizontal"
+            android:layout_marginBottom="4dp">
 
-        <!-- ===== הודעה ===== -->
-        <TextView
-            android:id="@+id/tvDialogMessage"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginBottom="24dp"
-            android:fontFamily="@font/varelaround"
-            android:gravity="center"
-            android:lineSpacingExtra="2dp"
-            android:text="האם אתם בטוחים?"
-            android:textColor="#5C6166"
-            android:textSize="15sp" />
-
-        <!-- ===== כפתורים ===== -->
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:gravity="center"
-            android:orientation="vertical">
-
-            <!-- כפתור אישור -->
-            <com.google.android.material.button.MaterialButton
-                android:id="@+id/btnConfirm"
-                android:layout_width="match_parent"
-                android:layout_height="52dp"
-                android:fontFamily="@font/gan"
-                android:text="אישור"
-                android:textColor="#FFFFFF"
-                android:textSize="17sp"
-                android:textStyle="bold"
-                app:backgroundTint="#FF5252"
-                app:cornerRadius="26dp"
-                app:elevation="4dp" />
-
-            <!-- כפתור ביטול -->
             <TextView
-                android:id="@+id/btnCancel"
+                android:id="@+id/tvDialogTitle"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="12dp"
-                android:fontFamily="@font/varelaround"
-                android:padding="10dp"
-                android:text="לא, חזור אחורה"
-                android:textColor="#9E9E9E"
-                android:textSize="14sp"
+                android:fontFamily="@font/gan"
+                android:gravity="center"
+                android:shadowColor="#90CAF9"
+                android:shadowDx="1"
+                android:shadowDy="1"
+                android:shadowRadius="4"
+                android:text="כותרת"
+                android:textColor="#1E5F8B"
+                android:textSize="24sp"
                 android:textStyle="bold" />
 
         </LinearLayout>
+
+        <!-- כרטיס הודעה -->
+        <androidx.cardview.widget.CardView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="14dp"
+            android:layout_marginBottom="22dp"
+            app:cardBackgroundColor="#dafaff"
+            app:cardCornerRadius="16dp"
+            app:cardElevation="0dp">
+
+            <TextView
+                android:id="@+id/tvDialogMessage"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:fontFamily="@font/varelaround"
+                android:gravity="center"
+                android:lineSpacingExtra="4dp"
+                android:padding="16dp"
+                android:text="האם אתם בטוחים?"
+                android:textColor="#1E5F8B"
+                android:textSize="15sp" />
+
+        </androidx.cardview.widget.CardView>
+
+        <!-- כפתור אישור -->
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/btnConfirm"
+            android:layout_width="match_parent"
+            android:layout_height="52dp"
+            android:fontFamily="@font/gan"
+            android:text="אישור"
+            android:textColor="#FFFFFF"
+            android:textSize="17sp"
+            android:textStyle="bold"
+            app:backgroundTint="#FF5252"
+            app:cornerRadius="26dp"
+            app:elevation="4dp" />
+
+        <!-- כפתור ביטול -->
+        <TextView
+            android:id="@+id/btnCancel"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="12dp"
+            android:fontFamily="@font/varelaround"
+            android:padding="10dp"
+            android:text="לא, חזור אחורה"
+            android:textColor="#9E9E9E"
+            android:textSize="14sp"
+            android:textStyle="bold" />
 
     </LinearLayout>
 </androidx.cardview.widget.CardView>

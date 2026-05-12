@@ -6,20 +6,26 @@
     android:layout_margin="8dp"
     android:clickable="true"
     android:focusable="true"
-    android:foreground="?attr/selectableItemBackground"
-    app:cardBackgroundColor="@android:color/transparent"
+    app:cardBackgroundColor="#FFFFFF"
     app:cardCornerRadius="20dp"
     app:cardElevation="8dp"
     app:strokeColor="#1E5F8B"
     app:strokeWidth="2dp">
 
     <LinearLayout
+        android:id="@+id/cardInner"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:background="@drawable/answer_button_gradient"
         android:gravity="center"
         android:orientation="vertical"
         android:padding="8dp">
+
+        <ImageView
+            android:id="@+id/answerImage"
+            android:layout_width="56dp"
+            android:layout_height="56dp"
+            android:scaleType="centerInside"
+            android:visibility="gone" />
 
         <TextView
             android:id="@+id/answerText"
@@ -27,14 +33,10 @@
             android:layout_height="wrap_content"
             android:fontFamily="@font/gan"
             android:gravity="center"
-            android:shadowColor="#FFFFFF"
-            android:shadowDx="1"
-            android:shadowDy="1"
-            android:shadowRadius="2"
-            android:text="תשובה"
             android:textColor="#1E5F8B"
             android:textSize="20sp"
-            android:textStyle="bold" />
+            android:textStyle="bold"
+            android:visibility="visible" />
 
     </LinearLayout>
 </com.google.android.material.card.MaterialCardView>

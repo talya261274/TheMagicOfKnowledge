@@ -1,6 +1,7 @@
 package com.example.themagicofknowledge.screens;
 
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.graphics.Color;
 import android.os.Bundle;
 import android.view.View;
@@ -18,6 +19,7 @@ import com.example.themagicofknowledge.models.UserChild;
 import com.example.themagicofknowledge.models.UserParent;
 import com.example.themagicofknowledge.services.DatabaseService;
 import com.example.themagicofknowledge.utils.SharedPreferencesUtil;
+import com.google.android.material.button.MaterialButton;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 
 import java.util.ArrayList;
@@ -37,33 +39,57 @@ public class SelectChildActivity extends BaseActivity {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
-        try {
-            super.onCreate(savedInstanceState);
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_select_child);
 
-            setContentView(R.layout.activity_select_child);
+        currentParent = SharedPreferencesUtil.getUser(this);
 
-            rvChildren = findViewById(R.id.rvChildren);
+        // הגנה: אם אין הורה מחובר, חזרה למסך הכניסה
+        if (currentParent == null) {
+            Intent intent = new Intent(this, LandingActivity.class);
+            intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+            startActivity(intent);
+            finish();
+            return;
+        }
 
-            currentParent = SharedPreferencesUtil.getUser(this);
+        rvChildren = findViewById(R.id.rvChildren);
+        childrenList = new ArrayList<>();
+        
+        if (currentParent.getChildrenList() != null) {
+            childrenList.addAll(currentParent.getChildrenListAsList());
+            childrenList.sort((a, b) -> Integer.compare(a.getAge(), b.getAge()));
+        }
 
-            childrenList = new ArrayList<>();
-            if (currentParent != null && currentParent.getChildrenList() != null) {
-                childrenList.addAll(currentParent.getChildrenListAsList());
-            }
+        updateLayoutManager();
 
+        adapter = new ChildAdapter(childrenList,
+                child -> handleChildClick(child),
+                child -> showDeleteConfirmationDialog(child)
+        );
+        rvChildren.setAdapter(adapter);
+        rvChildren.setLayoutDirection(View.LAYOUT_DIRECTION_RTL);
+
+        loadChildrenFromDB();
+        updateEmptyState();
+
+        findViewById(R.id.btnAddFirstChild).setOnClickListener(v -> showAddChildDialog());
+        ((FloatingActionButton) findViewById(R.id.fabAddChild)).setOnClickListener(v -> showAddChildDialog());
+    }
+
+    private void updateLayoutManager() {
+        if (childrenList.size() == 1) {
+            GridLayoutManager lm = new GridLayoutManager(this, 2);
+            lm.setSpanSizeLookup(new GridLayoutManager.SpanSizeLookup() {
+                @Override
+                public int getSpanSize(int position) {
+                    return 2; // ילד יחיד - תופס שתי עמודות = מרכז
+                }
+            });
+            rvChildren.setLayoutManager(lm);
+        } else {
             rvChildren.setLayoutManager(new GridLayoutManager(this, 2));
-            adapter = new ChildAdapter(childrenList,
-                    child -> handleChildClick(child),  // ⭐ פונקציה חדשה לטיפול בלחיצה
-                    child -> showDeleteConfirmationDialog(child)
-            );
-            rvChildren.setAdapter(adapter);
-
-            loadChildrenFromDB();
-
-            FloatingActionButton fabAddChild = findViewById(R.id.fabAddChild);
-            fabAddChild.setOnClickListener(v -> showAddChildDialog());
-
-        } catch (Exception e) {}
+        }
     }
 
     /**
@@ -71,22 +97,16 @@ public class SelectChildActivity extends BaseActivity {
      * בודקת אם הילד כבר עשה מבדק. אם כן - ישר ל-Main, אם לא - ל-PlacementTest.
      */
     private void handleChildClick(UserChild child) {
-        // שמירת הילד הנבחר
         SharedPreferencesUtil.saveCurrentChild(this, child);
         SharedPreferencesUtil.saveCurrentChildId(this, child.getId());
 
-        // ⭐ בדיקה אם הילד עשה מבדק
         if (child.getLastPlacementScore() != null) {
             // ✅ עשה מבדק - ישר ל-MainActivity
             Intent intent = new Intent(this, MainActivity.class);
             intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
             startActivity(intent);
         } else {
-            // ❌ לא עשה מבדק - שולחים למבדק רמה
-            Intent intent = new Intent(this, PlacementTestActivity.class);
-            intent.putExtra("isNewChild", true);
-            intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
-            startActivity(intent);
+            showPlacementTestIntroDialog(child); // ← העבר את child
         }
     }
 
@@ -97,12 +117,13 @@ public class SelectChildActivity extends BaseActivity {
                 if (userParentServer != null) {
                     childrenList.clear();
                     childrenList.addAll(userParentServer.getChildrenListAsList());
-
+                    childrenList.sort((a, b) -> Integer.compare(a.getAge(), b.getAge()));
                     currentParent.setChildrenList(userParentServer.getChildrenList());
                     SharedPreferencesUtil.saveUser(SelectChildActivity.this, currentParent);
-
+                    updateLayoutManager(); // ← עדכן layout לפי מספר הילדים
                     adapter.notifyDataSetChanged();
                 }
+                updateEmptyState();
             }
 
             @Override
@@ -179,6 +200,60 @@ public class SelectChildActivity extends BaseActivity {
                     tvError.setVisibility(View.VISIBLE);
                 }
             });
+        });
+
+        dialog.show();
+    }
+
+    private void updateEmptyState() {
+        View emptyStateLayout = findViewById(R.id.emptyStateLayout);
+        View childrenCard = findViewById(R.id.childrenCard);
+
+        if (childrenList.isEmpty()) {
+            emptyStateLayout.setVisibility(View.VISIBLE);
+            childrenCard.setVisibility(View.GONE);
+        } else {
+            emptyStateLayout.setVisibility(View.GONE);
+            childrenCard.setVisibility(View.VISIBLE);
+        }
+    }
+
+    private void showPlacementTestIntroDialog(UserChild child) {
+        SharedPreferences prefs = getSharedPreferences("placement_prefs", MODE_PRIVATE);
+        String level = child.getAgeGroup();
+        boolean hasSavedProgress = prefs.contains("placement_index_" + level)
+                && prefs.getInt("placement_index_" + level, 0) > 0;
+
+        final android.app.Dialog dialog = new android.app.Dialog(this);
+        dialog.setContentView(R.layout.dialog_placement_intro);
+        dialog.setCancelable(false);
+
+        if (dialog.getWindow() != null) {
+            dialog.getWindow().setBackgroundDrawableResource(android.R.color.transparent);
+        }
+
+        // ===== שינוי הטקסטים לפי מצב =====
+        TextView tvTitle = dialog.findViewById(R.id.tvDialogTitle);
+        TextView tvMessage = dialog.findViewById(R.id.tvDialogMessage);
+        MaterialButton btnStart = dialog.findViewById(R.id.btnStartTest);
+
+        if (hasSavedProgress) {
+            if (tvTitle != null) tvTitle.setText("ברוכים השבים!");
+            if (tvMessage != null) tvMessage.setText("השארת את המבדק באמצע, בואו נמשיך מאיפה שעצרנו! 💪");
+            btnStart.setText("המשך מבדק ▶");
+        }
+        // אם אין progress - הטקסטים הברירת מחדל מה-XML נשארים
+
+        dialog.findViewById(R.id.btnStartTest).setOnClickListener(v -> {
+            dialog.dismiss();
+            Intent intent = new Intent(this, PlacementTestActivity.class);
+            intent.putExtra("isNewChild", true);
+            intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+            startActivity(intent);
+        });
+
+        dialog.findViewById(R.id.btnLater).setOnClickListener(v -> {
+            dialog.dismiss();
         });
 
         dialog.show();

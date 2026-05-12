@@ -50,23 +50,42 @@ public class MemoryAdapter extends BaseAdapter {
             convertView = LayoutInflater.from(context).inflate(R.layout.card_item, parent, false);
         }
 
-        // הגדרת גודל הכרטיס
-        View cardContainer = convertView.findViewById(R.id.cardContainer);
-        if (cardContainer != null) {
-            ViewGroup.LayoutParams params = cardContainer.getLayoutParams();
+        // הגדרת גודל ישירות על convertView
+        ViewGroup.LayoutParams params = convertView.getLayoutParams();
+        if (params == null) {
+            params = new ViewGroup.LayoutParams(cardSize, cardSize);
+        } else {
             params.width = cardSize;
             params.height = cardSize;
-            cardContainer.setLayoutParams(params);
         }
+        convertView.setLayoutParams(params);
 
         FrameLayout cardBackground = convertView.findViewById(R.id.cardBackground);
-        ImageView ivCardBack = convertView.findViewById(R.id.ivCardBack);
+        TextView ivCardBack = convertView.findViewById(R.id.ivCardBack);
         ImageView imageView = convertView.findViewById(R.id.cardImage);
         TextView textView = convertView.findViewById(R.id.cardText);
 
-        if (card.isFlipped || card.isMatched) {
-            ivCardBack.setVisibility(View.GONE);
-            cardBackground.setBackgroundColor(Color.WHITE);
+        androidx.cardview.widget.CardView cardView =
+                (androidx.cardview.widget.CardView) convertView;
+
+
+        if (card.isMatched) {
+            cardView.setCardBackgroundColor(Color.parseColor("#C8F5C8"));
+            if (card.imageRes != 0) {
+                imageView.setVisibility(View.VISIBLE);
+                imageView.setImageResource(card.imageRes);
+                imageView.setBackgroundColor(Color.parseColor("#C8F5C8"));
+                textView.setVisibility(View.GONE);
+            } else {
+                textView.setVisibility(View.VISIBLE);
+                textView.setText(card.text);
+                textView.setBackgroundColor(Color.parseColor("#C8F5C8"));
+                imageView.setVisibility(View.GONE);
+            }
+        } else if (card.isFlipped) {
+            cardView.setCardBackgroundColor(Color.WHITE);
+            imageView.setBackgroundColor(Color.WHITE);
+            textView.setBackgroundColor(Color.WHITE);
             if (card.imageRes != 0) {
                 imageView.setVisibility(View.VISIBLE);
                 imageView.setImageResource(card.imageRes);
@@ -77,10 +96,12 @@ public class MemoryAdapter extends BaseAdapter {
                 imageView.setVisibility(View.GONE);
             }
         } else {
+            cardView.setCardBackgroundColor(Color.TRANSPARENT);
             ivCardBack.setVisibility(View.VISIBLE);
             imageView.setVisibility(View.GONE);
             textView.setVisibility(View.GONE);
-            cardBackground.setBackgroundColor(Color.TRANSPARENT);
+            imageView.setBackgroundColor(Color.TRANSPARENT);
+            textView.setBackgroundColor(Color.TRANSPARENT);
         }
 
         return convertView;

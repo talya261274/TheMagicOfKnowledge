@@ -6,184 +6,492 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="@drawable/main_background"
+    android:layoutDirection="ltr"
     android:padding="20dp"
     tools:context=".screens.PlacementTestActivity">
 
-    <ProgressBar
-        android:id="@+id/testProgress"
-        style="?android:attr/progressBarStyleHorizontal"
+    <!-- ===== פס התקדמות ===== -->
+    <androidx.cardview.widget.CardView
+        android:id="@+id/progressCard"
         android:layout_width="0dp"
-        android:layout_height="12dp"
-        android:layout_marginTop="16dp"
-        android:progressTint="#4CAF50"
-        app:layout_constraintEnd_toEndOf="parent"
+        android:layout_height="50dp"
+        android:layout_marginTop="20dp"
+        android:layout_marginEnd="8dp"
+        app:cardBackgroundColor="#FFFFFF"
+        app:cardCornerRadius="20dp"
+        app:cardElevation="8dp"
+        app:layout_constraintEnd_toStartOf="@id/exitCard"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+        app:layout_constraintTop_toTopOf="parent">
 
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:gravity="center_vertical"
+            android:orientation="horizontal"
+            android:padding="12dp">
+
+            <TextView
+                android:id="@+id/tvProgressPercent"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:fontFamily="@font/gan"
+                android:text="0%"
+                android:textColor="#FF9800"
+                android:textSize="14sp"
+                android:textStyle="bold" />
+
+            <ProgressBar
+                android:id="@+id/testProgress"
+                style="@android:style/Widget.ProgressBar.Horizontal"
+                android:layout_width="0dp"
+                android:layout_height="12dp"
+                android:layout_marginStart="5dp"
+                android:layout_marginEnd="5dp"
+                android:layout_weight="1"
+                android:progressDrawable="@drawable/progress_bar_colorful" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="🎯"
+                android:textSize="20sp" />
+
+        </LinearLayout>
+    </androidx.cardview.widget.CardView>
+
+    <!-- ===== כפתור יציאה ===== -->
+    <androidx.cardview.widget.CardView
+        android:id="@+id/exitCard"
+        android:layout_width="50dp"
+        android:layout_height="50dp"
+        android:layout_marginTop="20dp"
+        app:cardBackgroundColor="#FFFFFF"
+        app:cardCornerRadius="25dp"
+        app:cardElevation="8dp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="parent">
+
+        <ImageButton
+            android:id="@+id/btnExit"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:background="@android:color/transparent"
+            android:padding="10dp"
+            android:src="@android:drawable/ic_menu_close_clear_cancel"
+            app:tint="#E91E63" />
+
+    </androidx.cardview.widget.CardView>
+
+    <!-- ===== כותרת השאלה ===== -->
     <TextView
         android:id="@+id/tvQuestion"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:layout_marginTop="24dp"
+        android:layout_marginTop="45dp"
         android:fontFamily="@font/gan"
         android:gravity="center"
-        android:textColor="@color/white"
-        android:textSize="28sp"
+        android:shadowColor="#65A2B8"
+        android:shadowDx="2"
+        android:shadowDy="2"
+        android:shadowRadius="6"
+        android:textColor="#1E5F8B"
+        android:textSize="32sp"
         android:textStyle="bold"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/testProgress"
+        app:layout_constraintTop_toBottomOf="@id/progressCard"
         tools:text="מה מופיע בתמונה?" />
 
+    <!-- ===== אזור תוכן ===== -->
     <FrameLayout
         android:id="@+id/mediaContainer"
         android:layout_width="0dp"
-        android:layout_height="200dp"
-        android:layout_marginTop="20dp"
+        android:layout_height="0dp"
+        android:layout_marginTop="30dp"
+        android:layout_marginBottom="8dp"
+        app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/tvQuestion">
 
-        <androidx.cardview.widget.CardView
-            android:id="@+id/cardMedia"
+        <!-- ===== תמונה / כפתור אודיו ===== -->
+        <LinearLayout
+            android:id="@+id/mediaAndAnswers"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            app:cardCornerRadius="20dp"
-            app:cardElevation="4dp">
+            android:orientation="vertical">
 
-            <ImageView
-                android:id="@+id/ivQuestionMedia"
+            <!-- כרטיס מדיה (תמונה / אודיו) -->
+            <androidx.cardview.widget.CardView
+                android:id="@+id/cardMedia"
                 android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:scaleType="centerInside"
-                android:src="@drawable/wizard_placeholder" />
-        </androidx.cardview.widget.CardView>
+                android:layout_height="180dp"
+                android:visibility="gone"
+                app:cardBackgroundColor="#FFFFFF"
+                app:cardCornerRadius="24dp"
+                app:cardElevation="8dp">
 
-        <com.google.android.material.button.MaterialButton
-            android:id="@+id/btnPlayAudio"
-            android:layout_width="120dp"
-            android:layout_height="120dp"
-            android:layout_gravity="center"
-            android:visibility="gone"
-            app:backgroundTint="#FF9800"
-            app:cornerRadius="60dp"
-            app:icon="@drawable/ic_volume_up"
-            app:iconGravity="textStart"
-            app:iconSize="60dp" />
+                <ImageView
+                    android:id="@+id/ivQuestionMedia"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:padding="16dp"
+                    android:scaleType="centerInside"
+                    android:src="@drawable/wizard_placeholder1" />
+
+            </androidx.cardview.widget.CardView>
+
+            <!-- כפתור אודיו -->
+            <LinearLayout
+                android:id="@+id/audioContainer"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="25dp"
+                android:layout_marginBottom="8dp"
+                android:gravity="center"
+                android:orientation="vertical"
+                android:visibility="gone">
+
+                <!-- כרטיס רקע מעוגל שעוטף הכל -->
+                <androidx.cardview.widget.CardView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    app:cardBackgroundColor="#dafaff"
+                    app:cardCornerRadius="32dp"
+                    app:cardElevation="0dp">
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:gravity="center"
+                        android:orientation="vertical"
+                        android:paddingTop="20dp"
+                        android:paddingBottom="20dp">
+
+                        <!-- עיגולי הילה + כפתור -->
+                        <FrameLayout
+                            android:layout_width="120dp"
+                            android:layout_height="120dp">
+
+                            <View
+                                android:layout_width="120dp"
+                                android:layout_height="120dp"
+                                android:layout_gravity="center"
+                                android:alpha="0.15"
+                                android:background="@drawable/circle_glow" />
+
+                            <View
+                                android:layout_width="90dp"
+                                android:layout_height="90dp"
+                                android:layout_gravity="center"
+                                android:alpha="0.2"
+                                android:background="@drawable/circle_glow" />
+
+                            <com.google.android.material.button.MaterialButton
+                                android:id="@+id/btnPlayAudio"
+                                android:layout_width="120dp"
+                                android:layout_height="120dp"
+                                android:layout_gravity="center"
+                                android:insetLeft="0dp"
+                                android:insetTop="0dp"
+                                android:insetRight="0dp"
+                                android:insetBottom="0dp"
+                                app:backgroundTint="#FFFFFF"
+                                app:cornerRadius="60dp"
+                                app:elevation="12dp"
+                                app:icon="@drawable/ic_volume_up"
+                                app:iconGravity="textStart"
+                                app:iconPadding="0dp"
+                                app:iconSize="70dp"
+                                app:iconTint="#FF9800"
+                                app:rippleColor="#FFE0B2" />
+
+                        </FrameLayout>
+
+                        <!-- טקסט מתחת -->
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="12dp"
+                            android:alpha="0.8"
+                            android:fontFamily="@font/gan"
+                            android:text="לחצו להאזנה 🎧"
+                            android:textColor="#1E5F8B"
+                            android:textSize="14sp"
+                            android:textStyle="bold" />
+
+                    </LinearLayout>
+                </androidx.cardview.widget.CardView>
+
+            </LinearLayout>
+
+            <!-- 4 כפתורי תשובה -->
+            <LinearLayout
+                android:id="@+id/answersContainer"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="30dp"
+                android:orientation="vertical"
+                android:visibility="gone">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal">
+
+                    <com.google.android.material.card.MaterialCardView
+                        android:id="@+id/cardAns1"
+                        android:layout_width="0dp"
+                        android:layout_height="130dp"
+                        android:layout_margin="6dp"
+                        android:layout_weight="1"
+                        app:cardBackgroundColor="#FF9800"
+                        app:cardCornerRadius="20dp"
+                        app:cardElevation="8dp">
+
+                        <FrameLayout
+                            android:layout_width="match_parent"
+                            android:layout_height="match_parent">
+
+                            <ImageView
+                                android:id="@+id/btnAns1"
+                                android:layout_width="match_parent"
+                                android:layout_height="match_parent"
+                                android:padding="14dp"
+                                android:scaleType="centerInside" />
+
+                            <TextView
+                                android:id="@+id/tvAns1"
+                                android:layout_width="match_parent"
+                                android:layout_height="match_parent"
+                                android:fontFamily="@font/gan"
+                                android:gravity="center"
+                                android:textColor="#FFFFFF"
+                                android:textSize="22sp"
+                                android:textStyle="bold"
+                                android:visibility="gone" />
+
+                        </FrameLayout>
+                    </com.google.android.material.card.MaterialCardView>
+
+                    <com.google.android.material.card.MaterialCardView
+                        android:id="@+id/cardAns2"
+                        android:layout_width="0dp"
+                        android:layout_height="130dp"
+                        android:layout_margin="6dp"
+                        android:layout_weight="1"
+                        app:cardBackgroundColor="#4CAF50"
+                        app:cardCornerRadius="20dp"
+                        app:cardElevation="8dp">
+
+                        <FrameLayout
+                            android:layout_width="match_parent"
+                            android:layout_height="match_parent">
+
+                            <ImageView
+                                android:id="@+id/btnAns2"
+                                android:layout_width="match_parent"
+                                android:layout_height="match_parent"
+                                android:padding="14dp"
+                                android:scaleType="centerInside" />
+
+                            <TextView
+                                android:id="@+id/tvAns2"
+                                android:layout_width="match_parent"
+                                android:layout_height="match_parent"
+                                android:fontFamily="@font/gan"
+                                android:gravity="center"
+                                android:textColor="#FFFFFF"
+                                android:textSize="22sp"
+                                android:textStyle="bold"
+                                android:visibility="gone" />
+
+                        </FrameLayout>
+                    </com.google.android.material.card.MaterialCardView>
+
+                </LinearLayout>
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal">
+
+                    <com.google.android.material.card.MaterialCardView
+                        android:id="@+id/cardAns3"
+                        android:layout_width="0dp"
+                        android:layout_height="130dp"
+                        android:layout_margin="6dp"
+                        android:layout_weight="1"
+                        app:cardBackgroundColor="#2196F3"
+                        app:cardCornerRadius="20dp"
+                        app:cardElevation="8dp">
+
+                        <FrameLayout
+                            android:layout_width="match_parent"
+                            android:layout_height="match_parent">
+
+                            <ImageView
+                                android:id="@+id/btnAns3"
+                                android:layout_width="match_parent"
+                                android:layout_height="match_parent"
+                                android:padding="14dp"
+                                android:scaleType="centerInside" />
+
+                            <TextView
+                                android:id="@+id/tvAns3"
+                                android:layout_width="match_parent"
+                                android:layout_height="match_parent"
+                                android:fontFamily="@font/gan"
+                                android:gravity="center"
+                                android:textColor="#FFFFFF"
+                                android:textSize="22sp"
+                                android:textStyle="bold"
+                                android:visibility="gone" />
+
+                        </FrameLayout>
+                    </com.google.android.material.card.MaterialCardView>
+
+                    <com.google.android.material.card.MaterialCardView
+                        android:id="@+id/cardAns4"
+                        android:layout_width="0dp"
+                        android:layout_height="130dp"
+                        android:layout_margin="6dp"
+                        android:layout_weight="1"
+                        app:cardBackgroundColor="#E91E63"
+                        app:cardCornerRadius="20dp"
+                        app:cardElevation="8dp">
+
+                        <FrameLayout
+                            android:layout_width="match_parent"
+                            android:layout_height="match_parent">
+
+                            <ImageView
+                                android:id="@+id/btnAns4"
+                                android:layout_width="match_parent"
+                                android:layout_height="match_parent"
+                                android:padding="14dp"
+                                android:scaleType="centerInside" />
+
+                            <TextView
+                                android:id="@+id/tvAns4"
+                                android:layout_width="match_parent"
+                                android:layout_height="match_parent"
+                                android:fontFamily="@font/gan"
+                                android:gravity="center"
+                                android:textColor="#FFFFFF"
+                                android:textSize="22sp"
+                                android:textStyle="bold"
+                                android:visibility="gone" />
+
+                        </FrameLayout>
+                    </com.google.android.material.card.MaterialCardView>
+
+                </LinearLayout>
+
+            </LinearLayout>
+
+            <!-- ===== מקלדת (רמה 7-8) ===== -->
+            <LinearLayout
+                android:id="@+id/containerKeyboard"
+                android:layout_width="match_parent"
+                android:layout_height="0dp"
+                android:layout_weight="1"
+                android:orientation="vertical"
+                android:visibility="gone">
+
+                <!-- תמונה -->
+                <androidx.cardview.widget.CardView
+                    android:id="@+id/cardMediaKeyboard"
+                    android:layout_width="match_parent"
+                    android:layout_height="160dp"
+                    android:layout_marginTop="20dp"
+                    android:visibility="gone"
+                    app:cardBackgroundColor="#FFFFFF"
+                    app:cardCornerRadius="24dp"
+                    app:cardElevation="8dp">
+
+                    <ImageView
+                        android:id="@+id/ivQuestionMediaKeyboard"
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:padding="16dp"
+                        android:scaleType="centerInside"
+                        android:src="@drawable/wizard_placeholder1" />
+
+                </androidx.cardview.widget.CardView>
+
+                <!-- שדה תשובה -->
+                <com.google.android.material.card.MaterialCardView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="20dp"
+                    app:cardBackgroundColor="#FFFFFF"
+                    app:cardCornerRadius="20dp"
+                    app:cardElevation="8dp"
+                    app:strokeColor="#FF9800"
+                    app:strokeWidth="2dp">
+
+                    <EditText
+                        android:id="@+id/etPlacementAnswer"
+                        android:layout_width="match_parent"
+                        android:layout_height="60dp"
+                        android:background="@android:color/transparent"
+                        android:focusable="false"
+                        android:fontFamily="@font/gan"
+                        android:gravity="center"
+                        android:hint="הקלידו כאן..."
+                        android:textColor="#1E5F8B"
+                        android:textColorHint="#9E9E9E"
+                        android:textSize="22sp"
+                        android:textStyle="bold" />
+
+                </com.google.android.material.card.MaterialCardView>
+
+                <!-- מקלדת -->
+                <androidx.cardview.widget.CardView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="20dp"
+                    app:cardBackgroundColor="@color/transparent"
+                    app:cardCornerRadius="20dp"
+                    app:cardElevation="0dp">
+
+                    <GridView
+                        android:id="@+id/placementKeyboard"
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:layout_marginTop="5dp"
+                        android:layout_marginBottom="5dp"
+                        android:layout_marginRight="5dp"
+                        android:layout_marginLeft="5dp"
+                        android:horizontalSpacing="5dp"
+                        android:numColumns="7"
+                        android:padding="8dp"
+                        android:verticalSpacing="5dp" />
+
+                </androidx.cardview.widget.CardView>
+
+                <!-- כפתור בדיקה -->
+                <com.google.android.material.button.MaterialButton
+                    android:id="@+id/btnSubmitPlacement"
+                    android:layout_width="300dp"
+                    android:layout_height="54dp"
+                    android:layout_marginTop="20dp"
+                    android:layout_gravity="center"
+                    android:fontFamily="@font/gan"
+                    android:text="בדקו תשובה ✓"
+                    android:textColor="#FFFFFF"
+                    android:textSize="18sp"
+                    android:textStyle="bold"
+                    app:backgroundTint="#4CAF50"
+                    app:cornerRadius="27dp"
+                    app:elevation="8dp" />
+
+            </LinearLayout>
+
+        </LinearLayout>
+
     </FrameLayout>
-
-    <LinearLayout
-        android:id="@+id/answersContainer"
-        android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="24dp"
-        android:orientation="vertical"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/mediaContainer">
-
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:orientation="horizontal">
-
-            <com.google.android.material.button.MaterialButton
-                android:id="@+id/btnAns1"
-                android:layout_width="0dp"
-                android:layout_height="110dp"
-                android:layout_margin="6dp"
-                android:layout_weight="1"
-                android:textColor="#333333"
-                android:textSize="20sp"
-                app:backgroundTint="#FFFFFF"
-                app:cornerRadius="20dp"
-                app:strokeColor="#FF9800"
-                app:strokeWidth="2dp" />
-
-            <com.google.android.material.button.MaterialButton
-                android:id="@+id/btnAns2"
-                android:layout_width="0dp"
-                android:layout_height="110dp"
-                android:layout_margin="6dp"
-                android:layout_weight="1"
-                android:textColor="#333333"
-                android:textSize="20sp"
-                app:backgroundTint="#FFFFFF"
-                app:cornerRadius="20dp"
-                app:strokeColor="#4CAF50"
-                app:strokeWidth="2dp" />
-        </LinearLayout>
-
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:orientation="horizontal">
-
-            <com.google.android.material.button.MaterialButton
-                android:id="@+id/btnAns3"
-                android:layout_width="0dp"
-                android:layout_height="110dp"
-                android:layout_margin="6dp"
-                android:layout_weight="1"
-                android:textColor="#333333"
-                android:textSize="20sp"
-                app:backgroundTint="#FFFFFF"
-                app:cornerRadius="20dp"
-                app:strokeColor="#2196F3"
-                app:strokeWidth="2dp" />
-
-            <com.google.android.material.button.MaterialButton
-                android:id="@+id/btnAns4"
-                android:layout_width="0dp"
-                android:layout_height="110dp"
-                android:layout_margin="6dp"
-                android:layout_weight="1"
-                android:textColor="#333333"
-                android:textSize="20sp"
-                app:backgroundTint="#FFFFFF"
-                app:cornerRadius="20dp"
-                app:strokeColor="#E91E63"
-                app:strokeWidth="2dp" />
-        </LinearLayout>
-    </LinearLayout>
-
-    <LinearLayout
-        android:id="@+id/containerKeyboard"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:orientation="vertical"
-        android:visibility="gone"
-        app:layout_constraintTop_toBottomOf="@id/tvQuestion">
-
-        <EditText
-            android:id="@+id/etPlacementAnswer"
-            android:layout_width="match_parent"
-            android:layout_height="50dp"
-            android:layout_marginHorizontal="20dp"
-            android:background="@drawable/keyboard_key_selector"
-            android:focusable="false"
-            android:gravity="center"
-            android:textColor="@color/white"
-            android:textSize="22sp" />
-
-        <GridView
-            android:id="@+id/placementKeyboard"
-            android:layout_width="match_parent"
-            android:layout_height="200dp"
-            android:layout_marginTop="10dp"
-            android:horizontalSpacing="5dp"
-            android:numColumns="7"
-            android:verticalSpacing="5dp" />
-
-        <Button
-            android:id="@+id/btnSubmitPlacement"
-            android:layout_width="match_parent"
-            android:layout_height="55dp"
-            android:layout_marginHorizontal="40dp"
-            android:layout_marginTop="10dp"
-            android:backgroundTint="#4CAF50"
-            android:text="בדוק מילה"
-            android:textStyle="bold" />
-    </LinearLayout>
 
 </androidx.constraintlayout.widget.ConstraintLayout>

@@ -186,6 +186,11 @@ public class FlashCardMain extends AppCompatActivity {
     }
 
     private void handleStartGame() {
+        // סמן שראה את הכרטיסיות
+        getSharedPreferences("flashcard_prefs", MODE_PRIVATE)
+                .edit()
+                .putBoolean("seen_" + currentChild.getId() + "_" + subject, true)
+                .apply();
         long timeSpent = (System.currentTimeMillis() - startTime) / 1000;
         UserParent user = SharedPreferencesUtil.getUser(this);
         if (user == null) return;

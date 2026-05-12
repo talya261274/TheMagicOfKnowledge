@@ -58,7 +58,7 @@
                 android:layout_height="match_parent"
                 android:padding="12dp"
                 android:scaleType="centerCrop"
-                android:src="@drawable/wizard_placeholder"
+                android:src="@drawable/wizard_placeholder1"
                 android:contentDescription="אווטאר" />
 
         </androidx.cardview.widget.CardView>

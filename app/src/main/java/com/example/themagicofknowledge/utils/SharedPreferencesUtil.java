@@ -281,4 +281,5 @@ public class SharedPreferencesUtil {
     public static String getCurrentChildId(Context context) {
         return getString(context, "current_child_id", null);
     }
+
 }

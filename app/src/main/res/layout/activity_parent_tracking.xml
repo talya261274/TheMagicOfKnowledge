@@ -17,21 +17,6 @@
         android:paddingEnd="20dp"
         android:paddingBottom="24dp">
 
-        <!-- כפתור חזרה -->
-        <FrameLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content">
-
-            <com.google.android.material.button.MaterialButton
-                android:id="@+id/goBackBtnTracking"
-                android:layout_width="81dp"
-                android:layout_height="56dp"
-                android:backgroundTint="@android:color/transparent"
-                android:text="➜"
-                android:textColor="#1E5F8B"
-                android:textSize="24dp" />
-        </FrameLayout>
-
         <!-- כותרת -->
         <TextView
             android:layout_width="wrap_content"
@@ -52,7 +37,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_gravity="center"
-            android:layout_marginTop="4dp"
+            android:layout_marginTop="6dp"
             android:alpha="0.95"
             android:fontFamily="@font/varelaround"
             android:text="עקבו אחרי ההתקדמות של הילדים 📊"
@@ -63,7 +48,7 @@
         <androidx.cardview.widget.CardView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginTop="24dp"
+            android:layout_marginTop="40dp"
             app:cardBackgroundColor="#F6EBF3"
             app:cardCornerRadius="24dp"
             app:cardElevation="10dp">
@@ -128,7 +113,7 @@
         <androidx.cardview.widget.CardView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginTop="16dp"
+            android:layout_marginTop="20dp"
             app:cardBackgroundColor="#F6EBF3"
             app:cardCornerRadius="24dp"
             app:cardElevation="10dp">
@@ -184,7 +169,7 @@
                     android:id="@+id/tvCurrentLevel"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_marginTop="8dp"
+                    android:layout_marginTop="12dp"
                     android:background="@drawable/level_badge_background"
                     android:fontFamily="@font/varelaround"
                     android:paddingStart="16dp"
@@ -202,7 +187,7 @@
         <androidx.cardview.widget.CardView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginTop="16dp"
+            android:layout_marginTop="20dp"
             app:cardBackgroundColor="#FF9800"
             app:cardCornerRadius="24dp"
             app:cardElevation="10dp">
@@ -218,6 +203,7 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:gravity="center"
+                    android:layout_marginRight="10dp"
                     android:text="🏆"
                     android:textSize="48sp" />
 
@@ -226,29 +212,32 @@
                     android:layout_height="wrap_content"
                     android:layout_marginStart="16dp"
                     android:layout_weight="1"
+                    android:layout_marginRight="10dp"
                     android:gravity="start"
-                    android:orientation="vertical">
+                    android:orientation="horizontal">
 
                     <TextView
-                        android:layout_width="200dp"
+                        android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:fontFamily="@font/gan"
                         android:gravity="center"
                         android:text="נושאים שהושלמו"
+                        android:layout_marginLeft="20dp"
+                        android:layout_gravity="center"
                         android:textColor="#FFFFFF"
-                        android:textSize="16sp"
+                        android:textSize="22sp"
                         android:textStyle="bold" />
 
                     <TextView
                         android:id="@+id/tvCompletedCount"
-                        android:layout_width="200dp"
+                        android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:layout_marginTop="10dp"
+                        android:layout_gravity="center"
                         android:fontFamily="@font/gan"
                         android:gravity="center"
                         android:text="0"
                         android:textColor="#FFFFFF"
-                        android:textSize="42sp"
+                        android:textSize="32sp"
                         android:textStyle="bold" />
                 </LinearLayout>
             </LinearLayout>
@@ -258,19 +247,19 @@
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginTop="30dp"
+            android:layout_marginTop="35dp"
             android:layout_marginStart="20dp"
             android:fontFamily="@font/gan"
             android:text="📈 התקדמות לפי רמות"
             android:textColor="#FFFFFF"
-            android:textSize="20sp"
+            android:textSize="22sp"
             android:textStyle="bold" />
 
         <androidx.recyclerview.widget.RecyclerView
             android:id="@+id/rvLevels"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginTop="8dp"
+            android:layout_marginTop="15dp"
             android:layout_marginBottom="20dp"
             android:nestedScrollingEnabled="false" />
     </LinearLayout>

@@ -52,36 +52,33 @@ public abstract class BaseActivity extends AppCompatActivity
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
-        try {
-            super.onCreate(savedInstanceState);
-            databaseService = DatabaseService.getInstance();
-            super.setContentView(R.layout.activity_base);
+        super.onCreate(savedInstanceState);
+        databaseService = DatabaseService.getInstance();
+        super.setContentView(R.layout.activity_base);
 
-            toolbar = findViewById(R.id.toolBar);
-            ivToolbarAvatar = findViewById(R.id.ivToolbarAvatar);
-            setSupportActionBar(toolbar);
+        toolbar = findViewById(R.id.toolBar);
+        ivToolbarAvatar = findViewById(R.id.ivToolbarAvatar);
+        setSupportActionBar(toolbar);
 
-            drawerLayout = findViewById(R.id.nav_layout);
-            navigationView = findViewById(R.id.nav_view);
-            navigationView.setNavigationItemSelectedListener(this);
+        drawerLayout = findViewById(R.id.nav_layout);
+        navigationView = findViewById(R.id.nav_view);
+        navigationView.setNavigationItemSelectedListener(this);
 
-            navigationView.setBackgroundColor(Color.parseColor("#E0F7FA"));
-            navigationView.setItemTextAppearance(R.style.NavMenuItemStyle);
+        navigationView.setBackgroundColor(Color.parseColor("#E0F7FA"));
+        navigationView.setItemTextAppearance(R.style.NavMenuItemStyle);
 
-            if (hasSideMenu()) {
-                setupDrawer();
+        if (hasSideMenu()) {
+            setupDrawer();
+        } else {
+            lockDrawer();
+        }
+
+        if (toolbar != null) {
+            if (showToolbar()) {
+                toolbar.setVisibility(View.VISIBLE);
             } else {
-                lockDrawer();
+                toolbar.setVisibility(View.GONE);
             }
-
-            if (toolbar != null) {
-                if (showToolbar()) {
-                    toolbar.setVisibility(View.VISIBLE);
-                } else {
-                    toolbar.setVisibility(View.GONE);
-                }
-            }
-        } catch (Exception e) {
         }
     }
     private void updateNavMenuByRole() {
@@ -277,19 +274,7 @@ public abstract class BaseActivity extends AppCompatActivity
 
         }
         else if (id == R.id.nav_back_to_parent) {
-            // אישור עם דיאלוג
-            showCustomDialog(
-                    "חזרה למצב הורה",
-                    "האם להפסיק את התרגול ולחזור למצב הורה?",
-                    "כן, חזור",
-                    Color.parseColor("#FF9800"),
-                    () -> {
-                        SharedPreferencesUtil.clearSelectedChild(this);
-                        Intent intent = new Intent(this, SelectChildActivity.class);
-                        intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
-                        startActivity(intent);
-                    }
-            );
+            showParentPasswordDialog();
             return true;
         }
 
@@ -348,5 +333,47 @@ public abstract class BaseActivity extends AppCompatActivity
                     startActivity(intent);
                 }
         );
+    }
+
+    private void showParentPasswordDialog() {
+        final android.app.Dialog dialog = new android.app.Dialog(this);
+        dialog.setContentView(R.layout.dialog_parent_password);
+        if (dialog.getWindow() != null)
+            dialog.getWindow().setBackgroundDrawableResource(android.R.color.transparent);
+
+        android.widget.EditText etPassword = dialog.findViewById(R.id.etParentPassword);
+        com.google.android.material.button.MaterialButton btnConfirm = dialog.findViewById(R.id.btnConfirmPassword);
+        android.widget.TextView btnCancel = dialog.findViewById(R.id.btnCancelPassword);
+        android.widget.TextView tvError = dialog.findViewById(R.id.tvPasswordError);
+
+        btnConfirm.setOnClickListener(v -> {
+            String entered = etPassword.getText().toString().trim();
+
+            // בדיקת קלט
+            if (entered.isEmpty()) {
+                tvError.setVisibility(View.VISIBLE);
+                tvError.setText("אנא הכנס סיסמה ❌");
+                return;
+            }
+
+            UserParent parent = SharedPreferencesUtil.getUser(this);
+
+            if (parent != null && entered.equals(parent.getPassword())) {
+                dialog.dismiss();
+                SharedPreferencesUtil.clearSelectedChild(this);
+                Intent intent = new Intent(this, SelectChildActivity.class);
+                intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+                startActivity(intent);
+            } else {
+                tvError.setVisibility(View.VISIBLE);
+                tvError.setText("סיסמה שגויה ❌");
+                etPassword.setText("");
+            }
+        });
+
+        btnCancel.setOnClickListener(v -> dialog.dismiss());
+
+        dialog.setCancelable(true);
+        dialog.show();
     }
 }

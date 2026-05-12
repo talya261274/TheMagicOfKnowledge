@@ -16,6 +16,7 @@ public class UserChild {
     private String currentLevel;
     private long totalTimeSeconds;
     private Map<String, Object> progress = new HashMap<>();
+    private Map<String, Boolean> completedSubjects = new HashMap<>();
 
     // ⭐ חדש - ציון המבדק (null = לא עשה מבדק עדיין)
     private Double lastPlacementScore;
@@ -87,6 +88,9 @@ public class UserChild {
     public Map<String, Object> getProgress() { return progress; }
     public void setProgress(Map<String, Object> progress) { this.progress = progress; }
 
+    public Map<String, Boolean> getCompletedSubjects() { return completedSubjects; }
+    public void setCompletedSubjects(Map<String, Boolean> completedSubjects) { this.completedSubjects = completedSubjects; }
+
     // ⭐ Getter ו-Setter לשדה החדש
     public Double getLastPlacementScore() { return lastPlacementScore; }
     public void setLastPlacementScore(Double lastPlacementScore) { this.lastPlacementScore = lastPlacementScore; }
@@ -110,7 +114,8 @@ public class UserChild {
         result.put("currentLevel", currentLevel);
         result.put("totalTimeSeconds", totalTimeSeconds);
         result.put("progress", progress);
-        result.put("lastPlacementScore", lastPlacementScore);  // ⭐ הוספה
+        result.put("completedSubjects", completedSubjects);
+        result.put("lastPlacementScore", lastPlacementScore);
         return result;
     }
 

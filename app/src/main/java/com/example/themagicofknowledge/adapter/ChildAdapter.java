@@ -53,10 +53,10 @@ public class ChildAdapter extends RecyclerView.Adapter<ChildAdapter.ChildViewHol
             if (resId != 0) {
                 holder.ivAvatar.setImageResource(resId);
             } else {
-                holder.ivAvatar.setImageResource(R.drawable.wizard_placeholder);
+                holder.ivAvatar.setImageResource(R.drawable.wizard_placeholder1);
             }
         } else {
-            holder.ivAvatar.setImageResource(R.drawable.wizard_placeholder);
+            holder.ivAvatar.setImageResource(R.drawable.wizard_placeholder1);
         }
 
         // 3. הגדרת לחיצה רגילה (לבחירת הילד)
