@@ -24,13 +24,25 @@
             app:contentInsetStart="0dp"
             app:popupTheme="@style/ThemeOverlay.AppCompat.Light">
 
-            <ImageView
-                android:id="@+id/ivToolbarAvatar"
+            <androidx.cardview.widget.CardView
+                android:id="@+id/cardToolbarAvatar"
                 android:layout_width="45dp"
                 android:layout_height="45dp"
                 android:layout_gravity="end|center_vertical"
                 android:layout_marginEnd="16dp"
-                android:src="@drawable/logo" />
+                app:cardCornerRadius="22dp"
+                app:cardElevation="4dp"
+                xmlns:app="http://schemas.android.com/apk/res-auto">
+
+                <ImageView
+                    android:id="@+id/ivToolbarAvatar"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:scaleType="centerCrop"
+                    android:src="@drawable/logo" />
+
+            </androidx.cardview.widget.CardView>
+
         </androidx.appcompat.widget.Toolbar>
 
         <!--  ===== כאן ייכנס התוכן של כל מסך =====  -->

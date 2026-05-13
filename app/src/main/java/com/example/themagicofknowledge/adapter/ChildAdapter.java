@@ -11,6 +11,7 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.themagicofknowledge.R;
 import com.example.themagicofknowledge.models.UserChild;
+import com.example.themagicofknowledge.utils.ImageUtil;
 
 import java.util.List;
 
@@ -20,11 +21,20 @@ public class ChildAdapter extends RecyclerView.Adapter<ChildAdapter.ChildViewHol
     private OnChildClickListener listener;
     private OnChildLongClickListener longClickListener;
 
-    // קונסטרקטור
-    public ChildAdapter(List<UserChild> children, OnChildClickListener listener, OnChildLongClickListener longClickListener) {
+    // ממשק חדש
+    public interface OnChildEditListener {
+        void onChildEdit(UserChild child);
+    }
+
+    // קונסטרקטור מעודכן
+    private OnChildEditListener editListener;
+
+    public ChildAdapter(List<UserChild> children, OnChildClickListener listener,
+                        OnChildLongClickListener longClickListener, OnChildEditListener editListener) {
         this.children = children;
         this.listener = listener;
         this.longClickListener = longClickListener;
+        this.editListener = editListener;
     }
 
     @NonNull
@@ -43,21 +53,7 @@ public class ChildAdapter extends RecyclerView.Adapter<ChildAdapter.ChildViewHol
         holder.tvName.setText(child.getName());
         holder.tvAge.setText("גיל: " + child.getAge());
 
-        // 2. טעינת האוואטר מה-Drawable לפי השם ששמור ב-Firebase
-        String avatarName = child.getAvatar();
-        if (avatarName != null && !avatarName.isEmpty()) {
-            // הפיכת השם (כמו "avatar_1") למזהה תמונה (Resource ID)
-            int resId = holder.itemView.getContext().getResources().getIdentifier(
-                    avatarName, "drawable", holder.itemView.getContext().getPackageName());
-
-            if (resId != 0) {
-                holder.ivAvatar.setImageResource(resId);
-            } else {
-                holder.ivAvatar.setImageResource(R.drawable.wizard_placeholder1);
-            }
-        } else {
-            holder.ivAvatar.setImageResource(R.drawable.wizard_placeholder1);
-        }
+        ImageUtil.loadAvatar(holder.itemView.getContext(), holder.ivAvatar, child.getAvatar());
 
         // 3. הגדרת לחיצה רגילה (לבחירת הילד)
         holder.itemView.setOnClickListener(v -> {
@@ -72,6 +68,10 @@ public class ChildAdapter extends RecyclerView.Adapter<ChildAdapter.ChildViewHol
                 longClickListener.onChildLongClick(child);
             }
             return true;
+        });
+
+        holder.btnEditChild.setOnClickListener(v -> {
+            if (editListener != null) editListener.onChildEdit(child);
         });
     }
 
@@ -93,12 +93,14 @@ public class ChildAdapter extends RecyclerView.Adapter<ChildAdapter.ChildViewHol
     public static class ChildViewHolder extends RecyclerView.ViewHolder {
         TextView tvName, tvAge;
         ImageView ivAvatar;
+        View btnEditChild;
 
         public ChildViewHolder(@NonNull View view) {
             super(view);
             tvName = view.findViewById(R.id.tvChildName);
             tvAge = view.findViewById(R.id.tvChildAge);
-            ivAvatar = view.findViewById(R.id.ivChildAvatar); // ה-ID מה-XML החדש
+            ivAvatar = view.findViewById(R.id.ivChildAvatar);
+            btnEditChild = view.findViewById(R.id.btnEditChild);
         }
     }
 }

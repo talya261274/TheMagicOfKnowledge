@@ -5,25 +5,55 @@
     android:layout_height="wrap_content"
     android:gravity="center"
     android:orientation="vertical"
-    android:padding="16dp">
+    android:padding="16dp"
+    android:clipChildren="false"
+    android:clipToPadding="false">
 
-    <androidx.cardview.widget.CardView
+    <FrameLayout
         android:layout_width="120dp"
         android:layout_height="120dp"
-        android:innerRadius="0dp"
-        android:shape="ring"
-        app:cardBackgroundColor="#F2FCFD"
-        android:thicknessRatio="1.9"
-        app:cardCornerRadius="16dp"
-        app:cardElevation="6dp">
+        android:clipChildren="false"
+        android:clipToPadding="false">
+
+        <androidx.cardview.widget.CardView
+            android:layout_width="120dp"
+            android:layout_height="120dp"
+            app:cardBackgroundColor="#F2FCFD"
+            android:layoutDirection="rtl"
+            app:cardCornerRadius="16dp"
+            app:cardElevation="0dp">
 
         <ImageView
-            android:id="@+id/ivChildAvatar"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:scaleType="centerCrop"
-            android:src="@drawable/wizard_placeholder1" />
-    </androidx.cardview.widget.CardView>
+                android:id="@+id/ivChildAvatar"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:scaleType="centerCrop"
+                android:src="@drawable/wizard_placeholder1" />
+
+        </androidx.cardview.widget.CardView>
+
+        <!-- כפתור עריכה - פינה ימנית עליונה -->
+        <androidx.cardview.widget.CardView
+            android:id="@+id/btnEditChild"
+            android:layout_width="22dp"
+            android:layout_height="22dp"
+            android:layoutDirection="rtl"
+            android:layout_gravity="top|start"
+            android:layout_margin="4dp"
+            app:cardBackgroundColor="#FD9700"
+            app:cardCornerRadius="16dp"
+            app:cardElevation="8dp">
+
+            <ImageView
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:padding="6dp"
+                android:src="@drawable/ic_edit_square"
+                app:tint="#FFFFFF" />
+
+        </androidx.cardview.widget.CardView>
+
+    </FrameLayout>
 
     <TextView
         android:id="@+id/tvChildName"

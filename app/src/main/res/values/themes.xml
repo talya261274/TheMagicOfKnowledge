@@ -1,8 +1,8 @@
 <resources>
     <!-- Base application theme. -->
     <style name="Base.Theme.TheMagicOfKnowledge" parent="Theme.Material3.DayNight.NoActionBar">
-        <!-- Customize your light theme here. -->
-        <!-- <item name="colorPrimary">@color/my_light_primary</item> -->
+        <item name="colorPrimary">@color/transparent</item>
+        <item name="android:statusBarColor">@color/transparent</item>
     </style>
 
     <style name="Theme.SplashActivity" parent="Base.Theme.TheMagicOfKnowledge">
@@ -12,6 +12,8 @@
 
     <style name="Theme.TheMagicOfKnowledge" parent="Base.Theme.TheMagicOfKnowledge">
         <item name="android:windowBackground">@drawable/main_background</item>
+        <item name="android:statusBarColor">@android:color/transparent</item>
+        <item name="android:windowLightStatusBar">false</item>
     </style>
 
     <style name="NavMenuItemStyle">

@@ -40,6 +40,9 @@ public class AdminDashboardActivity extends BaseActivity {
             Intent intent = new Intent(this, UsersListActivity.class);
             startActivity(intent);
         });
+
+        MaterialButton btnStats = findViewById(R.id.btnViewStats);
+        btnStats.setOnClickListener(v -> startActivity(new Intent(this, StatisticsActivity.class)));
     }
 
     private void initViews() {

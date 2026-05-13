@@ -18,7 +18,7 @@
         <item
             android:id="@+id/nav_profile"
             android:icon="@drawable/nav_profile"
-            android:title="פרופיל הורה" />
+            android:title="פרופיל משתמש" />
 
         <item
             android:id="@+id/nav_progress"
@@ -32,22 +32,17 @@
 
     </group>
 
-    <item android:title="משחקים">
-        <menu>
-            <item
-                android:id="@+id/nav_mix"
-                android:icon="@drawable/nav_game"
-                android:title="עולם משחקים" />
-
-        </menu>
-    </item>
-
     <item android:title="ניהול">
         <menu>
             <item
                 android:id="@+id/nav_admin_users"
                 android:icon="@drawable/nav_cards"
                 android:title="רשימת משתמשים" />
+
+            <item
+                android:id="@+id/nav_statistics"
+                android:icon="@drawable/ic_trophy"
+                android:title="סטטיסטיקות" />
         </menu>
     </item>
 

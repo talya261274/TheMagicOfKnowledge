@@ -65,7 +65,8 @@ public class SelectChildActivity extends BaseActivity {
 
         adapter = new ChildAdapter(childrenList,
                 child -> handleChildClick(child),
-                child -> showDeleteConfirmationDialog(child)
+                child -> showDeleteConfirmationDialog(child),
+                child -> showEditChildDialog(child) // ← הוסף
         );
         rvChildren.setAdapter(adapter);
         rvChildren.setLayoutDirection(View.LAYOUT_DIRECTION_RTL);
@@ -201,6 +202,79 @@ public class SelectChildActivity extends BaseActivity {
                 }
             });
         });
+
+        dialog.show();
+    }
+
+    private void showEditChildDialog(UserChild child) {
+        final android.app.Dialog dialog = new android.app.Dialog(this);
+        dialog.setContentView(R.layout.dialog_edit_child);
+        if (dialog.getWindow() != null)
+            dialog.getWindow().setBackgroundDrawableResource(android.R.color.transparent);
+
+        android.widget.EditText etName = dialog.findViewById(R.id.etEditChildName);
+        android.widget.EditText etAge = dialog.findViewById(R.id.etEditChildAge);
+        android.widget.TextView tvError = dialog.findViewById(R.id.tvEditError);
+        android.widget.Button btnSave = dialog.findViewById(R.id.btnSaveEdit);
+        android.widget.TextView btnChangeAvatar = dialog.findViewById(R.id.btnChangeAvatar);
+
+        etName.setText(child.getName());
+        etAge.setText(String.valueOf(child.getAge()));
+
+        btnChangeAvatar.setOnClickListener(v -> {
+            dialog.dismiss();
+            Intent intent = new Intent(this, AvatarSelectionActivity.class);
+            intent.putExtra("childId", child.getId());
+            startActivity(intent);
+        });
+
+        btnSave.setOnClickListener(v -> {
+            String newName = etName.getText().toString().trim();
+            String ageStr = etAge.getText().toString().trim();
+
+            if (newName.isEmpty() || ageStr.isEmpty()) {
+                tvError.setText("נא למלא את כל השדות");
+                tvError.setVisibility(View.VISIBLE);
+                return;
+            }
+
+            int newAge;
+            try {
+                newAge = Integer.parseInt(ageStr);
+            } catch (NumberFormatException e) {
+                tvError.setText("הגיל חייב להיות מספר");
+                tvError.setVisibility(View.VISIBLE);
+                return;
+            }
+
+            if (newAge < 3 || newAge > 8) {
+                tvError.setText("הגיל חייב להיות בין 3 ל-8");
+                tvError.setVisibility(View.VISIBLE);
+                return;
+            }
+
+            // עדכון ב-Firebase - רק שם וגיל, לא רמה
+            java.util.Map<String, Object> updates = new java.util.HashMap<>();
+            updates.put("name", newName);
+            updates.put("age", newAge);
+
+            com.google.firebase.database.FirebaseDatabase.getInstance()
+                    .getReference("users")
+                    .child(currentParent.getId())
+                    .child("childrenList")
+                    .child(child.getId())
+                    .updateChildren(updates)
+                    .addOnSuccessListener(aVoid -> {
+                        dialog.dismiss();
+                        loadChildrenFromDB();
+                        Toast.makeText(this, "הפרטים עודכנו!", Toast.LENGTH_SHORT).show();
+                    })
+                    .addOnFailureListener(e -> {
+                        tvError.setText("שגיאה: " + e.getMessage());
+                        tvError.setVisibility(View.VISIBLE);
+                    });
+        });
+        dialog.findViewById(R.id.btnCancelEdit).setOnClickListener(v -> dialog.dismiss());
 
         dialog.show();
     }

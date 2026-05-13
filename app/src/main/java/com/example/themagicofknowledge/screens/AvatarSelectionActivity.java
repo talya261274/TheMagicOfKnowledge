@@ -1,7 +1,10 @@
 package com.example.themagicofknowledge.screens;
 
 import android.content.Intent;
+import android.graphics.Bitmap;
+import android.net.Uri;
 import android.os.Bundle;
+import android.provider.MediaStore;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.BaseAdapter;
@@ -10,9 +13,14 @@ import android.widget.GridView;
 import android.widget.ImageView;
 import android.widget.Toast;
 
+import androidx.activity.result.ActivityResultLauncher;
+import androidx.activity.result.contract.ActivityResultContracts;
+import androidx.cardview.widget.CardView;
+
 import com.example.themagicofknowledge.R;
 import com.example.themagicofknowledge.models.UserChild;
 import com.example.themagicofknowledge.models.UserParent;
+import com.example.themagicofknowledge.utils.ImageUtil;
 import com.example.themagicofknowledge.utils.SharedPreferencesUtil;
 import com.google.android.material.button.MaterialButton;
 import com.google.firebase.database.FirebaseDatabase;
@@ -22,25 +30,47 @@ import java.util.List;
 
 public class AvatarSelectionActivity extends BaseActivity {
 
+    private static final int REQUEST_CAMERA = 100;
+    private static final int REQUEST_GALLERY = 101;
+
     private GridView gvAvatars;
     private MaterialButton btnConfirmAvatar;
+    private ImageView ivSelectedPreview; // תצוגה מקדימה של תמונה מגלריה/מצלמה
     private List<String> avatarNames;
     private String childId;
     private UserParent currentParent;
 
-    // ⭐ חדש - שומר את הבחירה הנוכחית
     private int selectedPosition = -1;
     private AvatarAdapter adapter;
+    private String selectedCustomImageBase64 = null; // תמונה מגלריה/מצלמה
+
+    // Launchers לגלריה ומצלמה
+    private final ActivityResultLauncher<Intent> galleryLauncher =
+            registerForActivityResult(new ActivityResultContracts.StartActivityForResult(), result -> {
+                if (result.getResultCode() == RESULT_OK && result.getData() != null) {
+                    Uri imageUri = result.getData().getData();
+                    try {
+                        Bitmap bitmap = MediaStore.Images.Media.getBitmap(getContentResolver(), imageUri);
+                        handleSelectedBitmap(bitmap);
+                    } catch (Exception e) {
+                        Toast.makeText(this, "שגיאה בטעינת התמונה", Toast.LENGTH_SHORT).show();
+                    }
+                }
+            });
+
+    private final ActivityResultLauncher<Intent> cameraLauncher =
+            registerForActivityResult(new ActivityResultContracts.StartActivityForResult(), result -> {
+                if (result.getResultCode() == RESULT_OK && result.getData() != null) {
+                    Bitmap bitmap = (Bitmap) result.getData().getExtras().get("data");
+                    if (bitmap != null) handleSelectedBitmap(bitmap);
+                }
+            });
 
     @Override
-    protected boolean hasSideMenu() {
-        return false;
-    }
+    protected boolean hasSideMenu() { return false; }
 
     @Override
-    protected boolean showToolbar() {
-        return false;
-    }
+    protected boolean showToolbar() { return false; }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -52,53 +82,190 @@ public class AvatarSelectionActivity extends BaseActivity {
 
         gvAvatars = findViewById(R.id.gvAvatars);
         btnConfirmAvatar = findViewById(R.id.btnConfirmAvatar);
+        ivSelectedPreview = findViewById(R.id.ivSelectedPreview); // תוסיפי ל-XML
         MaterialButton btnBack = findViewById(R.id.btnBackAvatar);
+        MaterialButton btnFromGallery = findViewById(R.id.btnFromGallery); // תוסיפי ל-XML
 
         initAvatarList();
-
         adapter = new AvatarAdapter();
         gvAvatars.setAdapter(adapter);
 
-        // ⭐ לחיצה על תמונה - רק מסמנת אותה
         gvAvatars.setOnItemClickListener((parent, view, position, id) -> {
             selectedPosition = position;
-            adapter.notifyDataSetChanged();  // מרענן את התצוגה כדי להציג את הבחירה
-
-            // הופך את כפתור האישור לפעיל
+            selectedCustomImageBase64 = null; // איפוס תמונה מגלריה
+            ivSelectedPreview.setVisibility(View.GONE);
+            adapter.notifyDataSetChanged();
             btnConfirmAvatar.setEnabled(true);
             btnConfirmAvatar.setAlpha(1.0f);
         });
 
-        // ⭐ כפתור אישור - שומר את הבחירה
+        btnFromGallery.setOnClickListener(v -> showImageSourceDialog());
+
         btnConfirmAvatar.setOnClickListener(v -> {
-            if (selectedPosition >= 0) {
-                String selectedAvatar = avatarNames.get(selectedPosition);
-                updateChildAvatarInFirebase(selectedAvatar);
+            if (selectedCustomImageBase64 != null) {
+                saveAvatar("base64:" + selectedCustomImageBase64);
+            } else if (selectedPosition >= 0) {
+                saveAvatar(avatarNames.get(selectedPosition));
             } else {
                 Toast.makeText(this, "אנא בחרו תמונה תחילה", Toast.LENGTH_SHORT).show();
             }
         });
 
-        // ⭐ כפתור חזרה
-        if (btnBack != null) {
-            btnBack.setOnClickListener(v -> finish());
-        }
+        if (btnBack != null) btnBack.setOnClickListener(v -> finish());
 
-        // התחלה - הכפתור לא פעיל
         btnConfirmAvatar.setAlpha(0.5f);
+        btnConfirmAvatar.setEnabled(false);
+    }
+
+    private void saveAvatar(String avatarValue) {
+        boolean isParent = getIntent().getBooleanExtra("isParent", false);
+
+        if (isParent) {
+            String parentId = getIntent().getStringExtra("parentId");
+            FirebaseDatabase.getInstance().getReference("users")
+                    .child(parentId).child("avatar").setValue(avatarValue)
+                    .addOnSuccessListener(aVoid -> {
+                        UserParent parent = SharedPreferencesUtil.getUser(this);
+                        if (parent != null) {
+                            parent.setAvatar(avatarValue);
+                            SharedPreferencesUtil.saveUser(this, parent);
+                        }
+                        Toast.makeText(this, "התמונה עודכנה! 🎉", Toast.LENGTH_SHORT).show();
+
+                        // בדוק אם הגענו מפרופיל או מהרשמה
+                        boolean fromProfile = getIntent().getBooleanExtra("fromProfile", false);
+                        if (fromProfile) {
+                            finish(); // ← חזור לפרופיל
+                        } else {
+                            Intent intent = new Intent(this, SelectChildActivity.class);
+                            intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+                            startActivity(intent);
+                        }
+                    })
+                    .addOnFailureListener(e ->
+                            Toast.makeText(this, "שגיאה: " + e.getMessage(), Toast.LENGTH_SHORT).show());
+        } else {
+            // ילד - הקוד הקיים
+            if (avatarValue.startsWith("base64:")) {
+                saveBase64Avatar(avatarValue.substring(7));
+            } else {
+                updateChildAvatarInFirebase(avatarValue);
+            }
+        }
+    }
+
+    private void showImageSourceDialog() {
+        final android.app.Dialog dialog = new android.app.Dialog(this);
+        dialog.setContentView(R.layout.dialog_image_source);
+        if (dialog.getWindow() != null)
+            dialog.getWindow().setBackgroundDrawableResource(android.R.color.transparent);
+
+        dialog.findViewById(R.id.btnCamera).setOnClickListener(v -> {
+            dialog.dismiss();
+            openCamera();
+        });
+
+        dialog.findViewById(R.id.btnGallery).setOnClickListener(v -> {
+            dialog.dismiss();
+            openGallery();
+        });
+
+        dialog.findViewById(R.id.btnCancelSource).setOnClickListener(v -> dialog.dismiss());
+
+        dialog.setCancelable(true);
+        dialog.show();
+    }
+
+    private void openCamera() {
+        ImageUtil.requestPermission(this);
+        Intent intent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
+        cameraLauncher.launch(intent);
+    }
+
+    private void openGallery() {
+        ImageUtil.requestPermission(this);
+        Intent intent = new Intent(Intent.ACTION_PICK, MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
+        galleryLauncher.launch(intent);
+    }
+
+    private void handleSelectedBitmap(Bitmap bitmap) {
+        Bitmap resized = Bitmap.createScaledBitmap(bitmap, 300, 300, true);
+
+        ivSelectedPreview.setImageBitmap(resized);
+        ivSelectedPreview.setVisibility(View.VISIBLE);
+
+        // הצג גם את הכרטיס
+        CardView cardPreview = findViewById(R.id.cardPreview);
+        cardPreview.setVisibility(View.VISIBLE);
+        cardPreview.setCardElevation(12f);
+        // הוסף מסגרת כתומה
+        ((com.google.android.material.card.MaterialCardView) cardPreview)
+                .setStrokeColor(android.graphics.Color.parseColor("#FF9800"));
+        ((com.google.android.material.card.MaterialCardView) cardPreview)
+                .setStrokeWidth(6);
+
+        selectedCustomImageBase64 = ImageUtil.convertBitmapTo64Base(resized);
+        selectedPosition = -1;
+        adapter.notifyDataSetChanged();
+        btnConfirmAvatar.setEnabled(true);
+        btnConfirmAvatar.setAlpha(1.0f);
+    }
+
+    private void saveBase64Avatar(String base64) {
+        String path = "users/" + currentParent.getId() + "/childrenList/" + childId + "/avatar";
+        // שמור עם prefix כדי לדעת שזה Base64
+        String avatarValue = "base64:" + base64;
+
+        FirebaseDatabase.getInstance().getReference(path).setValue(avatarValue)
+                .addOnSuccessListener(aVoid -> {
+                    UserParent parent = SharedPreferencesUtil.getUser(this);
+                    if (parent != null && parent.getChildrenList() != null) {
+                        UserChild childInParent = parent.getChildrenList().get(childId);
+                        if (childInParent != null) {
+                            childInParent.setAvatar(avatarValue);
+                            SharedPreferencesUtil.saveUser(this, parent);
+                            SharedPreferencesUtil.saveCurrentChild(this, childInParent);
+                        }
+                    }
+                    showPlacementTestIntroDialog();
+                    Toast.makeText(this, "תמונה נשמרה! 🎉", Toast.LENGTH_SHORT).show();
+                })
+                .addOnFailureListener(e ->
+                        Toast.makeText(this, "שגיאה: " + e.getMessage(), Toast.LENGTH_SHORT).show());
+    }
+
+
+    private void loadAvatar(ImageView imageView, String avatar) {
+        if (avatar == null) {
+            imageView.setImageResource(R.drawable.logo);
+        } else if (avatar.startsWith("base64:")) {
+            // תמונה מגלריה/מצלמה
+            String base64 = avatar.substring(7);
+            Bitmap bitmap = ImageUtil.convertFrom64base(base64);
+            if (bitmap != null) imageView.setImageBitmap(bitmap);
+        } else {
+            // אווטר רגיל
+            int resId = getResources().getIdentifier(avatar, "drawable", getPackageName());
+            imageView.setImageResource(resId != 0 ? resId : R.drawable.logo);
+        }
     }
 
     private void initAvatarList() {
         avatarNames = new ArrayList<>();
-        avatarNames.add("avatar_1");
-        avatarNames.add("avatar_2");
-        avatarNames.add("avatar_3");
-        avatarNames.add("avatar_4");
-        avatarNames.add("avatar_5");
-        avatarNames.add("avatar_6");
-        avatarNames.add("avatar_7");
-        avatarNames.add("avatar_8");
-        avatarNames.add("avatar_9");
+
+        boolean isParent = getIntent().getBooleanExtra("isParent", false);
+
+        if (isParent) {
+            // אווטרים להורים
+            for (int i = 10; i <= 18; i++) {
+                avatarNames.add("avatar_" + i);
+            }
+        } else {
+            // אווטרים לילדים
+            for (int i = 1; i <= 9; i++) {
+                avatarNames.add("avatar_" + i);
+            }
+        }
     }
 
     private void updateChildAvatarInFirebase(String avatarName) {

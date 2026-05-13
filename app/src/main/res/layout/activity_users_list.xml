@@ -8,200 +8,295 @@
     android:background="@drawable/main_background"
     tools:context=".screens.UsersListActivity">
 
-    <LinearLayout
+    <androidx.core.widget.NestedScrollView
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:orientation="vertical">
+        android:fillViewport="true">
 
-        <!-- ===== כותרת ראשית ===== -->
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_gravity="center"
-            android:layout_marginTop="40dp"
-            android:fontFamily="@font/gan"
-            android:shadowColor="#65A2B8"
-            android:shadowDx="3"
-            android:shadowDy="3"
-            android:shadowRadius="8"
-            android:text="ניהול משתמשים"
-            android:textColor="@color/white"
-            android:textSize="36sp"
-            android:textStyle="bold" />
-
-        <!-- ===== כותרת משנה ===== -->
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_gravity="center"
-            android:layout_marginTop="6dp"
-            android:alpha="0.95"
-            android:fontFamily="@font/varelaround"
-            android:text="כל המשתמשים במערכת 👥"
-            android:textColor="#FFFFFF"
-            android:textSize="18sp" />
-
-        <!-- ===== כרטיס מונה משתמשים (כתום) ===== -->
-        <androidx.cardview.widget.CardView
+        <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginStart="20dp"
-            android:layout_marginTop="40dp"
-            android:layout_marginEnd="20dp"
-            android:layoutDirection="rtl"
-            app:cardBackgroundColor="#FF9800"
-            app:cardCornerRadius="20dp"
-            app:cardElevation="8dp">
+            android:orientation="vertical"
+            android:paddingBottom="80dp">
 
-            <FrameLayout
+            <!-- כותרת ראשית -->
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:layout_marginTop="40dp"
+                android:fontFamily="@font/gan"
+                android:shadowColor="#65A2B8"
+                android:shadowDx="3"
+                android:shadowDy="3"
+                android:shadowRadius="8"
+                android:text="ניהול משתמשים"
+                android:textColor="@color/white"
+                android:textSize="36sp"
+                android:textStyle="bold" />
+
+            <!-- כותרת משנה -->
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:layout_marginTop="6dp"
+                android:alpha="0.95"
+                android:fontFamily="@font/varelaround"
+                android:text="כל המשתמשים במערכת 👥"
+                android:textColor="#FFFFFF"
+                android:textSize="18sp" />
+
+            <!-- כרטיס מונה משתמשים -->
+            <androidx.cardview.widget.CardView
+                android:id="@+id/cardUserCount"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:padding="16dp">
+                android:layout_marginStart="20dp"
+                android:layout_marginTop="40dp"
+                android:layout_marginEnd="20dp"
+                android:layoutDirection="rtl"
+                app:cardBackgroundColor="#FF9800"
+                app:cardCornerRadius="20dp"
+                app:cardElevation="8dp">
 
-                <!-- ===== הטקסט במרכז ===== -->
-                <LinearLayout
-                    android:layout_width="wrap_content"
+                <FrameLayout
+                    android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_gravity="center"
-                    android:gravity="center"
-                    android:orientation="horizontal">
+                    android:padding="16dp">
+
+                    <LinearLayout
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_gravity="center"
+                        android:gravity="center"
+                        android:orientation="horizontal">
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:fontFamily="@font/gan"
+                            android:gravity="center"
+                            android:layout_marginRight="50dp"
+                            android:layout_marginLeft="20dp"
+                            android:layout_gravity="center"
+                            android:text="סך הכל משתמשים"
+                            android:textColor="#FFFFFF"
+                            android:textSize="22sp"
+                            android:textStyle="bold" />
+
+                        <TextView
+                            android:id="@+id/tv_user_count"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="2dp"
+                            android:fontFamily="@font/gan"
+                            android:gravity="center"
+                            android:layout_gravity="center"
+                            android:text="0"
+                            android:textColor="#FFFFFF"
+                            android:textSize="28sp"
+                            android:textStyle="bold" />
+
+                    </LinearLayout>
 
                     <TextView
                         android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:fontFamily="@font/gan"
-                        android:gravity="center"
-                        android:layout_marginRight="50dp"
-                        android:layout_marginLeft="20dp"
-                        android:layout_gravity="center"
-                        android:text="סך הכל משתמשים"
-                        android:textColor="#FFFFFF"
-                        android:textSize="22sp"
-                        android:textStyle="bold" />
+                        android:layout_height="50sp"
+                        android:layout_gravity="start|center_vertical"
+                        android:layout_marginLeft="10dp"
+                        android:layout_marginBottom="4.5dp"
+                        android:layout_marginRight="10dp"
+                        android:text="👥"
+                        android:textSize="36sp" />
 
-                    <TextView
-                        android:id="@+id/tv_user_count"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_marginTop="2dp"
-                        android:fontFamily="@font/gan"
-                        android:gravity="center"
-                        android:layout_gravity="center"
-                        android:text="0"
-                        android:textColor="#FFFFFF"
-                        android:textSize="28sp"
-                        android:textStyle="bold" />
+                </FrameLayout>
+            </androidx.cardview.widget.CardView>
 
-                </LinearLayout>
-
-                <!-- ===== האימוג'י בצד ===== -->
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="60sp"
-                    android:layout_gravity="start|center_vertical"
-                    android:layout_marginLeft="10dp"
-                    android:layout_marginRight="10dp"
-                    android:text="👥"
-                    android:textSize="36sp" />
-
-            </FrameLayout>
-        </androidx.cardview.widget.CardView>
-
-        <!-- ===== כרטיס רשימת משתמשים ===== -->
-        <androidx.cardview.widget.CardView
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginStart="20dp"
-            android:layout_marginTop="16dp"
-            android:layout_marginEnd="20dp"
-            android:layout_marginBottom="20dp"
-            app:cardBackgroundColor="@color/transparent"
-            app:cardCornerRadius="0dp"
-            app:cardElevation="0dp">
-
-            <FrameLayout
+            <!-- כרטיס חיפוש + רשימה ביחד -->
+            <androidx.cardview.widget.CardView
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content">
+                android:layout_height="wrap_content"
+                android:layout_marginStart="20dp"
+                android:layout_marginTop="12dp"
+                android:layout_marginEnd="20dp"
+                android:layout_marginBottom="20dp"
+                app:cardBackgroundColor="#FFFFFF"
+                app:cardCornerRadius="20dp"
+                app:cardElevation="6dp">
 
-                <!-- רשימת משתמשים -->
-                <androidx.recyclerview.widget.RecyclerView
-                    android:id="@+id/rv_users_list"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:clipToPadding="false"
-                    android:fadeScrollbars="false"
-                    android:scrollbarStyle="outsideOverlay"
-                    android:scrollbarThumbVertical="@drawable/scrollbar_thumb"
-                    android:scrollbars="vertical"
-                    tools:listitem="@layout/item_user" />
-
-                <!-- מצב ריק -->
                 <LinearLayout
-                    android:id="@+id/empty_state"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:gravity="center"
                     android:orientation="vertical"
-                    android:padding="32dp"
-                    android:visibility="gone">
+                    android:padding="12dp">
 
-                    <TextView
-                        android:layout_width="wrap_content"
+                    <!-- שדה חיפוש -->
+                    <com.google.android.material.textfield.TextInputLayout
+                        style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
+                        android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:text="🔍"
-                        android:textSize="80sp" />
+                        android:hint="חיפוש לפי שם / אימייל / טלפון..."
+                        app:boxCornerRadiusBottomEnd="16dp"
+                        app:boxCornerRadiusBottomStart="16dp"
+                        app:boxCornerRadiusTopEnd="16dp"
+                        app:boxCornerRadiusTopStart="16dp"
+                        app:boxStrokeColor="#1E5F8B"
+                        app:hintTextColor="#1E5F8B"
+                        app:startIconDrawable="@android:drawable/ic_menu_search"
+                        app:startIconTint="#1E5F8B">
 
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_marginTop="16dp"
-                        android:fontFamily="@font/gan"
-                        android:gravity="center"
-                        android:text="אין משתמשים"
-                        android:textColor="@color/white"
-                        android:textSize="22sp"
-                        android:textStyle="bold" />
+                        <com.google.android.material.textfield.TextInputEditText
+                            android:id="@+id/etSearch"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:fontFamily="@font/varelaround"
+                            android:inputType="text"
+                            android:textColor="#2C3E50"
+                            android:textSize="15sp" />
 
-                    <TextView
-                        android:layout_width="wrap_content"
+                    </com.google.android.material.textfield.TextInputLayout>
+
+                    <!-- כפתורי סינון -->
+                    <LinearLayout
+                        android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:layout_marginTop="8dp"
-                        android:fontFamily="@font/varelaround"
+                        android:layout_marginBottom="8dp"
+                        android:orientation="horizontal"
+                        android:gravity="center">
+
+                        <com.google.android.material.button.MaterialButton
+                            android:id="@+id/btnFilterAll"
+                            style="@style/Widget.MaterialComponents.Button.OutlinedButton"
+                            android:layout_width="wrap_content"
+                            android:layout_height="36dp"
+                            android:layout_marginEnd="8dp"
+                            android:fontFamily="@font/varelaround"
+                            android:text="הכל"
+                            android:textSize="13sp"
+                            android:textColor="#FFFFFF"
+                            app:cornerRadius="18dp"
+                            app:strokeColor="#1E5F8B"
+                            app:backgroundTint="#1E5F8B" />
+
+                        <com.google.android.material.button.MaterialButton
+                            android:id="@+id/btnFilterAdmins"
+                            style="@style/Widget.MaterialComponents.Button.OutlinedButton"
+                            android:layout_width="wrap_content"
+                            android:layout_height="36dp"
+                            android:layout_marginEnd="8dp"
+                            android:fontFamily="@font/varelaround"
+                            android:text="מנהלים 👑"
+                            android:textSize="13sp"
+                            android:textColor="#FF9800"
+                            app:cornerRadius="18dp"
+                            app:strokeColor="#FF9800" />
+
+                        <com.google.android.material.button.MaterialButton
+                            android:id="@+id/btnFilterUsers"
+                            style="@style/Widget.MaterialComponents.Button.OutlinedButton"
+                            android:layout_width="wrap_content"
+                            android:layout_height="36dp"
+                            android:fontFamily="@font/varelaround"
+                            android:text="משתמשים 👤"
+                            android:textSize="13sp"
+                            android:textColor="#1E5F8B"
+                            app:cornerRadius="18dp"
+                            app:strokeColor="#1E5F8B" />
+
+                    </LinearLayout>
+
+                    <!-- קו הפרדה -->
+                    <View
+                        android:layout_width="match_parent"
+                        android:layout_height="1dp"
+                        android:background="#E0E0E0"
+                        android:layout_marginBottom="8dp" />
+
+                    <!-- רשימת משתמשים -->
+                    <androidx.recyclerview.widget.RecyclerView
+                        android:id="@+id/rv_users_list"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="10dp"
+                        android:clipToPadding="false"
+                        android:fadeScrollbars="false"
+                        android:paddingEnd="8dp"
+                        android:scrollbarSize="4dp"
+                        android:scrollbarStyle="outsideOverlay"
+                        android:scrollbarThumbVertical="@drawable/scrollbar_thumb"
+                        android:scrollbars="vertical"
+                        android:nestedScrollingEnabled="false"
+                        tools:listitem="@layout/item_user" />
+
+                    <!-- מצב ריק -->
+                    <LinearLayout
+                        android:id="@+id/empty_state"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
                         android:gravity="center"
-                        android:lineSpacingExtra="4dp"
-                        android:text="עדיין לא נרשמו משתמשים\nבמערכת"
-                        android:textColor="@color/white"
-                        android:textSize="14sp" />
+                        android:orientation="vertical"
+                        android:padding="32dp"
+                        android:visibility="gone">
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="🔍"
+                            android:textSize="80sp" />
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="16dp"
+                            android:fontFamily="@font/gan"
+                            android:gravity="center"
+                            android:text="אין משתמשים"
+                            android:textColor="#1E5F8B"
+                            android:textSize="22sp"
+                            android:textStyle="bold" />
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="8dp"
+                            android:fontFamily="@font/varelaround"
+                            android:gravity="center"
+                            android:lineSpacingExtra="4dp"
+                            android:text="עדיין לא נרשמו משתמשים\nבמערכת"
+                            android:textColor="#5C6166"
+                            android:textSize="14sp" />
+
+                    </LinearLayout>
+
+                    <!-- אינדיקטור טעינה -->
+                    <ProgressBar
+                        android:id="@+id/progress_bar"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_gravity="center"
+                        android:indeterminateTint="#1E5F8B"
+                        android:visibility="gone" />
 
                 </LinearLayout>
+            </androidx.cardview.widget.CardView>
 
-                <!-- אינדיקטור טעינה -->
-                <ProgressBar
-                    android:id="@+id/progress_bar"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_gravity="center"
-                    android:indeterminateTint="#FFFFFF"
-                    android:visibility="gone" />
+        </LinearLayout>
+    </androidx.core.widget.NestedScrollView>
 
-            </FrameLayout>
-
-        </androidx.cardview.widget.CardView>
-
-    </LinearLayout>
-
-    <!-- ===== כפתור צף להוספת משתמש ===== -->
+    <!-- כפתור צף -->
     <com.google.android.material.floatingactionbutton.FloatingActionButton
         android:id="@+id/fabAddUser"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginEnd="20dp"
-        android:layout_marginBottom="20dp"
-        android:layout_gravity="bottom|end"
+        android:layout_marginEnd="28dp"
         android:contentDescription="הוספת משתמש"
         android:src="@android:drawable/ic_input_add"
-        app:backgroundTint="#FF9800"
+        app:backgroundTint="#FFFFFF"
         app:elevation="12dp"
-        app:tint="@color/white" />
+        app:tint="#FF9800"
+        app:layout_anchor="@id/cardUserCount"
+        app:layout_anchorGravity="bottom|end" />
 
 </androidx.coordinatorlayout.widget.CoordinatorLayout>

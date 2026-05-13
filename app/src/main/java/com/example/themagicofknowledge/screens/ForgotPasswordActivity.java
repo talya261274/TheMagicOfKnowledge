@@ -23,7 +23,7 @@ import java.util.function.UnaryOperator;
 
 public class ForgotPasswordActivity extends AppCompatActivity implements View.OnClickListener {
 
-    private EditText etEmail, etNewPassword;
+    private EditText etEmail, etNewPassword, etUsername;
     private Button btnUpdatePassword;
     private DatabaseService databaseService;
 
@@ -56,6 +56,8 @@ public class ForgotPasswordActivity extends AppCompatActivity implements View.On
 
         // Init UI
         etEmail = findViewById(R.id.et_email);
+        etUsername = ((com.google.android.material.textfield.TextInputLayout)
+                findViewById(R.id.usernameInputLayout)).getEditText();
         etNewPassword = findViewById(R.id.et_new_password);
         btnUpdatePassword = findViewById(R.id.btn_update_password);
 
@@ -73,7 +75,6 @@ public class ForgotPasswordActivity extends AppCompatActivity implements View.On
         String email = etEmail.getText().toString().trim();
         String newPassword = etNewPassword.getText().toString().trim();
 
-        // בדיקות תקינות
         if (!Validator.isEmailValid(email)) {
             etEmail.setError("נא הזן כתובת אימייל חוקית");
             etEmail.requestFocus();
@@ -86,41 +87,41 @@ public class ForgotPasswordActivity extends AppCompatActivity implements View.On
             return;
         }
 
-        // מקבל משתמש לפי אימייל
+        String username = etUsername.getText().toString().trim(); // ← שדה חדש
+
+        if (username.isEmpty()) {
+            etUsername.setError("נא הזן שם משתמש");
+            etUsername.requestFocus();
+            return;
+        }
+
         databaseService.getUserByEmail(email, new DatabaseService.DatabaseCallback<UserParent>() {
             @Override
             public void onCompleted(UserParent user) {
                 if (user == null) {
                     etEmail.setError("האימייל לא נמצא");
-                    etEmail.requestFocus();
-                    Toast.makeText(ForgotPasswordActivity.this,
-                            "לא נמצא חשבון עם האימייל הזה",
-                            Toast.LENGTH_SHORT
-                    ).show();
                     return;
                 }
 
-                // מעדכן סיסמה
+                // ← בדיקה שגם שם המשתמש תואם
+                if (!user.getUserName().equals(username)) {
+                    etUsername.setError("שם המשתמש לא תואם לאימייל");
+                    etUsername.requestFocus();
+                    return;
+                }
+
+                // שניהם תואמים - עדכן סיסמה
                 user.setPassword(newPassword);
-                databaseService.updateUser(user.id, new UnaryOperator<UserParent>() {
-                    @Override
-                    public UserParent apply(UserParent userParentServer) {
-                        if (userParentServer != null) {
-                            userParentServer.setPassword(user.password);
-                        }
-                        return userParentServer;
-                    }
+                databaseService.updateUser(user.id, userParentServer -> {
+                    if (userParentServer != null)
+                        userParentServer.setPassword(newPassword);
+                    return userParentServer;
                 }, new DatabaseService.DatabaseCallback<UserParent>() {
                     @Override
-                    public void onCompleted(UserParent userParentServer) {
+                    public void onCompleted(UserParent u) {
                         Toast.makeText(ForgotPasswordActivity.this,
-                                "הסיסמה עודכנה בהצלחה!",
-                                Toast.LENGTH_SHORT
-                        ).show();
-
-                        // מעבר לעמוד עדכון פרטים
-                        Intent intent = new Intent(ForgotPasswordActivity.this, UserProfileActivity.class);
-                        intent.putExtra("USER_ID", user.getId()); // מעביר את ה-ID של המשתמש
+                                "הסיסמה עודכנה בהצלחה! ✅", Toast.LENGTH_SHORT).show();
+                        Intent intent = new Intent(ForgotPasswordActivity.this, LoginActivity.class);
                         startActivity(intent);
                         finish();
                     }
@@ -128,9 +129,7 @@ public class ForgotPasswordActivity extends AppCompatActivity implements View.On
                     @Override
                     public void onFailed(Exception e) {
                         Toast.makeText(ForgotPasswordActivity.this,
-                                "לא ניתן לעדכן את הסיסמה. נסי שוב.",
-                                Toast.LENGTH_SHORT
-                        ).show();
+                                "שגיאה בעדכון הסיסמה", Toast.LENGTH_SHORT).show();
                     }
                 });
             }
@@ -138,9 +137,7 @@ public class ForgotPasswordActivity extends AppCompatActivity implements View.On
             @Override
             public void onFailed(Exception e) {
                 Toast.makeText(ForgotPasswordActivity.this,
-                        "שגיאה בקבלת המשתמש",
-                        Toast.LENGTH_SHORT
-                ).show();
+                        "שגיאה בקבלת המשתמש", Toast.LENGTH_SHORT).show();
             }
         });
     }

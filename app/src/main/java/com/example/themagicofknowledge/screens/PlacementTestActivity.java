@@ -47,11 +47,13 @@ public class PlacementTestActivity extends BaseActivity {
     private boolean isFirstAttempt = true;
     private boolean isUpgradeMode = false;
     private boolean isNewChild = false;  // ⭐ חדש - מציין אם זה ילד חדש
+    private boolean isIntroShown = false; // ⭐ חדש - למנוע כפילות דיאלוג
     private UserChild selectedChild;
     private String currentLevel;
     private TextToSpeech tts;
     private static final String PREF_PLACEMENT_INDEX = "placement_index_";
     private static final String PREF_PLACEMENT_CORRECT = "placement_correct_";
+    private String levelToTest;
 
     // רכיבי UI כלליים
     private TextView tvQuestion;
@@ -100,14 +102,13 @@ public class PlacementTestActivity extends BaseActivity {
         selectedChild = SharedPreferencesUtil.getCurrentChild(this);
         if (selectedChild != null) {
             currentLevel = selectedChild.getAgeGroup();
+            // ⭐ קבלת הפרמטרים מה-Intent
+            isUpgradeMode = getIntent().getBooleanExtra("isUpgrade", false);
+            isNewChild = getIntent().getBooleanExtra("isNewChild", false);
             loadQuestionsForCurrentLevel();
         } else {
             finish();
         }
-
-        // ⭐ קבלת הפרמטרים מה-Intent
-        isUpgradeMode = getIntent().getBooleanExtra("isUpgrade", false);
-        isNewChild = getIntent().getBooleanExtra("isNewChild", false);
     }
 
     private void initViews() {
@@ -149,7 +150,14 @@ public class PlacementTestActivity extends BaseActivity {
     }
 
     private void loadQuestionsForCurrentLevel() {
-        String levelPath = "level_" + currentLevel.replace("-", "_");
+        // עדכון המשתנה המחלקתי
+        levelToTest = currentLevel;
+        if (isUpgradeMode) {
+            String targetLevel = getIntent().getStringExtra("targetLevel");
+            if (targetLevel != null) levelToTest = targetLevel;
+        }
+
+        String levelPath = "level_" + levelToTest.replace("-", "_");
         DatabaseReference ref = FirebaseDatabase.getInstance()
                 .getReference("PlacementTests")
                 .child(levelPath);
@@ -164,11 +172,10 @@ public class PlacementTestActivity extends BaseActivity {
                 }
                 if (!testQuestions.isEmpty()) {
                     testProgress.setMax(testQuestions.size());
-                    loadProgress(); //
+                    loadProgress();
                     showNextQuestion();
                 } else {
                     Toast.makeText(PlacementTestActivity.this, "לא נמצאו שאלות לרמה זו", Toast.LENGTH_SHORT).show();
-                    // ⭐ אם אין שאלות - שמירת ציון ברירת מחדל ומעבר ל-Main
                     saveDefaultScoreAndProceed();
                 }
             }
@@ -195,8 +202,8 @@ public class PlacementTestActivity extends BaseActivity {
         }
 
         // הצג דיאלוג פתיחה פעם אחת בלבד
-        if (isUpgradeMode && currentQuestionIndex == 0) {
-            isUpgradeMode = false;
+        if (isUpgradeMode && currentQuestionIndex == 0 && !isIntroShown) {
+            isIntroShown = true;
 
             final android.app.Dialog dialog = new android.app.Dialog(this);
             dialog.setContentView(R.layout.dialog_upgrade_intro);
@@ -226,32 +233,34 @@ public class PlacementTestActivity extends BaseActivity {
         answersContainer.setVisibility(View.GONE);
         containerKeyboard.setVisibility(View.GONE);
 
+        // הגדרת תוכן לפי רמה
+        if (levelToTest.equals("3-4")) {
+            audioContainer.setVisibility(View.VISIBLE);
+            answersContainer.setVisibility(View.VISIBLE);
+            tvQuestion.setText("הקשיבו וביחרו בתמונה הנכונה:");
+            btnPlayAudio.setOnClickListener(v -> playAudio(q.getQuestionText()));
+            playAudio(q.getQuestionText());
+            setupChoiceButtons(q.getOptions(), true);
+        } else if (levelToTest.equals("5-6")) {
+            cardMedia.setVisibility(View.VISIBLE);
+            answersContainer.setVisibility(View.VISIBLE);
+            tvQuestion.setText("מה מופיע בתמונה?");
+            int resId = getResources().getIdentifier(q.getMediaUrl(), "drawable", getPackageName());
+            ivQuestionMedia.setImageResource(resId != 0 ? resId : R.drawable.wizard_placeholder1);
+            setupChoiceButtons(q.getOptions(), false);
+        } else if (levelToTest.equals("7-8")) {
+            containerKeyboard.setVisibility(View.VISIBLE);
+            cardMediaKeyboard.setVisibility(View.VISIBLE);
+            tvQuestion.setText(q.getQuestionText());
+            int resId = getResources().getIdentifier(q.getMediaUrl(), "drawable", getPackageName());
+            ivQuestionMediaKeyboard.setImageResource(resId != 0 ? resId : R.drawable.wizard_placeholder1);
+            String correctWord = q.getOptions().get(q.getCorrectAnswerIndex());
+            setupPlacementKeyboard(correctWord);
+        }
+
+        // טקסט מיוחד למצב שדרוג בשאלה הראשונה
         if (isUpgradeMode && currentQuestionIndex == 0) {
             tvQuestion.setText("כל הכבוד על עליית הרמה! בוא נראה אם אתה מוכן לאתגר החדש:");
-        } else {
-            if (currentLevel.equals("3-4")) {
-                audioContainer.setVisibility(View.VISIBLE);
-                answersContainer.setVisibility(View.VISIBLE);
-                tvQuestion.setText("הקשיבו וביחרו בתמונה הנכונה:");
-                btnPlayAudio.setOnClickListener(v -> playAudio(q.getQuestionText()));
-                playAudio(q.getQuestionText());
-                setupChoiceButtons(q.getOptions(), true);
-            } else if (currentLevel.equals("5-6")) {
-                cardMedia.setVisibility(View.VISIBLE);
-                answersContainer.setVisibility(View.VISIBLE);
-                tvQuestion.setText("מה מופיע בתמונה?");
-                int resId = getResources().getIdentifier(q.getMediaUrl(), "drawable", getPackageName());
-                ivQuestionMedia.setImageResource(resId != 0 ? resId : R.drawable.wizard_placeholder1);
-                setupChoiceButtons(q.getOptions(), false);
-            } else if (currentLevel.equals("7-8")) {
-                containerKeyboard.setVisibility(View.VISIBLE);
-                cardMediaKeyboard.setVisibility(View.VISIBLE);
-                tvQuestion.setText(q.getQuestionText());
-                int resId = getResources().getIdentifier(q.getMediaUrl(), "drawable", getPackageName());
-                ivQuestionMediaKeyboard.setImageResource(resId != 0 ? resId : R.drawable.wizard_placeholder1);
-                String correctWord = q.getOptions().get(q.getCorrectAnswerIndex());
-                setupPlacementKeyboard(correctWord);
-            }
         }
     }
 
@@ -574,22 +583,22 @@ public class PlacementTestActivity extends BaseActivity {
     private void saveProgress() {
         SharedPreferences prefs = getSharedPreferences("placement_prefs", MODE_PRIVATE);
         prefs.edit()
-                .putInt(PREF_PLACEMENT_INDEX + currentLevel, currentQuestionIndex)
-                .putInt(PREF_PLACEMENT_CORRECT + currentLevel, correctAnswersCount)
+                .putInt(PREF_PLACEMENT_INDEX + levelToTest, currentQuestionIndex)
+                .putInt(PREF_PLACEMENT_CORRECT + levelToTest, correctAnswersCount)
                 .apply();
     }
 
     private void loadProgress() {
         SharedPreferences prefs = getSharedPreferences("placement_prefs", MODE_PRIVATE);
-        currentQuestionIndex = prefs.getInt(PREF_PLACEMENT_INDEX + currentLevel, 0);
-        correctAnswersCount = prefs.getInt(PREF_PLACEMENT_CORRECT + currentLevel, 0);
+        currentQuestionIndex = prefs.getInt(PREF_PLACEMENT_INDEX + levelToTest, 0);
+        correctAnswersCount = prefs.getInt(PREF_PLACEMENT_CORRECT + levelToTest, 0);
     }
 
     private void clearProgress() {
         SharedPreferences prefs = getSharedPreferences("placement_prefs", MODE_PRIVATE);
         prefs.edit()
-                .remove(PREF_PLACEMENT_INDEX + currentLevel)
-                .remove(PREF_PLACEMENT_CORRECT + currentLevel)
+                .remove(PREF_PLACEMENT_INDEX + levelToTest)
+                .remove(PREF_PLACEMENT_CORRECT + levelToTest)
                 .apply();
     }
 

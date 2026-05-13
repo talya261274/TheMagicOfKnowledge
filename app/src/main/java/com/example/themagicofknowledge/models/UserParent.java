@@ -19,6 +19,7 @@ public class UserParent {
     public String userName;
     public String password;
     public boolean isAdmin;
+    private String avatar;
 
     public Map<String, UserChild> childrenList;
 
@@ -113,6 +114,9 @@ public class UserParent {
     public void setAdmin(boolean admin) {
         isAdmin = admin;
     }
+
+    public String getAvatar() { return avatar; }
+    public void setAvatar(String avatar) { this.avatar = avatar; }
 
     public Map<String, UserChild> getChildrenList() {
         if (childrenList == null) {

@@ -1027,7 +1027,7 @@ public class MixedGameActivity extends BaseActivity {
         Button btnStay = dialog.findViewById(R.id.btnStayAtCurrentLevel);
 
         if (tvTitle != null) tvTitle.setText("וואו! אלוף!");
-        if (tvMessage != null) tvMessage.setText("סיימת את התרגול בהצלחה!\nעכשיו מופיע לך V ירוק בתפריט.");
+        if (tvMessage != null) tvMessage.setText("סיימת את התרגול בהצלחה!\nעכשיו מופיע לך V בתפריט.");
         if (ivStatus != null) ivStatus.setImageResource(R.drawable.ic_trophy);
         if (ratingBar != null) ratingBar.setRating((float) (score / 20));
 

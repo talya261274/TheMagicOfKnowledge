@@ -28,6 +28,7 @@ import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.android.material.switchmaterial.SwitchMaterial;
 import com.google.android.material.textfield.TextInputEditText;
 
+import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Collections;
 import java.util.List;
@@ -40,6 +41,8 @@ public class UsersListActivity extends BaseActivity {
     private UserAdapter userAdapter;
     private TextView tvUserCount;
     private UserParent currentUser;
+    private List<UserParent> allUsers = new ArrayList<>(); // רשימה מלאה
+    private String currentFilter = "all"; // מצב סינון נוכחי
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -62,6 +65,7 @@ public class UsersListActivity extends BaseActivity {
         });
 
         initViews();
+        initSearch();
         setupRecyclerView();
         setupFab();
     }
@@ -134,9 +138,8 @@ public class UsersListActivity extends BaseActivity {
         databaseService.getUserList(new DatabaseService.DatabaseCallback<List<UserParent>>() {
             @Override
             public void onCompleted(List<UserParent> users) {
-                // מיון: מנהלים תחילה
                 sortUsersByAdminFirst(users);
-
+                allUsers = users; // ← שמור רשימה מלאה
                 runOnUiThread(() -> {
                     tvUserCount.setText(String.valueOf(users.size()));
                     userAdapter.setUserList(users);
@@ -432,5 +435,81 @@ public class UsersListActivity extends BaseActivity {
                 });
             }
         });
+    }
+
+    private void initSearch() {
+        com.google.android.material.textfield.TextInputEditText etSearch = findViewById(R.id.etSearch);
+
+        etSearch.addTextChangedListener(new android.text.TextWatcher() {
+            @Override public void beforeTextChanged(CharSequence s, int start, int count, int after) {}
+            @Override public void onTextChanged(CharSequence s, int start, int before, int count) {
+                filterUsers(s.toString(), currentFilter);
+            }
+            @Override public void afterTextChanged(android.text.Editable s) {}
+        });
+
+        findViewById(R.id.btnFilterAll).setOnClickListener(v -> {
+            currentFilter = "all";
+            updateFilterButtons("all");
+            filterUsers(etSearch.getText().toString(), "all");
+        });
+
+        findViewById(R.id.btnFilterAdmins).setOnClickListener(v -> {
+            currentFilter = "admins";
+            updateFilterButtons("admins");
+            filterUsers(etSearch.getText().toString(), "admins");
+        });
+
+        findViewById(R.id.btnFilterUsers).setOnClickListener(v -> {
+            currentFilter = "users";
+            updateFilterButtons("users");
+            filterUsers(etSearch.getText().toString(), "users");
+        });
+    }
+
+    private void filterUsers(String query, String filter) {
+        List<UserParent> filtered = new ArrayList<>();
+        String lowerQuery = query.toLowerCase().trim();
+
+        for (UserParent user : allUsers) {
+            // סינון לפי תפקיד
+            if (filter.equals("admins") && !user.isAdmin()) continue;
+            if (filter.equals("users") && user.isAdmin()) continue;
+
+            // סינון לפי חיפוש
+            if (!lowerQuery.isEmpty()) {
+                boolean matchName = (user.getFirstName() + " " + user.getLastName())
+                        .toLowerCase().contains(lowerQuery);
+                boolean matchEmail = user.getEmail() != null &&
+                        user.getEmail().toLowerCase().contains(lowerQuery);
+                boolean matchPhone = user.getPhone() != null &&
+                        user.getPhone().contains(lowerQuery);
+                if (!matchName && !matchEmail && !matchPhone) continue;
+            }
+
+            filtered.add(user);
+        }
+
+        tvUserCount.setText(String.valueOf(filtered.size()));
+        userAdapter.setUserList(filtered);
+    }
+
+    private void updateFilterButtons(String active) {
+        com.google.android.material.button.MaterialButton btnAll = findViewById(R.id.btnFilterAll);
+        com.google.android.material.button.MaterialButton btnAdmins = findViewById(R.id.btnFilterAdmins);
+        com.google.android.material.button.MaterialButton btnUsers = findViewById(R.id.btnFilterUsers);
+
+        // איפוס כולם
+        btnAll.setBackgroundTintList(android.content.res.ColorStateList.valueOf(
+                active.equals("all") ? android.graphics.Color.parseColor("#1E5F8B") : android.graphics.Color.TRANSPARENT));
+        btnAll.setTextColor(active.equals("all") ? android.graphics.Color.WHITE : android.graphics.Color.parseColor("#1E5F8B"));
+
+        btnAdmins.setBackgroundTintList(android.content.res.ColorStateList.valueOf(
+                active.equals("admins") ? android.graphics.Color.parseColor("#FF9800") : android.graphics.Color.TRANSPARENT));
+        btnAdmins.setTextColor(active.equals("admins") ? android.graphics.Color.WHITE : android.graphics.Color.parseColor("#FF9800"));
+
+        btnUsers.setBackgroundTintList(android.content.res.ColorStateList.valueOf(
+                active.equals("users") ? android.graphics.Color.parseColor("#1E5F8B") : android.graphics.Color.TRANSPARENT));
+        btnUsers.setTextColor(active.equals("users") ? android.graphics.Color.WHITE : android.graphics.Color.parseColor("#1E5F8B"));
     }
 }

@@ -266,14 +266,14 @@ public class RegisterActivity extends BaseActivity implements View.OnClickListen
             @Override
             public void onCompleted(Void object) {
                 Log.d(TAG, "createUserInDatabase: User created successfully");
-                /// save the user to shared preferences
                 SharedPreferencesUtil.saveUser(RegisterActivity.this, user);
-                Log.d(TAG, "createUserInDatabase: Redirecting to MainActivity");
-                /// Redirect to MainActivity and clear back stack to prevent user from going back to register screen
-                Intent mainIntent = new Intent(RegisterActivity.this, SelectChildActivity.class);
-                /// clear the back stack (clear history) and start the MainActivity
-                mainIntent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
-                startActivity(mainIntent);
+                Log.d(TAG, "createUserInDatabase: Redirecting to AvatarSelection");
+
+                Intent intent = new Intent(RegisterActivity.this, AvatarSelectionActivity.class);
+                intent.putExtra("isParent", true);
+                intent.putExtra("parentId", user.getId());
+                intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+                startActivity(intent);
             }
 
             @Override

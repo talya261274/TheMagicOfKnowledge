@@ -30,6 +30,7 @@ import com.example.themagicofknowledge.models.UserChild;
 import com.example.themagicofknowledge.models.UserParent;
 import com.example.themagicofknowledge.models.UserRole;
 import com.example.themagicofknowledge.services.DatabaseService;
+import com.example.themagicofknowledge.utils.ImageUtil;
 import com.example.themagicofknowledge.utils.SharedPreferencesUtil;
 import com.google.android.material.navigation.NavigationView;
 
@@ -80,34 +81,65 @@ public abstract class BaseActivity extends AppCompatActivity
                 toolbar.setVisibility(View.GONE);
             }
         }
+
+        ivToolbarAvatar.setOnClickListener(v -> {
+            UserParent user = SharedPreferencesUtil.getUser(this);
+            UserChild currentChild = SharedPreferencesUtil.getCurrentChild(this);
+
+            if (user != null && user.isAdmin()) {
+                navigateTo(AdminDashboardActivity.class);
+            } else if (currentChild != null) {
+                navigateTo(MainActivity.class);
+            } else {
+                navigateTo(SelectChildActivity.class);
+            }
+        });
+
+        toolbar.setOnClickListener(v -> {
+            if (drawerLayout != null) {
+                drawerLayout.openDrawer(GravityCompat.START);
+            }
+        });
+
+        findViewById(R.id.cardToolbarAvatar).setOnClickListener(v -> {
+            UserParent user = SharedPreferencesUtil.getUser(this);
+            UserChild currentChild = SharedPreferencesUtil.getCurrentChild(this);
+
+            if (user != null && user.isAdmin()) {
+                navigateTo(AdminDashboardActivity.class);
+            } else if (currentChild != null) {
+                navigateTo(MainActivity.class);
+            } else {
+                navigateTo(SelectChildActivity.class);
+            }
+        });
     }
+
     private void updateNavMenuByRole() {
         if (navigationView == null) return;
 
         UserParent user = SharedPreferencesUtil.getUser(this);
         if (user == null) return;
 
-        UserChild currentChild = SharedPreferencesUtil.getCurrentChild(this);
         Menu menu = navigationView.getMenu();
+        for (int i = 0; i < menu.size(); i++) {
+            menu.getItem(i).setVisible(true);
+        }
+
+        UserChild currentChild = SharedPreferencesUtil.getCurrentChild(this);
 
         if (user.isAdmin()) {
-            // מנהל - מסתיר הכל חוץ מניהול
             hideMenuItem(menu, R.id.nav_subjects);
-            hideMenuItem(menu, R.id.nav_profile);
             hideMenuItem(menu, R.id.nav_progress);
-            hideMenuItem(menu, R.id.nav_mix);
             hideMenuItem(menu, R.id.nav_back_to_parent);
         } else if (currentChild != null) {
-            // ילד - הוא נכנס למצב משחק (יש currentChild)
             hideMenuItem(menu, R.id.nav_profile);
             hideMenuItem(menu, R.id.nav_progress);
             hideMenuItem(menu, R.id.nav_admin_users);
             hideMenuItem(menu, R.id.nav_logout);
-            // nav_back_to_parent נשאר גלוי - הילד צריך אותו!
         } else {
-            // הורה רגיל - לא בחר ילד עדיין, או במסכי ניהול
             hideMenuItem(menu, R.id.nav_admin_users);
-            hideMenuItem(menu, R.id.nav_back_to_parent);  // ← הוספה - הורה לא צריך
+            hideMenuItem(menu, R.id.nav_back_to_parent);
         }
     }
 
@@ -148,7 +180,7 @@ public abstract class BaseActivity extends AppCompatActivity
         updateNavMenuByRole();
     }
 
-    private void updateUIComponents() {
+    protected void updateUIComponents() {
         UserChild currentChild = SharedPreferencesUtil.getCurrentChild(this);
 
         // 1. עדכון האוואטר ב-Toolbar (במקום הלוגו)
@@ -158,43 +190,35 @@ public abstract class BaseActivity extends AppCompatActivity
         updateNavigationHeader(currentChild);
     }
 
-    private void updateToolbarAvatar(UserChild child) {
+    protected void updateToolbarAvatar(UserChild child) {
         if (ivToolbarAvatar == null) return;
 
-        if (child != null && child.getAvatar() != null && !child.getAvatar().isEmpty()) {
-            int resId = getResources().getIdentifier(child.getAvatar(), "drawable", getPackageName());
-            if (resId != 0) {
-                ivToolbarAvatar.setImageResource(resId);
-            } else {
-                ivToolbarAvatar.setImageResource(R.drawable.logo); // ברירת מחדל
-            }
+        if (child != null && child.getAvatar() != null) {
+            ImageUtil.loadAvatar(this, ivToolbarAvatar, child.getAvatar());
         } else {
-            ivToolbarAvatar.setImageResource(R.drawable.logo); // אם אין ילד, נציג לוגו
+            UserParent parent = SharedPreferencesUtil.getUser(this);
+            if (parent != null && parent.getAvatar() != null) {
+                ImageUtil.loadAvatar(this, ivToolbarAvatar, parent.getAvatar());
+            } else {
+                ivToolbarAvatar.setImageResource(R.drawable.logo);
+            }
         }
     }
 
     protected void updateNavigationHeader(UserChild child) {
-        if (navigationView != null) {
-            View headerView = navigationView.getHeaderView(0);
-            TextView usernameText = headerView.findViewById(R.id.nav_user_name);
-            ImageView userImage = headerView.findViewById(R.id.nav_user_image);
+        if (navigationView == null) return;
+        View headerView = navigationView.getHeaderView(0);
+        TextView usernameText = headerView.findViewById(R.id.nav_user_name);
+        ImageView userImage = headerView.findViewById(R.id.nav_user_image);
 
-            if (child != null) {
-                // שם הילד עם "שלום"
-                if (usernameText != null) usernameText.setText("שלום, " + child.getName());
-
-                // אוואטר הילד בתפריט הצד
-                String avatarName = child.getAvatar();
-                if (avatarName != null && !avatarName.isEmpty() && userImage != null) {
-                    int resId = getResources().getIdentifier(avatarName, "drawable", getPackageName());
-                    if (resId != 0) userImage.setImageResource(resId);
-                }
-            } else {
-                // אם אין ילד נבחר, מציגים את שם ההורה
-                UserParent currentUser = SharedPreferencesUtil.getUser(this);
-                if (currentUser != null && usernameText != null) {
-                    usernameText.setText("שלום, " + currentUser.getFirstName());
-                }
+        if (child != null) {
+            if (usernameText != null) usernameText.setText("שלום, " + child.getName());
+            if (userImage != null) ImageUtil.loadAvatar(this, userImage, child.getAvatar());
+        } else {
+            UserParent currentUser = SharedPreferencesUtil.getUser(this);
+            if (currentUser != null) {
+                if (usernameText != null) usernameText.setText("שלום, " + currentUser.getFirstName());
+                if (userImage != null) ImageUtil.loadAvatar(this, userImage, currentUser.getAvatar());
             }
         }
     }
@@ -266,9 +290,6 @@ public abstract class BaseActivity extends AppCompatActivity
         } else if (id == R.id.nav_progress) {
             navigateTo(ParentTrackingActivity.class);
 
-        } else if (id == R.id.nav_mix) {
-            navigateTo(MixedGameActivity.class);
-
         } else if (id == R.id.nav_admin_users) {
             navigateTo(UsersListActivity.class);
 
@@ -320,7 +341,7 @@ public abstract class BaseActivity extends AppCompatActivity
     }
 
     // עדכון פונקציית ההתנתקות שתשתמש בדיאלוג החדש
-    private void showLogoutDialog() {
+    protected void showLogoutDialog() {
         showCustomDialog(
                 "התנתקות",
                 "האם אתה בטוח שברצונך לצאת?",

@@ -22,6 +22,7 @@ import com.example.themagicofknowledge.models.UserChild;
 import com.example.themagicofknowledge.models.UserParent;
 import com.example.themagicofknowledge.models.UserRole;
 import com.example.themagicofknowledge.services.DatabaseService;
+import com.example.themagicofknowledge.utils.ImageUtil;
 import com.example.themagicofknowledge.utils.SharedPreferencesUtil;
 import com.example.themagicofknowledge.utils.Validator;
 import com.google.android.material.button.MaterialButton;
@@ -38,8 +39,8 @@ public class UserProfileActivity extends BaseActivity {
     private FloatingActionButton btnUpdateAction;
     private LinearLayout containerChildrenLinks;
     private MaterialButton btnSignOut;
-    private FrameLayout backButtonContainer;
     private CardView childrenTrackingCard;
+    private ImageView ivParentAvatar;
 
     private UserParent currentUser;       // המשתמש שמוצג בפרופיל (אולי לא המחובר)
     private UserParent loggedInUser;      // המשתמש המחובר (לבדיקת הרשאות)
@@ -76,13 +77,6 @@ public class UserProfileActivity extends BaseActivity {
             populateUI();
         }
 
-        // ⭐ הכפתור מוצג רק למנהלים (בכל מקרה - שלהם או של אחרים)
-        if (loggedInUser != null && loggedInUser.isAdmin()) {
-            backButtonContainer.setVisibility(View.VISIBLE);
-        } else {
-            backButtonContainer.setVisibility(View.GONE);
-        }
-
         btnSignOut.setOnClickListener(v -> showLogoutDialog());
 
         btnUpdateAction.setOnClickListener(v -> {
@@ -92,6 +86,20 @@ public class UserProfileActivity extends BaseActivity {
                 validateAndSave();
             }
         });
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        loggedInUser = SharedPreferencesUtil.getUser(this);
+
+        if (isViewingOwnProfile) {
+            currentUser = loggedInUser;
+            populateUI();
+        } else if (currentUser != null) {
+            ImageUtil.loadAvatar(this, ivParentAvatar, currentUser.getAvatar());
+        }
+        updateUIComponents();
     }
 
     private void initViews() {
@@ -107,9 +115,18 @@ public class UserProfileActivity extends BaseActivity {
         btnUpdateAction = findViewById(R.id.et_update);
         containerChildrenLinks = findViewById(R.id.container_children_links);
         childrenTrackingCard = findViewById(R.id.childrenTrackingCard);
-        backButtonContainer = findViewById(R.id.backButtonContainer);  // ← בדיקה!
 
-        findViewById(R.id.btnBackToUsersList).setOnClickListener(v -> finish());
+        ivParentAvatar = findViewById(R.id.ivParentAvatar);
+        View btnChangeParentAvatar = findViewById(R.id.btnChangeParentAvatar);
+        btnChangeParentAvatar.setOnClickListener(v -> {
+            if (currentUser != null) {
+                Intent intent = new Intent(this, AvatarSelectionActivity.class);
+                intent.putExtra("isParent", true);
+                intent.putExtra("parentId", currentUser.getId());
+                intent.putExtra("fromProfile", true);
+                startActivity(intent);
+            }
+        });
 
     }
 
@@ -145,6 +162,7 @@ public class UserProfileActivity extends BaseActivity {
         etPhone.setText(currentUser.getPhone());
         etBirthDate.setText(currentUser.getBirthDate());
         etPassword.setText(currentUser.getPassword());
+        ImageUtil.loadAvatar(this, ivParentAvatar, currentUser.getAvatar());
 
         if (!isViewingOwnProfile) {
             btnSignOut.setVisibility(View.GONE);
@@ -273,48 +291,4 @@ public class UserProfileActivity extends BaseActivity {
         }
     }
 
-    // ===== דיאלוג מותאם אישית =====
-    public void showCustomDialog(String title, String message, String confirmText, int confirmColor, Runnable onConfirm) {
-        Dialog dialog = new Dialog(this);
-        dialog.setContentView(R.layout.custom_action_dialog);
-
-        if (dialog.getWindow() != null) {
-            dialog.getWindow().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
-        }
-
-        TextView tvTitle = dialog.findViewById(R.id.tvDialogTitle);
-        TextView tvMessage = dialog.findViewById(R.id.tvDialogMessage);
-        MaterialButton btnConfirm = dialog.findViewById(R.id.btnConfirm);
-        TextView btnCancel = dialog.findViewById(R.id.btnCancel);
-
-        tvTitle.setText(title);
-        tvMessage.setText(message);
-        btnConfirm.setText(confirmText);
-        btnConfirm.setBackgroundTintList(ColorStateList.valueOf(confirmColor));
-
-        btnConfirm.setOnClickListener(v -> {
-            onConfirm.run();
-            dialog.dismiss();
-        });
-
-        btnCancel.setOnClickListener(v -> dialog.dismiss());
-        dialog.show();
-    }
-
-
-    // ===== דיאלוג התנתקות =====
-    private void showLogoutDialog() {
-        showCustomDialog(
-                "התנתקות",
-                "האם אתה בטוח שברצונך לצאת?",
-                "התנתק",
-                Color.parseColor("#FF5252"),
-                () -> {
-                    SharedPreferencesUtil.signOutUser(this);
-                    Intent intent = new Intent(this, LandingActivity.class);
-                    intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
-                    startActivity(intent);
-                }
-        );
-    }
 }
