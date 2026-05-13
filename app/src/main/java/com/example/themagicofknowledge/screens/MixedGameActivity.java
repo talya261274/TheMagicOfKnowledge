@@ -519,7 +519,8 @@ public class MixedGameActivity extends BaseActivity {
         ImageView ivHint = findViewById(R.id.ivMixedSentenceHint);
         TextView tvSentence = findViewById(R.id.tvMixedSentenceText);
         EditText etAnswer = findViewById(R.id.etMixedAnswer);
-        GridView keyboardGrid = findViewById(R.id.mixedKeyboard);
+        GridView mixedKeyboard = findViewById(R.id.mixedKeyboard);
+        mixedKeyboard.setNestedScrollingEnabled(false);
         Button btnCheck = findViewById(R.id.btnCheck);
 
         int resId = getResources().getIdentifier(sq.getHintImage(), "drawable", getPackageName());
@@ -537,7 +538,7 @@ public class MixedGameActivity extends BaseActivity {
                 etAnswer.append(letter);
             }
         });
-        keyboardGrid.setAdapter(adapter);
+        mixedKeyboard.setAdapter(adapter);
 
         btnCheck.setOnClickListener(v -> {
             if (isProcessingAnswer) return;

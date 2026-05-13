@@ -1,45 +1,73 @@
+<?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:layout_width="match_parent"
-    android:layout_height="200dp"
-    android:background="@drawable/nav_background"
-    android:fitsSystemWindows="true"
-    android:gravity="center"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="wrap_content"
+    android:layout_height="230dp"
+    android:background="@drawable/main_background"
     android:orientation="vertical"
-    android:padding="24dp">
+    android:paddingTop="48dp"
+    android:paddingBottom="20dp"
+    android:layout_marginBottom="10dp"
+    android:layoutDirection="rtl"
+    android:paddingStart="24dp"
+    android:paddingEnd="24dp">
 
-    <androidx.cardview.widget.CardView
-        android:layout_width="80dp"
-        android:layout_height="80dp"
-        android:layout_marginBottom="16dp"
-        app:cardCornerRadius="40dp"
-        app:cardElevation="4dp"
-        xmlns:app="http://schemas.android.com/apk/res-auto">
-
-        <ImageView
-            android:id="@+id/nav_user_image"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:scaleType="centerCrop"
-            android:src="@drawable/logo" />
-
-    </androidx.cardview.widget.CardView>
-    <TextView
-        android:id="@+id/nav_user_name"
-        android:layout_width="wrap_content"
+    <!-- שורה עליונה: אווטר + שם -->
+    <LinearLayout
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:fontFamily="@font/varelaround"
-        android:text="שלום, משתמש"
-        android:textColor="@color/white"
-        android:textSize="20sp"
-        android:textStyle="bold" />
+        android:gravity="center"
+        android:orientation="vertical">
 
-    <TextView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="4dp"
-        android:fontFamily="@font/gveretlevin"
-        android:text="הקסם שבידע"
-        android:textColor="@color/white"
-        android:textSize="14sp" />
+        <!-- אווטר עגול עם מסגרת -->
+        <com.google.android.material.card.MaterialCardView
+            android:layout_width="80dp"
+            android:layout_height="80dp"
+            app:cardCornerRadius="40dp"
+            app:cardElevation="0dp"
+            app:strokeColor="#FFFFFF"
+            app:strokeWidth="2dp"
+            app:cardBackgroundColor="#FFFFFF">
+
+            <ImageView
+                android:id="@+id/nav_user_image"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:scaleType="centerCrop"
+                android:src="@drawable/logo" />
+
+        </com.google.android.material.card.MaterialCardView>
+
+        <!-- שם -->
+        <TextView
+            android:id="@+id/nav_user_name"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="20dp"
+            android:fontFamily="@font/gan"
+            android:text="שלום, משתמש"
+            android:textColor="#FFFFFF"
+            android:textSize="20sp"
+            android:textStyle="bold" />
+
+        <!-- כותרת -->
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="4dp"
+            android:fontFamily="@font/varelaround"
+            android:text="הקסם שבידע ✨"
+            android:textColor="@color/white"
+            android:textStyle="bold"
+            android:textSize="14sp" />
+
+    </LinearLayout>
+
+    <!-- קו הפרדה -->
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="1dp"
+        android:layout_marginTop="20dp"
+        android:background="#2E7BAF" />
 
 </LinearLayout>

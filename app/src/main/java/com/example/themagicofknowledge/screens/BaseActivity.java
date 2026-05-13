@@ -65,8 +65,15 @@ public abstract class BaseActivity extends AppCompatActivity
         navigationView = findViewById(R.id.nav_view);
         navigationView.setNavigationItemSelectedListener(this);
 
-        navigationView.setBackgroundColor(Color.parseColor("#E0F7FA"));
         navigationView.setItemTextAppearance(R.style.NavMenuItemStyle);
+        navigationView.setItemIconTintList(null);
+        navigationView.setItemTextColor(createNavColorStateList());
+        navigationView.setItemBackground(createNavItemBackground());
+
+        navigationView.setBackgroundColor(Color.WHITE);
+        navigationView.setItemIconTintList(null);
+        navigationView.setItemTextColor(createNavColorStateList());
+        navigationView.setItemBackground(createNavItemBackground());        navigationView.setItemTextAppearance(R.style.NavMenuItemStyle);
 
         if (hasSideMenu()) {
             setupDrawer();
@@ -137,9 +144,12 @@ public abstract class BaseActivity extends AppCompatActivity
             hideMenuItem(menu, R.id.nav_progress);
             hideMenuItem(menu, R.id.nav_admin_users);
             hideMenuItem(menu, R.id.nav_logout);
+            hideMenuItem(menu, R.id.nav_statistics);
         } else {
             hideMenuItem(menu, R.id.nav_admin_users);
             hideMenuItem(menu, R.id.nav_back_to_parent);
+            hideMenuItem(menu, R.id.nav_statistics);
+
         }
     }
 
@@ -283,7 +293,6 @@ public abstract class BaseActivity extends AppCompatActivity
             navigateTo(SelectSubjectActivity.class);
 
         }
-        // ניווט לבחירת נושאים (הקלפים)
         else if (id == R.id.nav_profile) {
             navigateTo(UserProfileActivity.class);
 
@@ -292,6 +301,10 @@ public abstract class BaseActivity extends AppCompatActivity
 
         } else if (id == R.id.nav_admin_users) {
             navigateTo(UsersListActivity.class);
+
+        }
+        else if (id == R.id.nav_statistics) {
+            navigateTo(StatisticsActivity.class);
 
         }
         else if (id == R.id.nav_back_to_parent) {
@@ -396,5 +409,32 @@ public abstract class BaseActivity extends AppCompatActivity
 
         dialog.setCancelable(true);
         dialog.show();
+    }
+
+    private android.content.res.ColorStateList createNavColorStateList() {
+        int[][] states = new int[][] {
+                new int[] { android.R.attr.state_checked },
+                new int[] { -android.R.attr.state_checked }
+        };
+        int[] colors = new int[] {
+                Color.parseColor("#1E5F8B"),
+                Color.parseColor("#2C3E50")
+        };
+        return new android.content.res.ColorStateList(states, colors);
+    }
+
+    private android.graphics.drawable.Drawable createNavItemBackground() {
+        android.graphics.drawable.StateListDrawable stateList =
+                new android.graphics.drawable.StateListDrawable();
+
+        android.graphics.drawable.GradientDrawable selected =
+                new android.graphics.drawable.GradientDrawable();
+        selected.setColor(Color.parseColor("#1A1E5F8B"));
+        selected.setCornerRadius(50f);
+
+        stateList.addState(new int[]{ android.R.attr.state_checked }, selected);
+        stateList.addState(new int[]{},
+                new android.graphics.drawable.ColorDrawable(Color.TRANSPARENT));
+        return stateList;
     }
 }
