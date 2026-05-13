@@ -53,7 +53,6 @@ public class UserProfileActivity extends BaseActivity {
 
         // הגנה - ילדים לא רואים פרופיל
         if (UserRole.isChild(this)) {
-            Toast.makeText(this, "מסך זה אינו זמין", Toast.LENGTH_SHORT).show();
             finish();
             return;
         }

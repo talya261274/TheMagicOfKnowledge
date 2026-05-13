@@ -63,35 +63,22 @@
 
         </com.google.android.material.card.MaterialCardView>
 
-        <!-- כרטיס לבן עם תצוגה מקדימה וכפתור -->
-        <androidx.cardview.widget.CardView
-            android:id="@+id/cardGallerySection"
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/btnFromGallery"
             android:layout_width="200dp"
             android:layout_height="50dp"
-            android:layout_marginStart="10dp"
-            android:layout_marginEnd="10dp"
-            android:layout_marginTop="40dp"
-            app:cardBackgroundColor="#F6EBF3"
-            app:cardCornerRadius="20dp"
-            app:cardElevation="6dp"
+            android:layout_marginTop="50dp"
+            android:fontFamily="@font/varelaround"
+            android:text="העלה תמונה 📷"
+            android:textColor="#F4ECEF"
+            android:textSize="18sp"
+            android:textStyle="bold"
+            app:backgroundTint="#0865B5"
+            app:cornerRadius="20dp"
+            app:elevation="8dp"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/cardPreview">
-
-            <com.google.android.material.button.MaterialButton
-                    android:id="@+id/btnFromGallery"
-                    style="@style/Widget.MaterialComponents.Button.OutlinedButton"
-                    android:layout_width="wrap_content"
-                    android:layout_height="42dp"
-                    android:fontFamily="@font/varelaround"
-                    android:layout_gravity="center"
-                    android:text="העלה תמונה 📷"
-                    android:textColor="#E91E63"
-                    android:textSize="18sp"
-                    android:textStyle="bold"
-                    app:cornerRadius="20dp"/>
-
-        </androidx.cardview.widget.CardView>
+            app:layout_constraintTop_toBottomOf="@+id/cardPreview" />
 
         <!-- GridView אווטרים -->
         <GridView
@@ -111,7 +98,7 @@
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintHorizontal_bias="0.0"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/cardGallerySection" />
+            app:layout_constraintTop_toBottomOf="@+id/btnFromGallery" />
 
         <!-- כפתור אישור -->
         <com.google.android.material.button.MaterialButton
