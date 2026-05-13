@@ -72,8 +72,9 @@ public abstract class BaseActivity extends AppCompatActivity
     }
 
     private void setupClickListeners() {
-        // 1. לחיצה על הפס (Toolbar) - חזרה לדף הבית לפי סוג משתמש
-        toolbar.setOnClickListener(v -> handleHomeNavigation());
+        if (toolbar != null) {
+            toolbar.setOnClickListener(v -> handleHomeNavigation());
+        }
 
         // 2. לחיצה על התמונה (Avatar) - מעבר לפרופיל (רק להורה/מנהל)
         View.OnClickListener profileListener = v -> {

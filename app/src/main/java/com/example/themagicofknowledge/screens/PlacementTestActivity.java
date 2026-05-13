@@ -258,10 +258,6 @@ public class PlacementTestActivity extends BaseActivity {
             setupPlacementKeyboard(correctWord);
         }
 
-        // טקסט מיוחד למצב שדרוג בשאלה הראשונה
-        if (isUpgradeMode && currentQuestionIndex == 0) {
-            tvQuestion.setText("כל הכבוד על עליית הרמה! בוא נראה אם אתה מוכן לאתגר החדש:");
-        }
     }
 
     private void setupChoiceButtons(List<String> options, boolean isImageMode) {

@@ -86,6 +86,24 @@ public class AvatarSelectionActivity extends BaseActivity {
         MaterialButton btnBack = findViewById(R.id.btnBackAvatar);
         MaterialButton btnFromGallery = findViewById(R.id.btnFromGallery); // תוסיפי ל-XML
 
+        if (btnBack != null) {
+            btnBack.setOnClickListener(v -> {
+                boolean fromRegistration = getIntent().getBooleanExtra("isFromRegistration", false);
+
+                if (fromRegistration) {
+                    // במקום רק לעשות finish() שאולי סוגר את האפליקציה כי המחסנית ריקה
+                    // נפתח מחדש את מסך ההרשמה
+                    Intent intent = new Intent(this, RegisterActivity.class);
+                    // דגלים שמונעים יצירת כפילויות של מסכים
+                    intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_SINGLE_TOP);
+                    startActivity(intent);
+                    finish();
+                } else {
+                    finish();
+                }
+            });
+        }
+
         initAvatarList();
         adapter = new AvatarAdapter();
         gvAvatars.setAdapter(adapter);

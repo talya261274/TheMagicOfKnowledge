@@ -24,7 +24,6 @@ import com.example.themagicofknowledge.services.DatabaseService;
 import com.example.themagicofknowledge.utils.SharedPreferencesUtil;
 import com.example.themagicofknowledge.utils.Validator;
 import com.google.android.material.button.MaterialButton;
-import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.android.material.switchmaterial.SwitchMaterial;
 import com.google.android.material.textfield.TextInputEditText;
 
@@ -121,8 +120,10 @@ public class UsersListActivity extends BaseActivity {
     }
 
     private void setupFab() {
-        FloatingActionButton fabAddUser = findViewById(R.id.fabAddUser);
-        fabAddUser.setOnClickListener(v -> showAddUserDialog());
+        View fabAddUser = findViewById(R.id.fabAddUser);
+        if (fabAddUser != null) {
+            fabAddUser.setOnClickListener(v -> showAddUserDialog());
+        }
     }
 
 

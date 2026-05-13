@@ -99,7 +99,7 @@
             android:shadowRadius="6"
             android:text="האזינו לשאלה 🎧"
             android:textColor="#1E5F8B"
-            android:textSize="36sp"
+            android:textSize="34sp"
             android:textStyle="bold"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
@@ -114,15 +114,14 @@
             android:layout_marginBottom="24dp"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/tvMixedQuestionTitle"
-            app:layout_constraintBottom_toBottomOf="parent">
+            app:layout_constraintTop_toBottomOf="@id/tvMixedQuestionTitle">
 
             <!-- ===== מצב 1: בחירה (אודיו/תמונה) ===== -->
             <LinearLayout
                 android:id="@+id/containerSelection"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
-                android:layout_marginTop="30dp"
+                android:layout_marginTop="20dp"
                 android:orientation="vertical"
                 android:visibility="gone">
 
@@ -440,7 +439,7 @@
                 android:id="@+id/containerSentence"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
-                android:layout_marginTop="20dp"
+                android:layout_marginTop="10dp"
                 android:orientation="vertical"
                 android:visibility="gone">
 
