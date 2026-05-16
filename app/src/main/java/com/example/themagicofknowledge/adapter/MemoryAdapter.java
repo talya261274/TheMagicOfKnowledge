@@ -47,7 +47,7 @@ public class MemoryAdapter extends BaseAdapter {
         MemoryCard card = cards.get(position);
 
         if (convertView == null) {
-            convertView = LayoutInflater.from(context).inflate(R.layout.card_item, parent, false);
+            convertView = LayoutInflater.from(context).inflate(R.layout.item_card, parent, false);
         }
 
         // הגדרת גודל ישירות על convertView
