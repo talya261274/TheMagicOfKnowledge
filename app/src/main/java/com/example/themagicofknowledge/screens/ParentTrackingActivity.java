@@ -161,7 +161,7 @@ public class ParentTrackingActivity extends BaseActivity {
     }
 
     /**
-     * ⭐⭐⭐ פונקציה חדשה - מעבדת את הנתונים לרשימת רמות ⭐⭐⭐
+     * ⭐⭐⭐ מעבדת את הנתונים לרשימת רמות ⭐⭐⭐
      */
     private void processProgressData(DataSnapshot snapshot, UserChild selectedChild) {
         levelsList.clear();

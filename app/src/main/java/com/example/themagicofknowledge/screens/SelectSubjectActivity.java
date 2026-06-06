@@ -178,7 +178,7 @@ public class SelectSubjectActivity extends BaseActivity {
     }
 
     /**
-     * ⭐⭐⭐ פונקציה חדשה - בוחרת איזה דיאלוג להציג ⭐⭐⭐
+     * ⭐⭐⭐ בוחרת איזה דיאלוג להציג ⭐⭐⭐
      * אם הילד ברמה 3-4 או 5-6 → דיאלוג רגיל של עליית רמה
      * אם הילד ברמה 7-8 (הרמה האחרונה) → דיאלוג מיוחד של "סיימת את הקסם!"
      */
@@ -235,7 +235,7 @@ public class SelectSubjectActivity extends BaseActivity {
     }
 
     /**
-     * ⭐⭐⭐ פונקציה חדשה - דיאלוג סיום סופי לרמה 7-8 ⭐⭐⭐
+     * ⭐⭐⭐ דיאלוג סיום סופי לרמה 7-8 ⭐⭐⭐
      * מציג "סיימת את הקסם!" עם 2 כפתורים:
      * 1. שחק מההתחלה - איפוס completedSubjects
      * 2. חזור הביתה - finish()
@@ -273,7 +273,7 @@ public class SelectSubjectActivity extends BaseActivity {
     }
 
     /**
-     * ⭐⭐⭐ פונקציה חדשה - איפוס כל הנושאים ⭐⭐⭐
+     * ⭐⭐⭐  איפוס כל הנושאים ⭐⭐⭐
      * מוחק את completedSubjects כך שהילד יוכל לשחק שוב מההתחלה
      */
     private void resetAllSubjects() {

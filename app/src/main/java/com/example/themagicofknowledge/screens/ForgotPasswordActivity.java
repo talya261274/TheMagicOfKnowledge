@@ -87,7 +87,7 @@ public class ForgotPasswordActivity extends AppCompatActivity implements View.On
             return;
         }
 
-        String username = etUsername.getText().toString().trim(); // ← שדה חדש
+        String username = etUsername.getText().toString().trim();
 
         if (username.isEmpty()) {
             etUsername.setError("נא הזן שם משתמש");

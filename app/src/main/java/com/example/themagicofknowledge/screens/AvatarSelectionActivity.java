@@ -82,9 +82,9 @@ public class AvatarSelectionActivity extends BaseActivity {
 
         gvAvatars = findViewById(R.id.gvAvatars);
         btnConfirmAvatar = findViewById(R.id.btnConfirmAvatar);
-        ivSelectedPreview = findViewById(R.id.ivSelectedPreview); // תוסיפי ל-XML
+        ivSelectedPreview = findViewById(R.id.ivSelectedPreview);
         MaterialButton btnBack = findViewById(R.id.btnBackAvatar);
-        MaterialButton btnFromGallery = findViewById(R.id.btnFromGallery); // תוסיפי ל-XML
+        MaterialButton btnFromGallery = findViewById(R.id.btnFromGallery);
 
         if (btnBack != null) {
             btnBack.setOnClickListener(v -> {

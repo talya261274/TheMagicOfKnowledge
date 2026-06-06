@@ -388,29 +388,16 @@ public class DatabaseService {
 
 
     /// מחיקת ילד מההורה
-    public void deleteChild(String parentId, String childId, DatabaseCallback<Void> callback) {
-        // הגנה - אם פרמטרים לא תקינים, החזר שגיאה
-        if (parentId == null || childId == null) {
-            if (callback != null) callback.onFailed(new Exception("Parent ID or Child ID is null"));
-            return;
-        }
-
-        // ניווט לנתיב הספציפי של הילד:
-        // users -> parentId -> childrenList -> childId
-        databaseReference.child("users")
-                .child(parentId)
-                .child("childrenList")
-                .child(childId)
-                // .removeValue() - מוחק את כל התת-עץ הזה
-                .removeValue()
-                // .addOnSuccessListener - אם הצליח
-                .addOnSuccessListener(aVoid -> {
-                    if (callback != null) callback.onCompleted(null);
-                })
-                // .addOnFailureListener - אם נכשל
-                .addOnFailureListener(e -> {
-                    if (callback != null) callback.onFailed(e);
-                });
+    public void deleteChild(String parentId, String childId, DatabaseCallback<UserParent> callback) {
+        updateUser(parentId, new UnaryOperator<UserParent>() {
+            @Override
+            public UserParent apply(UserParent userParent) {
+                if (userParent != null) {
+                    userParent.childrenList.remove(childId);
+                }
+                return userParent;
+            }
+        }, callback);
     }
 
 
@@ -513,5 +500,57 @@ public class DatabaseService {
 
         // נקרא כשהפעולה נכשלה
         void onFailed(Exception e);
+    }
+
+    /// עדכון התקדמות במשחק
+    public void updateGameProgress(String parentId, String childId,
+                                   String ageGroup, String subject,
+                                   int currentIndex, int percent,
+                                   long timeSpent, int attempts) {
+
+        DatabaseReference ref = FirebaseDatabase.getInstance()
+                .getReference("users")
+                .child(parentId)
+                .child("childrenList")
+                .child(childId)
+                .child("progress")
+                .child(ageGroup)
+                .child(subject);
+
+        Map<String, Object> updates = new HashMap<>();
+        updates.put("lastQuestionIndex", currentIndex);
+        updates.put("progressPercent", percent);
+        updates.put("completed", percent >= 100);
+        ref.updateChildren(updates);
+
+        ref.child("timeSeconds").setValue(
+                com.google.firebase.database.ServerValue.increment(timeSpent));
+        ref.child("attempts").setValue(
+                com.google.firebase.database.ServerValue.increment(attempts));
+    }
+
+    /// סימון נושא כהושלם
+    public void markSubjectAsCompleted(String parentId, String childId,
+                                       String ageGroup, String subject,
+                                       int currentIndex,
+                                       DatabaseCallback<Void> callback) {
+
+        DatabaseReference ref = FirebaseDatabase.getInstance()
+                .getReference("users")
+                .child(parentId)
+                .child("childrenList")
+                .child(childId)
+                .child("completedSubjects");
+
+        ref.child(subject).setValue(true)
+                .addOnSuccessListener(aVoid -> {
+                    updateDetailedProgress(
+                            parentId, childId, ageGroup,
+                            subject, 0, 0, 100, currentIndex);
+                    if (callback != null) callback.onCompleted(null);
+                })
+                .addOnFailureListener(e -> {
+                    if (callback != null) callback.onFailed(e);
+                });
     }
 }

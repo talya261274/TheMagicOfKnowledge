@@ -35,12 +35,6 @@ import com.example.themagicofknowledge.models.UserChild;
 import com.example.themagicofknowledge.services.DatabaseService;
 import com.example.themagicofknowledge.utils.SharedPreferencesUtil;
 import com.google.android.material.button.MaterialButton;
-import com.google.firebase.database.DataSnapshot;
-import com.google.firebase.database.DatabaseError;
-import com.google.firebase.database.DatabaseReference;
-import com.google.firebase.database.FirebaseDatabase;
-import com.google.firebase.database.Query;
-import com.google.firebase.database.ValueEventListener;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -888,31 +882,23 @@ public class MixedGameActivity extends BaseActivity {
     }
 
     private void updateProgressInFirebase() {
-        if (allQuestions.isEmpty() || currentIndex == 0) return; // אל תשמור index=0
+        if (allQuestions.isEmpty() || currentIndex == 0) return;
+        if (SharedPreferencesUtil.getUser(this) == null) return;
 
         int percent = 15 + (int) (((double) currentIndex / allQuestions.size()) * 85);
-        if (SharedPreferencesUtil.getUser(this) == null) return;
-        String pId = SharedPreferencesUtil.getUser(this).getId();
-
+        String parentId = SharedPreferencesUtil.getUser(this).getId();
         long timeSpent = (System.currentTimeMillis() - gameStartTime) / 1000;
 
-        DatabaseReference ref = FirebaseDatabase.getInstance().getReference("users")
-                .child(pId).child("childrenList").child(currentChild.getId())
-                .child("progress").child(currentChild.getAgeGroup()).child(subject);
-
-        // עדכון ישיר בלי לקרוא קודם - מהיר יותר
-        Map<String, Object> updates = new HashMap<>();
-        updates.put("lastQuestionIndex", currentIndex);
-        updates.put("progressPercent", percent);
-        updates.put("completed", percent >= 100);
-        // timeSeconds - נעדכן בנפרד עם increment
-        ref.updateChildren(updates);
-
-        // זמן ונסיונות - נצבור עם transactions
-        ref.child("timeSeconds").setValue(
-                com.google.firebase.database.ServerValue.increment(timeSpent));
-        ref.child("attempts").setValue(
-                com.google.firebase.database.ServerValue.increment(attempts));
+        DatabaseService.getInstance().updateGameProgress(
+                parentId,
+                currentChild.getId(),
+                currentChild.getAgeGroup(),
+                subject,
+                currentIndex,
+                percent,
+                timeSpent,
+                attempts
+        );
 
         updateProgressBar();
         gameStartTime = System.currentTimeMillis();
@@ -1047,16 +1033,14 @@ public class MixedGameActivity extends BaseActivity {
         if (SharedPreferencesUtil.getUser(this) == null) return;
         String parentId = SharedPreferencesUtil.getUser(this).getId();
 
-        DatabaseReference ref = FirebaseDatabase.getInstance().getReference("users")
-                .child(parentId).child("childrenList").child(currentChild.getId())
-                .child("completedSubjects");
-
-        ref.child(subject).setValue(true).addOnSuccessListener(aVoid -> {
-            DatabaseService.getInstance().updateDetailedProgress(
-                    parentId, currentChild.getId(), currentChild.getAgeGroup(),
-                    subject, 0, 0, 100, currentIndex
-            );
-        });
+        DatabaseService.getInstance().markSubjectAsCompleted(
+                parentId,
+                currentChild.getId(),
+                currentChild.getAgeGroup(),
+                subject,
+                currentIndex,
+                null
+        );
     }
 
     @Override

@@ -66,7 +66,7 @@ public class SelectChildActivity extends BaseActivity {
         adapter = new ChildAdapter(childrenList,
                 child -> handleChildClick(child),
                 child -> showDeleteConfirmationDialog(child),
-                child -> showEditChildDialog(child) // ← הוסף
+                child -> showEditChildDialog(child)
         );
         rvChildren.setAdapter(adapter);
         rvChildren.setLayoutDirection(View.LAYOUT_DIRECTION_RTL);
@@ -94,7 +94,7 @@ public class SelectChildActivity extends BaseActivity {
     }
 
     /**
-     * ⭐⭐⭐ פונקציה חדשה - טיפול בלחיצה על ילד קיים ⭐⭐⭐
+     * ⭐⭐⭐ טיפול בלחיצה על ילד קיים ⭐⭐⭐
      * בודקת אם הילד כבר עשה מבדק. אם כן - ישר ל-Main, אם לא - ל-PlacementTest.
      */
     private void handleChildClick(UserChild child) {
@@ -343,9 +343,9 @@ public class SelectChildActivity extends BaseActivity {
                     String pId = currentParent.getId();
                     String cId = child.getId();
 
-                    DatabaseService.getInstance().deleteChild(pId, cId, new DatabaseService.DatabaseCallback<Void>() {
+                    DatabaseService.getInstance().deleteChild(pId, cId, new DatabaseService.DatabaseCallback<UserParent>() {
                         @Override
-                        public void onCompleted(Void object) {
+                        public void onCompleted(UserParent userParent) {
                             Toast.makeText(SelectChildActivity.this, "הילד/ה נמחק/ה בהצלחה", Toast.LENGTH_SHORT).show();
                             loadChildrenFromDB();
                         }

@@ -1,3 +1,5 @@
+
+```plantuml
 @startuml TheMagicOfKnowledge
 
 ' ==================== הגדרות עיצוב ====================
@@ -13,19 +15,20 @@ skinparam roundCorner 10
 
 title The Magic of Knowledge - Class Diagram
 
-' ==================== Models (מודלים) ====================
+' ==================== Models ====================
 package "Models" #FFF3E0 {
 
     class UserParent {
-        - id: String
-        - firstName: String
-        - lastName: String
-        - email: String
-        - phone: String
-        - birthDate: String
-        - userName: String
-        - password: String
-        - isAdmin: boolean
+        + id: String
+        + firstName: String
+        + lastName: String
+        + email: String
+        + phone: String
+        + birthDate: String
+        + userName: String
+        + password: String
+        + isAdmin: boolean
+        - avatar: String
         - childrenList: Map<String, UserChild>
         --
         + getChildrenListAsList(): List<UserChild>
@@ -42,6 +45,9 @@ package "Models" #FFF3E0 {
         - currentLevel: String
         - totalTimeSeconds: long
         - progress: Map<String, Object>
+        - completedSubjects: Map<String, Boolean>
+        - lastPlacementScore: Double
+        - startingLevel: String
         --
         + initializeDefaultProgress(): void
         + getFormattedTime(): String
@@ -51,6 +57,7 @@ package "Models" #FFF3E0 {
     class Question {
         - questionText: String
         - options: List<String>
+        - optionLabels: List<String>
         - correctAnswerIndex: int
         - mediaUrl: String
     }
@@ -103,6 +110,39 @@ package "Models" #FFF3E0 {
         - completed: boolean
         - progressPercent: int
     }
+
+    class LevelProgress {
+        - ageGroup: String
+        - subjects: List<SubjectStat>
+        - isCurrent: boolean
+        - isLocked: boolean
+        - isCompleted: boolean
+        - isExpanded: boolean
+        --
+        + getTotalTimeSeconds(): long
+        + getTotalAttempts(): int
+        + getAveragePercent(): int
+        + getCompletedCount(): int
+    }
+
+    class GameProgress {
+        - attempts: int
+        - completed: boolean
+        - timeSeconds: long
+    }
+
+    enum Role {
+        CHILD
+        PARENT
+        ADMIN
+    }
+
+    class UserRole {
+        + {static} getCurrentRole(context): Role
+        + {static} isAdmin(context): boolean
+        + {static} isChild(context): boolean
+        + {static} isParent(context): boolean
+    }
 }
 
 ' ==================== Services ====================
@@ -112,12 +152,19 @@ package "Services" #E8F5E9 {
         - databaseReference: DatabaseReference
         --
         + {static} getInstance(): DatabaseService
+        + generateUserId(): String
+        + generateChildId(userId): String
         + createNewUser(user, callback): void
         + getUser(uid, callback): void
         + getUserList(callback): void
+        + getUserByUsernameAndPassword(username, password, callback): void
+        + getUserByEmail(email, callback): void
+        + checkIfEmailExists(email, callback): void
         + updateUser(userId, function, callback): void
+        + deleteUser(uid, callback): void
         + deleteChild(parentId, childId, callback): void
         + updateDetailedProgress(...): void
+        + resetGameIndex(...): void
     }
 
     interface "DatabaseCallback<T>" as DBCallback {
@@ -141,8 +188,29 @@ package "Utils" #FCE4EC {
         + {static} saveUser(context, user): void
         + {static} getUser(context): UserParent
         + {static} signOutUser(context): void
+        + {static} isUserLoggedIn(context): boolean
+        + {static} getUserId(context): String
         + {static} saveCurrentChild(context, child): void
         + {static} getCurrentChild(context): UserChild
+        + {static} isChildSelected(context): boolean
+        + {static} clearSelectedChild(context): void
+        + {static} saveCurrentChildId(context, childId): void
+        + {static} getCurrentChildId(context): String
+        + {static} clear(context): void
+    }
+
+    class ImageUtil {
+        + {static} requestPermission(activity): void
+        + {static} convertTo64Base(postImage): String
+        + {static} convertFrom64base(base64Code): Bitmap
+        + {static} convertBitmapTo64Base(bitmap): String
+        + {static} loadAvatar(context, imageView, avatar): void
+    }
+
+    class GameProgressManager {
+        + {static} saveProgress(...): void
+        + {static} getAttempts(...): void
+        + {static} updateTotalTime(...): void
     }
 }
 
@@ -151,6 +219,8 @@ package "Adapters" #F3E5F5 {
     class ChildAdapter {
         - children: List<UserChild>
         - listener: OnChildClickListener
+        - longClickListener: OnChildLongClickListener
+        - editListener: OnChildEditListener
         --
         + onBindViewHolder(holder, position): void
     }
@@ -165,10 +235,30 @@ package "Adapters" #F3E5F5 {
     class KeyboardAdapter {
         - letters: String[]
         - listener: OnKeyClickListener
+        --
+        + getView(position, view, parent): View
     }
 
     class SubjectProgressAdapter {
         - statsList: List<SubjectStat>
+        --
+        + onBindViewHolder(holder, position): void
+    }
+
+    class LevelProgressAdapter {
+        - levels: List<LevelProgress>
+        --
+        + onBindViewHolder(holder, position): void
+    }
+
+    class UserAdapter {
+        - userList: List<UserParent>
+        - onUserClickListener: OnUserClickListener
+        --
+        + setUserList(users): void
+        + addUser(user): void
+        + updateUser(user): void
+        + removeUser(user): void
     }
 }
 
@@ -178,85 +268,259 @@ package "Activities" #E0F2F1 {
         # databaseService: DatabaseService
         # drawerLayout: DrawerLayout
         # navigationView: NavigationView
+        # toolbar: Toolbar
+        # ivToolbarAvatar: ImageView
         --
         # hasSideMenu(): boolean
         # showToolbar(): boolean
+        # navigateTo(targetActivity): void
+        # updateUIComponents(): void
+        # showCustomDialog(...): void
+        # showLogoutDialog(): void
         + onNavigationItemSelected(item): boolean
     }
 
-    class LoginActivity
-    class RegisterActivity
-    class SelectChildActivity
-    class MainActivity
-    class SelectSubjectActivity
-    class UserProfileActivity
+    class SplashActivity {
+        - navigateToCorrectScreen(): void
+    }
 
-    class MixedGameActivity {
-        - allQuestions: List<UnifiedQuestion>
-        - currentIndex: int
-        - attempts: int
-        - tts: TextToSpeech
+    class LandingActivity
+
+    class LoginActivity {
+        - etUName: EditText
+        - etPassword: EditText
         --
-        - loadAllData(): void
-        - showCurrentQuestion(): void
-        - finishGame(): void
+        - checkInput(uName, password): boolean
+        - loginUser(uName, password): void
+    }
+
+    class RegisterActivity {
+        - etFName: TextInputLayout
+        - etLName: TextInputLayout
+        - etEmail: TextInputLayout
+        - etPhone: TextInputLayout
+        - etBDate: TextInputLayout
+        - etUName: TextInputLayout
+        - etPassword: TextInputLayout
+        - etCPassword: TextInputLayout
+        --
+        - checkInput(...): boolean
+        - registerUser(...): void
+        - createUserInDatabase(user): void
+    }
+
+    class ForgotPasswordActivity {
+        - etEmail: EditText
+        - etNewPassword: EditText
+        - etUsername: EditText
+        --
+        - updatePassword(): void
+    }
+
+    class SelectChildActivity {
+        - rvChildren: RecyclerView
+        - adapter: ChildAdapter
+        - childrenList: List<UserChild>
+        --
+        - handleChildClick(child): void
+        - loadChildrenFromDB(): void
+        - showAddChildDialog(): void
+        - showEditChildDialog(child): void
+        - showDeleteConfirmationDialog(child): void
+        - showPlacementTestIntroDialog(child): void
+    }
+
+    class AvatarSelectionActivity {
+        - gvAvatars: GridView
+        - avatarNames: List<String>
+        - selectedPosition: int
+        - selectedCustomImageBase64: String
+        --
+        - saveAvatar(avatarValue): void
+        - openCamera(): void
+        - openGallery(): void
+        - handleSelectedBitmap(bitmap): void
+        - showPlacementTestIntroDialog(): void
+    }
+
+    class MainActivity {
+        - tvWelcomeChild: TextView
+        - ivWelcomeAvatar: ImageView
+    }
+
+    class SelectSubjectActivity {
+        - currentChild: UserChild
+        - levelUpDialogShown: boolean
+        --
+        - checkCompletedSubjects(): void
+        - handleAllSubjectsCompleted(): void
+        - showLevelUpDialog(): void
+        - showFinalAchievementDialog(): void
+        - handleLevelUpgrade(): void
+        - resetAllSubjects(): void
     }
 
     class FlashCardMain {
         - cards: ArrayList<FlashCard>
         - currentIndex: int
         - tts: TextToSpeech
+        - subject: String
+        --
+        - createCards(subject): void
+        - showImage(): void
+        - showText(): void
+        - flipCard(): void
+        - handleStartGame(): void
+    }
+
+    class MixedGameActivity {
+        - allQuestions: List<UnifiedQuestion>
+        - currentIndex: int
+        - attempts: int
+        - tts: TextToSpeech
+        - subject: String
+        --
+        - loadAllData(): void
+        - loadCategory(query, type, modelClass): void
+        - showCurrentQuestion(): void
+        - displayAudioQuestion(q): void
+        - displayImageQuestion(q): void
+        - displayMatchingQuestion(pairs): void
+        - displaySentenceQuestion(sq): void
+        - displayMemoryGame(items): void
+        - handleCorrect(): void
+        - finishGame(): void
+        - checkSavedProgress(): void
     }
 
     class PlacementTestActivity {
         - testQuestions: List<Question>
         - correctAnswersCount: int
         - currentLevel: String
+        - levelToTest: String
+        - isUpgradeMode: boolean
+        - isNewChild: boolean
+        - tts: TextToSpeech
+        --
+        - loadQuestionsForCurrentLevel(): void
+        - showNextQuestion(): void
+        - checkAnswer(selectedIdx): void
+        - finishTest(): void
+        - determineNewLevel(currentLevel, percent): String
+        - updateChildLevelInFirebase(level, grade): void
     }
 
     class ParentTrackingActivity {
-        - subjectsStats: List<SubjectStat>
+        - levelsList: List<LevelProgress>
+        - levelAdapter: LevelProgressAdapter
+        - currentParent: UserParent
+        --
+        - setupChildrenSelector(): void
+        - loadStatsForChild(childId): void
+        - processProgressData(snapshot, child): void
+    }
+
+    class UserProfileActivity {
+        - currentUser: UserParent
+        - isViewingOwnProfile: boolean
+        - isEditMode: boolean
+        --
+        - populateUI(): void
+        - setEditMode(enable): void
+        - validateAndSave(): void
+        - setupChildrenProgressLinks(): void
+    }
+
+    class AdminDashboardActivity {
+        - tvTotalUsers: TextView
+        - tvTotalChildren: TextView
+        --
+        - loadStatistics(): void
+    }
+
+    class UsersListActivity {
+        - userAdapter: UserAdapter
+        - allUsers: List<UserParent>
+        - currentFilter: String
+        --
+        - loadUsers(): void
+        - filterUsers(query, filter): void
+        - confirmAndUpdateAdminStatus(user, makeAdmin): void
+        - confirmAndDeleteUser(user): void
+        - showAddUserDialog(): void
+    }
+
+    class StatisticsActivity {
+        - tvTotalChildren: TextView
+        - tvAvgCompletion: TextView
+        - tvLevelUpCount: TextView
+        - tvCompletedAll: TextView
+        --
+        - loadStatistics(): void
+        - processData(users): void
+        - countLevelUps(callback): void
+        - updateUI(...): void
     }
 }
 
 ' ==================== Relationships ====================
 
-' Inheritance - ירושה
+' Inheritance
+BaseActivity <|-- SplashActivity
 BaseActivity <|-- LoginActivity
 BaseActivity <|-- RegisterActivity
+BaseActivity <|-- ForgotPasswordActivity
 BaseActivity <|-- SelectChildActivity
+BaseActivity <|-- AvatarSelectionActivity
 BaseActivity <|-- MainActivity
 BaseActivity <|-- SelectSubjectActivity
+BaseActivity <|-- FlashCardMain
+BaseActivity <|-- MixedGameActivity
+BaseActivity <|-- PlacementTestActivity
+BaseActivity <|-- ParentTrackingActivity
 BaseActivity <|-- UserProfileActivity
+BaseActivity <|-- AdminDashboardActivity
+BaseActivity <|-- UsersListActivity
+BaseActivity <|-- StatisticsActivity
 
-' Composition - הורה מכיל ילדים
+' Composition
 UserParent "1" *-- "0..*" UserChild : contains >
+LevelProgress "1" *-- "0..*" SubjectStat : contains >
 
-' UnifiedQuestion uses Type enum
+' Enum relationships
 UnifiedQuestion --> Type
+UserRole --> Role
 
-' Dependencies - תלויות
+' Dependencies - Activities
 BaseActivity ..> DatabaseService : uses >
 BaseActivity ..> SharedPreferencesUtil : uses >
 LoginActivity ..> Validator : validates >
 RegisterActivity ..> Validator : validates >
+ForgotPasswordActivity ..> Validator : validates >
+UserProfileActivity ..> Validator : validates >
+SelectChildActivity ..> ChildAdapter : uses >
+AvatarSelectionActivity ..> ImageUtil : uses >
 MixedGameActivity ..> UnifiedQuestion : uses >
-MixedGameActivity ..> DatabaseService
-FlashCardMain ..> FlashCard
-PlacementTestActivity ..> Question
-ParentTrackingActivity ..> SubjectStat
-ParentTrackingActivity ..> SubjectProgressAdapter
+MixedGameActivity ..> DatabaseService : uses >
+FlashCardMain ..> FlashCard : uses >
+PlacementTestActivity ..> Question : uses >
+ParentTrackingActivity ..> LevelProgress : uses >
+ParentTrackingActivity ..> LevelProgressAdapter : uses >
+UsersListActivity ..> UserAdapter : uses >
+SelectSubjectActivity ..> UserRole : uses >
+UserProfileActivity ..> ImageUtil : uses >
 
-' Adapters depend on Models
+' Adapters
 ChildAdapter ..> UserChild : displays >
 MemoryAdapter ..> MemoryCard : displays >
 SubjectProgressAdapter ..> SubjectStat : displays >
+LevelProgressAdapter ..> LevelProgress : displays >
+UserAdapter ..> UserParent : displays >
 
-' DatabaseService uses Callback
+' Services
 DatabaseService ..> DBCallback : uses >
-
-' Services manage Models
 DatabaseService ..> UserParent : manages >
 DatabaseService ..> UserChild : manages >
 
 @enduml
+```
