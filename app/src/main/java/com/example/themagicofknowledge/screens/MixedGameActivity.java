@@ -35,6 +35,7 @@ import com.example.themagicofknowledge.models.UserChild;
 import com.example.themagicofknowledge.services.DatabaseService;
 import com.example.themagicofknowledge.utils.SharedPreferencesUtil;
 import com.google.android.material.button.MaterialButton;
+import com.google.firebase.database.DataSnapshot;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -46,7 +47,6 @@ import java.util.Map;
 public class MixedGameActivity extends BaseActivity {
 
     private static final String TAG = "MixedGameActivity";
-
     private final String[] hebrewLetters = {
             "ו", "ה", "ד", "ג", "ב", "א", "DEL",
             "מ", "ל", "כ", "י", "ט", "ח", "ז",
@@ -54,7 +54,6 @@ public class MixedGameActivity extends BaseActivity {
             "ץ", "ף", "ן", "ם", "ך", "ת", "ש",
     };
     private EditText etAnswer;
-
 
     // ===== נתוני המשחק =====
     private List<UnifiedQuestion> allQuestions = new ArrayList<>();
@@ -178,119 +177,65 @@ public class MixedGameActivity extends BaseActivity {
 
     private void loadAllData() {
         String level = currentChild.getAgeGroup().replace("-", "_");
-        DatabaseReference rootRef = FirebaseDatabase.getInstance().getReference("Games");
-
         tasksCompleted = 0;
         allQuestions.clear();
 
         if (level.equals("3_4") || level.equals("5_6")) {
             tasksToLoad = 3;
-
-            String audioPath = "Games/audioRecognition/level_" + level + "/" + subject;
-            String matchingPath = "Games/matching/level_" + level + "/" + subject + "/pairs";
-            String memoryPath = "Games/memoryGame/level_" + level + "/" + subject;
-
-            loadCategory(rootRef.child("audioRecognition").child("level_" + level).child(subject),
-                    UnifiedQuestion.Type.AUDIO, Question.class);
-            loadCategory(rootRef.child("matching").child("level_" + level).child(subject).child("pairs"),
-                    UnifiedQuestion.Type.MATCHING, Pair.class);
-            loadCategory(rootRef.child("memoryGame").child("level_" + level).child(subject),
-                    UnifiedQuestion.Type.MEMORY, DataSnapshot.class);
-
+            loadCategory("Games/audioRecognition/level_" + level + "/" + subject, UnifiedQuestion.Type.AUDIO, Question.class);
+            loadCategory("Games/matching/level_" + level + "/" + subject + "/pairs", UnifiedQuestion.Type.MATCHING, Pair.class);
+            loadCategory("Games/memoryGame/level_" + level + "/" + subject, UnifiedQuestion.Type.MEMORY, null);
         } else if (level.equals("7_8")) {
             tasksToLoad = 3;
-
-            String imagePath = "Games/imageRecognition/level_" + level + "/" + subject;
-            String sentencePath = "Games/sentenceCompletion/level_" + level + "/" + subject;
-            String memoryPath = "Games/memoryGame/level_" + level + "/" + subject;
-
-            loadCategory(rootRef.child("imageRecognition").child("level_" + level).child(subject),
-                    UnifiedQuestion.Type.IMAGE, Question.class);
-            loadCategory(rootRef.child("sentenceCompletion").child("level_" + level).child(subject),
-                    UnifiedQuestion.Type.SENTENCE, SentenceQuestion.class);
-            loadCategory(rootRef.child("memoryGame").child("level_" + level).child(subject),
-                    UnifiedQuestion.Type.MEMORY, DataSnapshot.class);
+            loadCategory("Games/imageRecognition/level_" + level + "/" + subject, UnifiedQuestion.Type.IMAGE, Question.class);
+            loadCategory("Games/sentenceCompletion/level_" + level + "/" + subject, UnifiedQuestion.Type.SENTENCE, SentenceQuestion.class);
+            loadCategory("Games/memoryGame/level_" + level + "/" + subject, UnifiedQuestion.Type.MEMORY, null);
         }
     }
 
-    private void loadCategory(Query query, UnifiedQuestion.Type type, Class<?> modelClass) {
-        query.addListenerForSingleValueEvent(new ValueEventListener() {
+    private void loadCategory(String path, UnifiedQuestion.Type type, Class<?> modelClass) {
+        DatabaseService.getInstance().loadGameData(path, new DatabaseService.DatabaseCallback<DataSnapshot>() {
             @Override
-            public void onDataChange(@NonNull DataSnapshot snapshot) {
-
-                // 🔍 הדפסת כל המפתחות
-                for (DataSnapshot child : snapshot.getChildren()) {
-                    Log.d(TAG, "   🔑 key: " + child.getKey());
-                }
-
+            public void onCompleted(DataSnapshot snapshot) {
                 try {
                     if (type == UnifiedQuestion.Type.MEMORY) {
                         List<DataSnapshot> allItems = new ArrayList<>();
                         for (DataSnapshot item : snapshot.getChildren()) {
                             allItems.add(item);
-
-                            // 🔍 לוג של פרטי כל פריט
-                            String image = item.child("image").getValue(String.class);
-                            String name = item.child("name").getValue(String.class);
-                            Log.d(TAG, "   🎴 image=" + image + ", name=" + name);
                         }
                         int chunkSize = 3;
                         for (int i = 0; i < allItems.size(); i += chunkSize) {
                             int end = Math.min(i + chunkSize, allItems.size());
                             allQuestions.add(new UnifiedQuestion(type, new ArrayList<>(allItems.subList(i, end))));
                         }
-                        Log.d(TAG, "✅ נוצרו " + (allItems.size() / chunkSize) + " משחקי זיכרון");
 
                     } else if (type == UnifiedQuestion.Type.MATCHING) {
                         List<Pair> pairs = new ArrayList<>();
                         for (DataSnapshot ds : snapshot.getChildren()) {
                             Pair p = ds.getValue(Pair.class);
-                            if (p != null) {
-                                pairs.add(p);
-                                Log.d(TAG, "   🔗 left=" + p.getLeft() + ", right=" + p.getRight() + ", id=" + p.getId());
-                            }
+                            if (p != null) pairs.add(p);
                         }
-                        if (!pairs.isEmpty()) {
-                            int chunkSize = 4;
-                            for (int i = 0; i < pairs.size(); i += chunkSize) {
-                                int end = Math.min(i + chunkSize, pairs.size());
-                                allQuestions.add(new UnifiedQuestion(type, new ArrayList<>(pairs.subList(i, end))));
-                            }
+                        int chunkSize = 4;
+                        for (int i = 0; i < pairs.size(); i += chunkSize) {
+                            int end = Math.min(i + chunkSize, pairs.size());
+                            allQuestions.add(new UnifiedQuestion(type, new ArrayList<>(pairs.subList(i, end))));
                         }
-                        Log.d(TAG, "✅ נוצרו " + pairs.size() + " זוגות התאמה");
 
                     } else {
-                        int count = 0;
                         for (DataSnapshot ds : snapshot.getChildren()) {
                             Object data = ds.getValue(modelClass);
-                            if (data != null) {
-                                allQuestions.add(new UnifiedQuestion(type, data));
-                                count++;
-
-                                // 🔍 פרטי שאלה
-                                if (data instanceof Question) {
-                                    Question q = (Question) data;
-                                    Log.d(TAG, "   ❓ question=" + q.getQuestionText()
-                                            + ", mediaUrl=" + q.getMediaUrl()
-                                            + ", options=" + q.getOptions()
-                                            + ", correctIdx=" + q.getCorrectAnswerIndex());
-                                }
-                            } else {
-                                Log.w(TAG, "   ⚠️ data is null for key: " + ds.getKey());
-                            }
+                            if (data != null) allQuestions.add(new UnifiedQuestion(type, data));
                         }
-                        Log.d(TAG, "✅ נטענו " + count + " שאלות מסוג " + type);
                     }
                 } catch (Exception e) {
-                    Log.e(TAG, "Error loading data for type=" + type + " msg=" + e.getMessage(), e);
+                    Log.e(TAG, "Error loading type=" + type + ": " + e.getMessage());
                 }
-
                 checkIfLoadingFinished();
             }
 
             @Override
-            public void onCancelled(@NonNull DatabaseError error) {
-                Log.e(TAG, "❌ שגיאת Firebase ב-" + type + ": " + error.getMessage());
+            public void onFailed(Exception e) {
+                Log.e(TAG, "❌ שגיאת Firebase ב-" + type + ": " + e.getMessage());
                 checkIfLoadingFinished();
             }
         });

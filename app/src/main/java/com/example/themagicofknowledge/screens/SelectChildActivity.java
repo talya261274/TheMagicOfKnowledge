@@ -253,29 +253,28 @@ public class SelectChildActivity extends BaseActivity {
                 return;
             }
 
-            // עדכון ב-Firebase - רק שם וגיל, לא רמה
-            java.util.Map<String, Object> updates = new java.util.HashMap<>();
-            updates.put("name", newName);
-            updates.put("age", newAge);
+            DatabaseService.getInstance().updateUser(currentParent.getId(), userParent -> {
+                if (userParent != null && userParent.getChildrenList().containsKey(child.getId())) {
+                    userParent.getChildrenList().get(child.getId()).setName(newName);
+                    userParent.getChildrenList().get(child.getId()).setAge(newAge);
+                }
+                return userParent;
+            }, new DatabaseService.DatabaseCallback<UserParent>() {
+                @Override
+                public void onCompleted(UserParent userParent) {
+                    dialog.dismiss();
+                    loadChildrenFromDB();
+                    Toast.makeText(SelectChildActivity.this, "הפרטים עודכנו!", Toast.LENGTH_SHORT).show();
+                }
 
-            com.google.firebase.database.FirebaseDatabase.getInstance()
-                    .getReference("users")
-                    .child(currentParent.getId())
-                    .child("childrenList")
-                    .child(child.getId())
-                    .updateChildren(updates)
-                    .addOnSuccessListener(aVoid -> {
-                        dialog.dismiss();
-                        loadChildrenFromDB();
-                        Toast.makeText(this, "הפרטים עודכנו!", Toast.LENGTH_SHORT).show();
-                    })
-                    .addOnFailureListener(e -> {
-                        tvError.setText("שגיאה: " + e.getMessage());
-                        tvError.setVisibility(View.VISIBLE);
-                    });
+                @Override
+                public void onFailed(Exception e) {
+                    tvError.setText("שגיאה: " + e.getMessage());
+                    tvError.setVisibility(View.VISIBLE);
+                }
+            });
         });
         dialog.findViewById(R.id.btnCancelEdit).setOnClickListener(v -> dialog.dismiss());
-
         dialog.show();
     }
 
