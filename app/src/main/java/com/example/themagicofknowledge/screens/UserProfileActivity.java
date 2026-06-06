@@ -213,18 +213,9 @@ public class UserProfileActivity extends BaseActivity {
         String bDate = etBirthDate.getText().toString().trim();
         String pass = etPassword.getText().toString().trim();
 
-        if (!Validator.isNameValid(fName)) {
-            etFirstName.setError("שם לא תקין");
-            return;
-        }
-        if (!Validator.isEmailValid(email)) {
-            etEmail.setError("אימייל לא תקין");
-            return;
-        }
-        if (!Validator.isPasswordValid(pass)) {
-            etPassword.setError("סיסמה קצרה מדי");
-            return;
-        }
+        if (!Validator.isNameValid(fName)) { etFirstName.setError("שם לא תקין"); return; }
+        if (!Validator.isEmailValid(email)) { etEmail.setError("אימייל לא תקין"); return; }
+        if (!Validator.isPasswordValid(pass)) { etPassword.setError("סיסמה קצרה מדי"); return; }
 
         currentUser.setFirstName(fName);
         currentUser.setLastName(lName);
@@ -233,20 +224,18 @@ public class UserProfileActivity extends BaseActivity {
         currentUser.setBirthDate(bDate);
         currentUser.setPassword(pass);
 
-        FirebaseDatabase.getInstance().getReference("users")
-                .child(currentUser.getId())
-                .setValue(currentUser)
-                .addOnSuccessListener(aVoid -> {
-                    // אם זה המשתמש המחובר - מעדכנים גם את ה-SharedPreferences
-                    if (isViewingOwnProfile) {
-                        SharedPreferencesUtil.saveUser(this, currentUser);
-                    }
-                    setEditMode(false);
-                    Toast.makeText(this, "הפרופיל עודכן בהצלחה!", Toast.LENGTH_SHORT).show();
-                })
-                .addOnFailureListener(e -> {
-                    Toast.makeText(this, "שגיאה בעדכון " + e.getMessage(), Toast.LENGTH_SHORT).show();
-                });
+        DatabaseService.getInstance().saveUserProfile(currentUser.getId(), currentUser, new DatabaseService.DatabaseCallback<Void>() {
+            @Override
+            public void onCompleted(Void unused) {
+                if (isViewingOwnProfile) SharedPreferencesUtil.saveUser(UserProfileActivity.this, currentUser);
+                setEditMode(false);
+                Toast.makeText(UserProfileActivity.this, "הפרופיל עודכן בהצלחה!", Toast.LENGTH_SHORT).show();
+            }
+            @Override
+            public void onFailed(Exception e) {
+                Toast.makeText(UserProfileActivity.this, "שגיאה בעדכון " + e.getMessage(), Toast.LENGTH_SHORT).show();
+            }
+        });
     }
 
     private void setupChildrenProgressLinks() {

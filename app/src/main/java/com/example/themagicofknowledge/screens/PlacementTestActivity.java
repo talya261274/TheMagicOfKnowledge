@@ -6,7 +6,6 @@ import android.graphics.Color;
 import android.os.Bundle;
 import android.speech.tts.TextToSpeech;
 import android.view.View;
-import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.GridView;
@@ -16,21 +15,16 @@ import android.widget.RatingBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import androidx.annotation.NonNull;
-import androidx.appcompat.app.AlertDialog;
-import androidx.appcompat.app.AppCompatActivity;
-
 import com.example.themagicofknowledge.R;
 import com.example.themagicofknowledge.adapter.KeyboardAdapter;
 import com.example.themagicofknowledge.models.Question;
 import com.example.themagicofknowledge.models.UserChild;
+import com.example.themagicofknowledge.services.DatabaseService;
 import com.example.themagicofknowledge.utils.SharedPreferencesUtil;
 import com.google.android.material.button.MaterialButton;
 import com.google.firebase.database.DataSnapshot;
-import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
-import com.google.firebase.database.ValueEventListener;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -150,7 +144,6 @@ public class PlacementTestActivity extends BaseActivity {
     }
 
     private void loadQuestionsForCurrentLevel() {
-        // עדכון המשתנה המחלקתי
         levelToTest = currentLevel;
         if (isUpgradeMode) {
             String targetLevel = getIntent().getStringExtra("targetLevel");
@@ -158,13 +151,10 @@ public class PlacementTestActivity extends BaseActivity {
         }
 
         String levelPath = "level_" + levelToTest.replace("-", "_");
-        DatabaseReference ref = FirebaseDatabase.getInstance()
-                .getReference("PlacementTests")
-                .child(levelPath);
 
-        ref.addListenerForSingleValueEvent(new ValueEventListener() {
+        DatabaseService.getInstance().loadPlacementQuestions(levelPath, new DatabaseService.DatabaseCallback<DataSnapshot>() {
             @Override
-            public void onDataChange(@NonNull DataSnapshot snapshot) {
+            public void onCompleted(DataSnapshot snapshot) {
                 testQuestions.clear();
                 for (DataSnapshot ds : snapshot.getChildren()) {
                     Question q = ds.getValue(Question.class);
@@ -179,9 +169,8 @@ public class PlacementTestActivity extends BaseActivity {
                     saveDefaultScoreAndProceed();
                 }
             }
-
             @Override
-            public void onCancelled(@NonNull DatabaseError error) {
+            public void onFailed(Exception e) {
                 Toast.makeText(PlacementTestActivity.this, "שגיאה בטעינה", Toast.LENGTH_SHORT).show();
                 saveDefaultScoreAndProceed();
             }
@@ -515,41 +504,29 @@ public class PlacementTestActivity extends BaseActivity {
             return;
         }
 
-        String parentId = selectedChild.getParentId();
-        String childId = selectedChild.getId();
-
-        DatabaseReference childRef = FirebaseDatabase.getInstance()
-                .getReference("users")
-                .child(parentId)
-                .child("childrenList")
-                .child(childId);
-
         Map<String, Object> updates = new HashMap<>();
         updates.put("ageGroup", level);
         updates.put("lastPlacementScore", grade);
+        if (isNewChild) updates.put("startingLevel", level);
 
-        if (isNewChild) {
-            updates.put("startingLevel", level);
-        }
-
-        childRef.updateChildren(updates)
-                .addOnSuccessListener(aVoid -> {
-                    // עדכון האובייקט המקומי
-                    selectedChild.setAgeGroup(level);
-                    selectedChild.setLastPlacementScore(grade);  //  עדכון השדה החדש
-                    SharedPreferencesUtil.saveCurrentChild(this, selectedChild);
-
-                    //  מעבר ל-MainActivity
-                    Toast.makeText(this, "כל הכבוד! בוא נתחיל לשחק 🎮", Toast.LENGTH_SHORT).show();
-                    Intent intent = new Intent(this, MainActivity.class);
-                    intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
-                    clearProgress();
-                    startActivity(intent);
-                    finish();
-                })
-                .addOnFailureListener(e -> {
-                    Toast.makeText(this, "שגיאה בשמירת הנתונים: " + e.getMessage(), Toast.LENGTH_LONG).show();
-                });
+        DatabaseService.getInstance().updateChildLevel(selectedChild.getParentId(), selectedChild.getId(), updates, new DatabaseService.DatabaseCallback<Void>() {
+            @Override
+            public void onCompleted(Void unused) {
+                selectedChild.setAgeGroup(level);
+                selectedChild.setLastPlacementScore(grade);
+                SharedPreferencesUtil.saveCurrentChild(PlacementTestActivity.this, selectedChild);
+                Toast.makeText(PlacementTestActivity.this, "כל הכבוד! בוא נתחיל לשחק 🎮", Toast.LENGTH_SHORT).show();
+                Intent intent = new Intent(PlacementTestActivity.this, MainActivity.class);
+                intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+                clearProgress();
+                startActivity(intent);
+                finish();
+            }
+            @Override
+            public void onFailed(Exception e) {
+                Toast.makeText(PlacementTestActivity.this, "שגיאה בשמירת הנתונים: " + e.getMessage(), Toast.LENGTH_LONG).show();
+            }
+        });
     }
 
     private void showExitDialog() {

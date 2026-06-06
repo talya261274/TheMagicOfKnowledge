@@ -20,6 +20,7 @@ import androidx.cardview.widget.CardView;
 import com.example.themagicofknowledge.R;
 import com.example.themagicofknowledge.models.UserChild;
 import com.example.themagicofknowledge.models.UserParent;
+import com.example.themagicofknowledge.services.DatabaseService;
 import com.example.themagicofknowledge.utils.ImageUtil;
 import com.example.themagicofknowledge.utils.SharedPreferencesUtil;
 import com.google.android.material.button.MaterialButton;
@@ -140,30 +141,30 @@ public class AvatarSelectionActivity extends BaseActivity {
 
         if (isParent) {
             String parentId = getIntent().getStringExtra("parentId");
-            FirebaseDatabase.getInstance().getReference("users")
-                    .child(parentId).child("avatar").setValue(avatarValue)
-                    .addOnSuccessListener(aVoid -> {
-                        UserParent parent = SharedPreferencesUtil.getUser(this);
-                        if (parent != null) {
-                            parent.setAvatar(avatarValue);
-                            SharedPreferencesUtil.saveUser(this, parent);
-                        }
-                        Toast.makeText(this, "התמונה עודכנה! 🎉", Toast.LENGTH_SHORT).show();
-
-                        // בדוק אם הגענו מפרופיל או מהרשמה
-                        boolean fromProfile = getIntent().getBooleanExtra("fromProfile", false);
-                        if (fromProfile) {
-                            finish(); // ← חזור לפרופיל
-                        } else {
-                            Intent intent = new Intent(this, SelectChildActivity.class);
-                            intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
-                            startActivity(intent);
-                        }
-                    })
-                    .addOnFailureListener(e ->
-                            Toast.makeText(this, "שגיאה: " + e.getMessage(), Toast.LENGTH_SHORT).show());
+            DatabaseService.getInstance().updateParentAvatar(parentId, avatarValue, new DatabaseService.DatabaseCallback<Void>() {
+                @Override
+                public void onCompleted(Void unused) {
+                    UserParent parent = SharedPreferencesUtil.getUser(AvatarSelectionActivity.this);
+                    if (parent != null) {
+                        parent.setAvatar(avatarValue);
+                        SharedPreferencesUtil.saveUser(AvatarSelectionActivity.this, parent);
+                    }
+                    Toast.makeText(AvatarSelectionActivity.this, "התמונה עודכנה! 🎉", Toast.LENGTH_SHORT).show();
+                    boolean fromProfile = getIntent().getBooleanExtra("fromProfile", false);
+                    if (fromProfile) {
+                        finish();
+                    } else {
+                        Intent intent = new Intent(AvatarSelectionActivity.this, SelectChildActivity.class);
+                        intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+                        startActivity(intent);
+                    }
+                }
+                @Override
+                public void onFailed(Exception e) {
+                    Toast.makeText(AvatarSelectionActivity.this, "שגיאה: " + e.getMessage(), Toast.LENGTH_SHORT).show();
+                }
+            });
         } else {
-            // ילד - הקוד הקיים
             if (avatarValue.startsWith("base64:")) {
                 saveBase64Avatar(avatarValue.substring(7));
             } else {
@@ -230,26 +231,27 @@ public class AvatarSelectionActivity extends BaseActivity {
     }
 
     private void saveBase64Avatar(String base64) {
-        String path = "users/" + currentParent.getId() + "/childrenList/" + childId + "/avatar";
-        // שמור עם prefix כדי לדעת שזה Base64
         String avatarValue = "base64:" + base64;
-
-        FirebaseDatabase.getInstance().getReference(path).setValue(avatarValue)
-                .addOnSuccessListener(aVoid -> {
-                    UserParent parent = SharedPreferencesUtil.getUser(this);
-                    if (parent != null && parent.getChildrenList() != null) {
-                        UserChild childInParent = parent.getChildrenList().get(childId);
-                        if (childInParent != null) {
-                            childInParent.setAvatar(avatarValue);
-                            SharedPreferencesUtil.saveUser(this, parent);
-                            SharedPreferencesUtil.saveCurrentChild(this, childInParent);
-                        }
+        DatabaseService.getInstance().updateChildAvatar(currentParent.getId(), childId, avatarValue, new DatabaseService.DatabaseCallback<Void>() {
+            @Override
+            public void onCompleted(Void unused) {
+                UserParent parent = SharedPreferencesUtil.getUser(AvatarSelectionActivity.this);
+                if (parent != null && parent.getChildrenList() != null) {
+                    UserChild childInParent = parent.getChildrenList().get(childId);
+                    if (childInParent != null) {
+                        childInParent.setAvatar(avatarValue);
+                        SharedPreferencesUtil.saveUser(AvatarSelectionActivity.this, parent);
+                        SharedPreferencesUtil.saveCurrentChild(AvatarSelectionActivity.this, childInParent);
                     }
-                    showPlacementTestIntroDialog();
-                    Toast.makeText(this, "תמונה נשמרה! 🎉", Toast.LENGTH_SHORT).show();
-                })
-                .addOnFailureListener(e ->
-                        Toast.makeText(this, "שגיאה: " + e.getMessage(), Toast.LENGTH_SHORT).show());
+                }
+                showPlacementTestIntroDialog();
+                Toast.makeText(AvatarSelectionActivity.this, "תמונה נשמרה! 🎉", Toast.LENGTH_SHORT).show();
+            }
+            @Override
+            public void onFailed(Exception e) {
+                Toast.makeText(AvatarSelectionActivity.this, "שגיאה: " + e.getMessage(), Toast.LENGTH_SHORT).show();
+            }
+        });
     }
 
 
@@ -287,28 +289,26 @@ public class AvatarSelectionActivity extends BaseActivity {
     }
 
     private void updateChildAvatarInFirebase(String avatarName) {
-        String path = "users/" + currentParent.getId() + "/childrenList/" + childId + "/avatar";
-
-        FirebaseDatabase.getInstance().getReference(path).setValue(avatarName)
-                .addOnSuccessListener(aVoid -> {
-                    UserParent parent = SharedPreferencesUtil.getUser(AvatarSelectionActivity.this);
-                    if (parent != null && parent.getChildrenList() != null) {
-                        UserChild childInParent = parent.getChildrenList().get(childId);
-
-                        if (childInParent != null) {
-                            childInParent.setAvatar(avatarName);
-                            SharedPreferencesUtil.saveUser(AvatarSelectionActivity.this, parent);
-                            SharedPreferencesUtil.saveCurrentChild(AvatarSelectionActivity.this, childInParent);
-                        }
+        DatabaseService.getInstance().updateChildAvatar(currentParent.getId(), childId, avatarName, new DatabaseService.DatabaseCallback<Void>() {
+            @Override
+            public void onCompleted(Void unused) {
+                UserParent parent = SharedPreferencesUtil.getUser(AvatarSelectionActivity.this);
+                if (parent != null && parent.getChildrenList() != null) {
+                    UserChild childInParent = parent.getChildrenList().get(childId);
+                    if (childInParent != null) {
+                        childInParent.setAvatar(avatarName);
+                        SharedPreferencesUtil.saveUser(AvatarSelectionActivity.this, parent);
+                        SharedPreferencesUtil.saveCurrentChild(AvatarSelectionActivity.this, childInParent);
                     }
-
-                    showPlacementTestIntroDialog();
-
-                    Toast.makeText(AvatarSelectionActivity.this, "בחירה נהדרת! עכשיו נבדוק את הרמה שלך 🎯", Toast.LENGTH_SHORT).show();
-                })
-                .addOnFailureListener(e -> {
-                    Toast.makeText(AvatarSelectionActivity.this, "שגיאה בשמירה: " + e.getMessage(), Toast.LENGTH_SHORT).show();
-                });
+                }
+                showPlacementTestIntroDialog();
+                Toast.makeText(AvatarSelectionActivity.this, "בחירה נהדרת! עכשיו נבדוק את הרמה שלך 🎯", Toast.LENGTH_SHORT).show();
+            }
+            @Override
+            public void onFailed(Exception e) {
+                Toast.makeText(AvatarSelectionActivity.this, "שגיאה בשמירה: " + e.getMessage(), Toast.LENGTH_SHORT).show();
+            }
+        });
     }
 
     private class AvatarAdapter extends BaseAdapter {

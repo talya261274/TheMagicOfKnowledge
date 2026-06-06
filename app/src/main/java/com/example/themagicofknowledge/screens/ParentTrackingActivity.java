@@ -22,6 +22,7 @@ import com.example.themagicofknowledge.models.SubjectStat;
 import com.example.themagicofknowledge.models.UserChild;
 import com.example.themagicofknowledge.models.UserParent;
 import com.example.themagicofknowledge.models.UserRole;
+import com.example.themagicofknowledge.services.DatabaseService;
 import com.example.themagicofknowledge.utils.SharedPreferencesUtil;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
@@ -134,7 +135,6 @@ public class ParentTrackingActivity extends BaseActivity {
             int resId = getResources().getIdentifier(selectedChild.getAvatar(), "drawable", getPackageName());
             ivSelectedChildAvatar.setImageResource(resId != 0 ? resId : R.drawable.logo);
 
-            // ⭐ הצגת רמה נוכחית
             String currentAge = selectedChild.getAgeGroup();
             if (currentAge != null) {
                 tvCurrentLevel.setText("🌟 רמה נוכחית: " + currentAge);
@@ -144,18 +144,14 @@ public class ParentTrackingActivity extends BaseActivity {
             }
         }
 
-        DatabaseReference childRef = FirebaseDatabase.getInstance().getReference("users")
-                .child(currentParent.getId()).child("childrenList").child(childId);
-
-        childRef.addValueEventListener(new ValueEventListener() {
+        DatabaseService.getInstance().listenToChildData(currentParent.getId(), childId, new DatabaseService.DatabaseCallback<DataSnapshot>() {
             @Override
-            public void onDataChange(@NonNull DataSnapshot snapshot) {
+            public void onCompleted(DataSnapshot snapshot) {
                 processProgressData(snapshot, selectedChild);
             }
-
             @Override
-            public void onCancelled(@NonNull DatabaseError error) {
-                Log.e("ParentTracking", error.getMessage());
+            public void onFailed(Exception e) {
+                Log.e("ParentTracking", e.getMessage());
             }
         });
     }

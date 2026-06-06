@@ -411,4 +411,95 @@ public class DatabaseService {
             }
         });
     }
+
+    /// האזנה לשינויים בנתוני ילד (real-time)
+    public void listenToChildData(String parentId, String childId, DatabaseCallback<DataSnapshot> callback) {
+        String path = USERS_PATH + "/" + parentId + "/childrenList/" + childId;
+        readData(path).addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot snapshot) {
+                callback.onCompleted(snapshot);
+            }
+            @Override
+            public void onCancelled(@NonNull DatabaseError error) {
+                callback.onFailed(error.toException());
+            }
+        });
+    }
+
+    /// עדכון אווטר של הורה
+    public void updateParentAvatar(String parentId, String avatarValue, DatabaseCallback<Void> callback) {
+        String path = USERS_PATH + "/" + parentId + "/avatar";
+        writeData(path, avatarValue, callback);
+    }
+
+    /// עדכון אווטר של ילד
+    public void updateChildAvatar(String parentId, String childId, String avatarValue, DatabaseCallback<Void> callback) {
+        String path = USERS_PATH + "/" + parentId + "/childrenList/" + childId + "/avatar";
+        writeData(path, avatarValue, callback);
+    }
+
+    /// עדכון רמת ילד לאחר מבדק
+    public void updateChildLevel(String parentId, String childId, Map<String, Object> updates, DatabaseCallback<Void> callback) {
+        String path = USERS_PATH + "/" + parentId + "/childrenList/" + childId;
+        readData(path).updateChildren(updates)
+                .addOnSuccessListener(aVoid -> { if (callback != null) callback.onCompleted(null); })
+                .addOnFailureListener(e -> { if (callback != null) callback.onFailed(e); });
+    }
+
+    /// שמירת פרופיל משתמש
+    public void saveUserProfile(String userId, UserParent user, DatabaseCallback<Void> callback) {
+        writeData(USERS_PATH + "/" + userId, user, callback);
+    }
+
+    /// טעינת שאלות מבדק
+    public void loadPlacementQuestions(String levelPath, DatabaseCallback<DataSnapshot> callback) {
+        readData("PlacementTests/" + levelPath).addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot snapshot) {
+                callback.onCompleted(snapshot);
+            }
+            @Override
+            public void onCancelled(@NonNull DatabaseError error) {
+                callback.onFailed(error.toException());
+            }
+        });
+    }
+
+    /// איפוס התקדמות כל הנושאים
+    public void resetAllSubjectsProgress(String parentId, String childId, String ageGroup, Map<String, Object> updates, DatabaseCallback<Void> callback) {
+        String path = USERS_PATH + "/" + parentId + "/childrenList/" + childId + "/progress/" + ageGroup;
+        readData(path).updateChildren(updates)
+                .addOnSuccessListener(aVoid -> { if (callback != null) callback.onCompleted(null); })
+                .addOnFailureListener(e -> { if (callback != null) callback.onFailed(e); });
+    }
+
+    /// בדיקת עליות רמה לסטטיסטיקות
+    public void loadAllUsersData(DatabaseCallback<DataSnapshot> callback) {
+        readData(USERS_PATH).addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot snapshot) {
+                callback.onCompleted(snapshot);
+            }
+            @Override
+            public void onCancelled(@NonNull DatabaseError error) {
+                callback.onFailed(error.toException());
+            }
+        });
+    }
+
+    /// האזנה להתקדמות נושאים של ילד (real-time)
+    public void listenToChildProgress(String parentId, String childId, String ageGroup, DatabaseCallback<DataSnapshot> callback) {
+        String path = USERS_PATH + "/" + parentId + "/childrenList/" + childId + "/progress/" + ageGroup;
+        readData(path).addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot snapshot) {
+                callback.onCompleted(snapshot);
+            }
+            @Override
+            public void onCancelled(@NonNull DatabaseError error) {
+                callback.onFailed(error.toException());
+            }
+        });
+    }
 }

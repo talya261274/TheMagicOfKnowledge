@@ -199,29 +199,27 @@ public class StatisticsActivity extends BaseActivity {
     }
 
     private void countLevelUps(LevelUpsCallback callback) {
-        FirebaseDatabase.getInstance().getReference("users")
-                .addListenerForSingleValueEvent(new ValueEventListener() {
-                    @Override
-                    public void onDataChange(@NonNull DataSnapshot snapshot) {
-                        int count = 0;
-                        for (DataSnapshot userSnap : snapshot.getChildren()) {
-                            DataSnapshot childrenSnap = userSnap.child("childrenList");
-                            for (DataSnapshot childSnap : childrenSnap.getChildren()) {
-                                String startingLevel = childSnap.child("startingLevel").getValue(String.class);
-                                String currentLevel = childSnap.child("ageGroup").getValue(String.class);
-                                if (startingLevel != null && currentLevel != null && !startingLevel.equals(currentLevel)) {
-                                    count++;
-                                }
-                            }
+        DatabaseService.getInstance().loadAllUsersData(new DatabaseService.DatabaseCallback<DataSnapshot>() {
+            @Override
+            public void onCompleted(DataSnapshot snapshot) {
+                int count = 0;
+                for (DataSnapshot userSnap : snapshot.getChildren()) {
+                    DataSnapshot childrenSnap = userSnap.child("childrenList");
+                    for (DataSnapshot childSnap : childrenSnap.getChildren()) {
+                        String startingLevel = childSnap.child("startingLevel").getValue(String.class);
+                        String currentLevel = childSnap.child("ageGroup").getValue(String.class);
+                        if (startingLevel != null && currentLevel != null && !startingLevel.equals(currentLevel)) {
+                            count++;
                         }
-                        callback.onResult(count);
                     }
-
-                    @Override
-                    public void onCancelled(@NonNull DatabaseError error) {
-                        callback.onResult(0);
-                    }
-                });
+                }
+                callback.onResult(count);
+            }
+            @Override
+            public void onFailed(Exception e) {
+                callback.onResult(0);
+            }
+        });
     }
 
     private void updateUI(int totalChildren, int avgCompletion, int levelUps, int completedAll,

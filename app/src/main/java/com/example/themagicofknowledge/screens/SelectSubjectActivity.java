@@ -14,12 +14,15 @@ import androidx.cardview.widget.CardView;
 
 import com.example.themagicofknowledge.R;
 import com.example.themagicofknowledge.models.UserChild;
+import com.example.themagicofknowledge.services.DatabaseService;
 import com.example.themagicofknowledge.utils.SharedPreferencesUtil;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
+
+import java.util.Map;
 
 public class SelectSubjectActivity extends BaseActivity {
 
@@ -122,58 +125,36 @@ public class SelectSubjectActivity extends BaseActivity {
 
     private void checkCompletedSubjects() {
         if (currentChild == null) return;
-
         String ageGroup = currentChild.getAgeGroup();
-        if (ageGroup == null || ageGroup.isEmpty()) {
-            return;
-        }
+        if (ageGroup == null || ageGroup.isEmpty()) return;
 
-        // ⭐ עכשיו אנחנו מסתכלים ב-progress/[ageGroup] במקום completedSubjects
-        DatabaseReference ref = FirebaseDatabase.getInstance().getReference("users")
-                .child(currentChild.getParentId())
-                .child("childrenList")
-                .child(currentChild.getId())
-                .child("progress")
-                .child(ageGroup);
-
-        ref.addValueEventListener(new ValueEventListener() {
+        DatabaseService.getInstance().listenToChildProgress(currentChild.getParentId(), currentChild.getId(), ageGroup, new DatabaseService.DatabaseCallback<DataSnapshot>() {
             @Override
-            public void onDataChange(@NonNull DataSnapshot snapshot) {
+            public void onCompleted(DataSnapshot snapshot) {
                 int completedCount = 0;
                 String[] subjects = {"animals", "colors", "numbers", "letters", "shapes", "bodyparts"};
                 ImageView[] vImages = {ivVAnimals, ivVColors, ivVNumbers, ivVLetters, ivVShapes, ivVBodyParts};
 
                 for (int i = 0; i < subjects.length; i++) {
                     boolean isComplete = false;
-
                     if (snapshot.hasChild(subjects[i])) {
-                        // ⭐ עכשיו צריך להיכנס לתוך הנושא ולבדוק את השדה "completed"
                         DataSnapshot subjectSnapshot = snapshot.child(subjects[i]);
                         if (subjectSnapshot.hasChild("completed")) {
                             Boolean completedValue = subjectSnapshot.child("completed").getValue(Boolean.class);
                             isComplete = completedValue != null && completedValue;
                         }
                     }
-
-                    if (vImages[i] != null) {
-                        vImages[i].setVisibility(isComplete ? View.VISIBLE : View.GONE);
-                    }
-
-                    if (isComplete) {
-                        completedCount++;
-                    }
+                    if (vImages[i] != null) vImages[i].setVisibility(isComplete ? View.VISIBLE : View.GONE);
+                    if (isComplete) completedCount++;
                 }
 
-                // ⭐ אם סיים את כל 6 הנושאים - דיאלוג מתאים
-                if (completedCount >= 6 && !levelUpDialogShown) { // ← הוסף את הבדיקה
+                if (completedCount >= 6 && !levelUpDialogShown) {
                     levelUpDialogShown = true;
                     new android.os.Handler().postDelayed(() -> handleAllSubjectsCompleted(), 500);
                 }
             }
-
             @Override
-            public void onCancelled(@NonNull DatabaseError error) {
-            }
+            public void onFailed(Exception e) {}
         });
     }
 
@@ -278,18 +259,9 @@ public class SelectSubjectActivity extends BaseActivity {
      */
     private void resetAllSubjects() {
         String ageGroup = currentChild.getAgeGroup();
-
-        DatabaseReference progressRef = FirebaseDatabase.getInstance().getReference("users")
-                .child(currentChild.getParentId())
-                .child("childrenList")
-                .child(currentChild.getId())
-                .child("progress")
-                .child(ageGroup);
-
-        // ⭐ מאפס את ה-completed של כל נושא ל-false
         String[] subjects = {"animals", "colors", "numbers", "letters", "shapes", "bodyparts"};
 
-        java.util.Map<String, Object> updates = new java.util.HashMap<>();
+        Map<String, Object> updates = new java.util.HashMap<>();
         for (String subject : subjects) {
             updates.put(subject + "/completed", false);
             updates.put(subject + "/progressPercent", 0);
@@ -297,14 +269,16 @@ public class SelectSubjectActivity extends BaseActivity {
             updates.put(subject + "/timeSeconds", 0);
         }
 
-        progressRef.updateChildren(updates)
-                .addOnSuccessListener(aVoid -> {
-                    Toast.makeText(this, "מעולה! בואו נתחיל מחדש 🎮", Toast.LENGTH_SHORT).show();
-                    // ה-ValueEventListener אוטומטית יעדכן את ה-V הירוקים
-                })
-                .addOnFailureListener(e -> {
-                    Toast.makeText(this, "שגיאה באיפוס: " + e.getMessage(), Toast.LENGTH_SHORT).show();
-                });
+        DatabaseService.getInstance().resetAllSubjectsProgress(currentChild.getParentId(), currentChild.getId(), ageGroup, updates, new DatabaseService.DatabaseCallback<Void>() {
+            @Override
+            public void onCompleted(Void unused) {
+                Toast.makeText(SelectSubjectActivity.this, "מעולה! בואו נתחיל מחדש 🎮", Toast.LENGTH_SHORT).show();
+            }
+            @Override
+            public void onFailed(Exception e) {
+                Toast.makeText(SelectSubjectActivity.this, "שגיאה באיפוס: " + e.getMessage(), Toast.LENGTH_SHORT).show();
+            }
+        });
     }
 
     /**
