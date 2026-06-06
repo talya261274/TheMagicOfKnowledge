@@ -24,7 +24,6 @@ import com.example.themagicofknowledge.services.DatabaseService;
 import com.example.themagicofknowledge.utils.ImageUtil;
 import com.example.themagicofknowledge.utils.SharedPreferencesUtil;
 import com.google.android.material.button.MaterialButton;
-import com.google.firebase.database.FirebaseDatabase;
 
 import java.util.ArrayList;
 import java.util.List;

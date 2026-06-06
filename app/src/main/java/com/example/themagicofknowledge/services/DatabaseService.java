@@ -502,4 +502,17 @@ public class DatabaseService {
             }
         });
     }
+
+    public void loadFlashCards(String subject, DatabaseCallback<DataSnapshot> callback) {
+        readData("FlashCards/" + subject).addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot snapshot) {
+                callback.onCompleted(snapshot);
+            }
+            @Override
+            public void onCancelled(@NonNull DatabaseError error) {
+                callback.onFailed(error.toException());
+            }
+        });
+    }
 }
