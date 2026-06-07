@@ -17,8 +17,6 @@ public class UserChild {
     private long totalTimeSeconds;
     private Map<String, Object> progress = new HashMap<>();
     private Map<String, Boolean> completedSubjects = new HashMap<>();
-
-    // ⭐ חדש - ציון המבדק (null = לא עשה מבדק עדיין)
     private Double lastPlacementScore;
 
     public UserChild() {
@@ -30,7 +28,7 @@ public class UserChild {
         this.name = name;
         this.age = age;
         this.totalTimeSeconds = 0;
-        this.lastPlacementScore = null;  // ⭐ ילד חדש - לא עשה מבדק עדיין
+        this.lastPlacementScore = null;
 
         if (age >= 3 && age <= 4) this.ageGroup = "3-4";
         else if (age >= 5 && age <= 6) this.ageGroup = "5-6";
@@ -90,34 +88,8 @@ public class UserChild {
 
     public Map<String, Boolean> getCompletedSubjects() { return completedSubjects; }
     public void setCompletedSubjects(Map<String, Boolean> completedSubjects) { this.completedSubjects = completedSubjects; }
-
-    // ⭐ Getter ו-Setter לשדה החדש
     public Double getLastPlacementScore() { return lastPlacementScore; }
     public void setLastPlacementScore(Double lastPlacementScore) { this.lastPlacementScore = lastPlacementScore; }
-
-    @Exclude
-    public String getFormattedTime() {
-        long hours = totalTimeSeconds / 3600;
-        long minutes = (totalTimeSeconds % 3600) / 60;
-        long seconds = totalTimeSeconds % 60;
-        return String.format("%02d:%02d:%02d", hours, minutes, seconds);
-    }
-
-    public Map<String, Object> toMap() {
-        HashMap<String, Object> result = new HashMap<>();
-        result.put("id", id);
-        result.put("parentId", parentId);
-        result.put("name", name);
-        result.put("avatar", avatar);
-        result.put("ageGroup", ageGroup);
-        result.put("age", age);
-        result.put("currentLevel", currentLevel);
-        result.put("totalTimeSeconds", totalTimeSeconds);
-        result.put("progress", progress);
-        result.put("completedSubjects", completedSubjects);
-        result.put("lastPlacementScore", lastPlacementScore);
-        return result;
-    }
 
     @Override
     public String toString() {

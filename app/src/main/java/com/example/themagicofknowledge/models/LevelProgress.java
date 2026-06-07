@@ -4,11 +4,11 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class LevelProgress {
-    private String ageGroup;        // "3-4", "5-6", "7-8"
+    private String ageGroup;
     private List<SubjectStat> subjects;
-    private boolean isCurrent;       // האם זו הרמה הנוכחית
+    private boolean isCurrent;
     private boolean isLocked;        // האם הרמה נעולה (עתידית)
-    private boolean isCompleted;     // האם הושלמה
+    private boolean isCompleted;
     private boolean isExpanded;      // האם פתוחה כרגע (UI)
 
     public LevelProgress(String ageGroup) {
@@ -63,13 +63,5 @@ public class LevelProgress {
             total += s.getProgressPercent();
         }
         return total / subjects.size();
-    }
-
-    public int getCompletedCount() {
-        int count = 0;
-        for (SubjectStat s : subjects) {
-            if (s.isCompleted()) count++;
-        }
-        return count;
     }
 }

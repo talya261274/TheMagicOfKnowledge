@@ -1,9 +1,9 @@
 package com.example.themagicofknowledge.models;
 
 public class SentenceQuestion {
-    private String sentence;       // המשפט עם הקו הריק
-    private String correctAnswer;  // המילה שהילד צריך להקליד
-    private String hintImage;      // שם התמונה ב-drawable
+    private String sentence;
+    private String correctAnswer;
+    private String hintImage;
 
     public SentenceQuestion() {
     }
