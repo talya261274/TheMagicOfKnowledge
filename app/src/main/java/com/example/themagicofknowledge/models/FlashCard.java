@@ -1,47 +1,32 @@
 package com.example.themagicofknowledge.models;
 
 public class FlashCard {
-    private String imageResId;
-    private String answer;
+    private String image;
+    private String name;
     private String subject;
 
     public FlashCard() {}
 
-    public FlashCard(String imageResId, String answer, String subject) {
-        this.imageResId = imageResId;
-        this.answer = answer;
+    public FlashCard(String image, String name, String subject) {
+        this.image = image;
+        this.name = name;
         this.subject = subject;
     }
 
-    public String getImageResId() {
-        return imageResId;
-    }
+    public String getImage() { return image; }
+    public void setImage(String image) { this.image = image; }
 
-    public void setImageResId(String imageResId) {
-        this.imageResId = imageResId;
-    }
+    public String getName() { return name; }
+    public void setName(String name) { this.name = name; }
 
-    public String getAnswer() {
-        return answer;
-    }
-
-    public void setAnswer(String answer) {
-        this.answer = answer;
-    }
-
-    public String getSubject() {
-        return subject;
-    }
-
-    public void setSubject(String subject) {
-        this.subject = subject;
-    }
+    public String getSubject() { return subject; }
+    public void setSubject(String subject) { this.subject = subject; }
 
     @Override
     public String toString() {
         return "FlashCard{" +
-                "imageResId=" + imageResId +
-                ", answer='" + answer + '\'' +
+                "image='" + image + '\'' +
+                ", name='" + name + '\'' +
                 ", subject='" + subject + '\'' +
                 '}';
     }

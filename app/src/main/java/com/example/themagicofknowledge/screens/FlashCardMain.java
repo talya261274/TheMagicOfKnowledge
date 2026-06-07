@@ -141,7 +141,7 @@ public class FlashCardMain extends AppCompatActivity {
 
         btnStartGame.setOnClickListener(v -> handleStartGame());
 
-        btnPlaySound.setOnClickListener(v -> speakWord(cards.get(currentIndex).getAnswer()));
+        btnPlaySound.setOnClickListener(v -> speakWord(cards.get(currentIndex).getName()));
 
         MaterialButton btnBackToSubjects = findViewById(R.id.btnBackToSubjects);
         btnBackToSubjects.setOnClickListener(v -> showBackConfirmationDialog());
@@ -179,7 +179,7 @@ public class FlashCardMain extends AppCompatActivity {
         imgCard.setVisibility(View.VISIBLE);
         tvCardText.setVisibility(View.GONE);
         btnPlaySound.setVisibility(View.GONE);
-        String imageName = cards.get(currentIndex).getImageResId();
+        String imageName = cards.get(currentIndex).getImage();
         int resId = getResources().getIdentifier(imageName, "drawable", getPackageName());
         imgCard.setImageResource(resId != 0 ? resId : R.drawable.logo);
         updateProgress();
@@ -189,7 +189,7 @@ public class FlashCardMain extends AppCompatActivity {
         tvCardText.setVisibility(View.VISIBLE);
         imgCard.setVisibility(View.GONE);
         btnPlaySound.setVisibility(View.VISIBLE);
-        tvCardText.setText(cards.get(currentIndex).getAnswer());
+        tvCardText.setText(cards.get(currentIndex).getName());
         updateProgress();
     }
 
