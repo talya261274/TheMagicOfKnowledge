@@ -91,7 +91,6 @@ public class AvatarSelectionActivity extends BaseActivity {
                 boolean fromRegistration = getIntent().getBooleanExtra("isFromRegistration", false);
 
                 if (fromRegistration) {
-                    // במקום רק לעשות finish() שאולי סוגר את האפליקציה כי המחסנית ריקה
                     // נפתח מחדש את מסך ההרשמה
                     Intent intent = new Intent(this, RegisterActivity.class);
                     // דגלים שמונעים יצירת כפילויות של מסכים

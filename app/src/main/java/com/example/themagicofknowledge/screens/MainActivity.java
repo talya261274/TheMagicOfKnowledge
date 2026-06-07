@@ -19,12 +19,10 @@ public class MainActivity extends BaseActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        // 1. מציאת הרכיבים במסך
         TextView tvWelcomeChild = findViewById(R.id.tvWelcomeChild);
         ImageView ivWelcomeAvatar = findViewById(R.id.ivWelcomeAvatar);
         Button btnStart = findViewById(R.id.btnStartJourney);
 
-        // 2. שליפת נתוני הילד
         UserChild currentChild = SharedPreferencesUtil.getCurrentChild(this);
 
         if (currentChild != null) {

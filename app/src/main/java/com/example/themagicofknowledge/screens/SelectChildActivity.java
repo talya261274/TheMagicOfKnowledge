@@ -94,7 +94,7 @@ public class SelectChildActivity extends BaseActivity {
     }
 
     /**
-     * ⭐⭐⭐ טיפול בלחיצה על ילד קיים ⭐⭐⭐
+     *  טיפול בלחיצה על ילד קיים
      * בודקת אם הילד כבר עשה מבדק. אם כן - ישר ל-Main, אם לא - ל-PlacementTest.
      */
     private void handleChildClick(UserChild child) {
@@ -105,7 +105,7 @@ public class SelectChildActivity extends BaseActivity {
             intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
             startActivity(intent);
         } else {
-            showPlacementTestIntroDialog(child); // ← העבר את child
+            showPlacementTestIntroDialog(child); //  העבר את child
         }
     }
 
@@ -119,7 +119,7 @@ public class SelectChildActivity extends BaseActivity {
                     childrenList.sort((a, b) -> Integer.compare(a.getAge(), b.getAge()));
                     currentParent.setChildrenList(userParentServer.getChildrenList());
                     SharedPreferencesUtil.saveUser(SelectChildActivity.this, currentParent);
-                    updateLayoutManager(); // ← עדכן layout לפי מספר הילדים
+                    updateLayoutManager(); //  עדכן layout לפי מספר הילדים
                     adapter.notifyDataSetChanged();
                 }
                 updateEmptyState();

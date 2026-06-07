@@ -140,7 +140,7 @@ public class UsersListActivity extends BaseActivity {
             @Override
             public void onCompleted(List<UserParent> users) {
                 sortUsersByAdminFirst(users);
-                allUsers = users; // ← שמור רשימה מלאה
+                allUsers = users; //  שמור רשימה מלאה
                 runOnUiThread(() -> {
                     tvUserCount.setText(String.valueOf(users.size()));
                     userAdapter.setUserList(users);
@@ -207,7 +207,7 @@ public class UsersListActivity extends BaseActivity {
                             makeAdmin ? "המשתמש הפך למנהל" : "הרשאת המנהל הוסרה",
                             Toast.LENGTH_SHORT).show();
 
-                    // ⭐ טעינה מחדש - הרשימה תמוין מחדש אוטומטית
+                    //  טעינה מחדש - הרשימה תמוין מחדש אוטומטית
                     loadUsers();
                 });
             }
@@ -252,7 +252,7 @@ public class UsersListActivity extends BaseActivity {
                     Toast.makeText(UsersListActivity.this,
                             "המשתמש נמחק בהצלחה", Toast.LENGTH_SHORT).show();
 
-                    // ⭐ טעינה מחדש - המשתמש ייעלם והמונה יתעדכן
+                    //  טעינה מחדש - המשתמש ייעלם והמונה יתעדכן
                     loadUsers();
                 });
             }
@@ -422,7 +422,7 @@ public class UsersListActivity extends BaseActivity {
                             "משתמש נוצר בהצלחה!", Toast.LENGTH_SHORT).show();
                     dialog.dismiss();
 
-                    // ⭐ טעינה מחדש - המשתמש החדש יופיע במיקום הנכון
+                    //  טעינה מחדש - המשתמש החדש יופיע במיקום הנכון
                     loadUsers();
                 });
             }

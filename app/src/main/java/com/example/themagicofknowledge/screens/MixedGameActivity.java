@@ -63,7 +63,6 @@ public class MixedGameActivity extends BaseActivity {
     private String subject;
     private boolean isProcessingAnswer = false;
 
-    // ⭐ חדש - מעקב אחר זמן המשחק
     private long gameStartTime;
 
     private UserChild currentChild;
@@ -124,7 +123,6 @@ public class MixedGameActivity extends BaseActivity {
             return;
         }
 
-        // ⭐ חדש - מתחילים למדוד זמן
         gameStartTime = System.currentTimeMillis();
 
         initViews();
@@ -926,7 +924,7 @@ public class MixedGameActivity extends BaseActivity {
                 dialog.dismiss();
                 currentIndex = 0;
                 attempts = 0;
-                gameStartTime = System.currentTimeMillis();  // ⭐ איפוס זמן
+                gameStartTime = System.currentTimeMillis();  //  איפוס זמן
                 Collections.shuffle(allQuestions);
                 showCurrentQuestion();
             });
@@ -990,7 +988,6 @@ public class MixedGameActivity extends BaseActivity {
 
     @Override
     protected void onDestroy() {
-        // הסר את updateProgressInFirebase מכאן!
         if (tts != null) {
             tts.stop();
             tts.shutdown();

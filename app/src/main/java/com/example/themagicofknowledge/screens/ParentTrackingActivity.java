@@ -38,10 +38,7 @@ public class ParentTrackingActivity extends BaseActivity {
     private List<LevelProgress> levelsList = new ArrayList<>();
     private LevelProgressAdapter levelAdapter;
     private UserParent currentParent;
-
-    // ⭐ סדר הרמות באפליקציה
     private static final String[] AGE_GROUPS = {"3-4", "5-6", "7-8"};
-    // ⭐ כל הנושאים האפשריים
     private static final String[] ALL_SUBJECTS = {"animals", "colors", "numbers", "letters", "shapes", "bodyparts"};
 
     @Override
@@ -151,7 +148,7 @@ public class ParentTrackingActivity extends BaseActivity {
     }
 
     /**
-     * ⭐⭐⭐ מעבדת את הנתונים לרשימת רמות ⭐⭐⭐
+     *  מעבדת את הנתונים לרשימת רמות
      */
     private void processProgressData(DataSnapshot snapshot, UserChild selectedChild) {
         levelsList.clear();
@@ -171,14 +168,14 @@ public class ParentTrackingActivity extends BaseActivity {
         if (startingLevel != null) {
             startingLevelIndex = Arrays.asList(AGE_GROUPS).indexOf(startingLevel);
         } else {
-            startingLevelIndex = 0; // ← ברירת מחדל - הצג מהרמה הראשונה
+            startingLevelIndex = 0; //  ברירת מחדל - הצג מהרמה הראשונה
         }
 
         for (int i = 0; i < AGE_GROUPS.length; i++) {
             if (i < startingLevelIndex) continue; // הסתר רמות לפני רמת ההתחלה
 
-            String ageGroup = AGE_GROUPS[i]; // ← חסר!
-            LevelProgress level = new LevelProgress(ageGroup); // ← חסר!
+            String ageGroup = AGE_GROUPS[i];
+            LevelProgress level = new LevelProgress(ageGroup);
 
             if (i > currentLevelIndex) {
                 level.setLocked(true);

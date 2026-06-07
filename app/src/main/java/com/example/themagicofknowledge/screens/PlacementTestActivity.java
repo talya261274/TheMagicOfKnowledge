@@ -38,8 +38,8 @@ public class PlacementTestActivity extends BaseActivity {
     private int correctAnswersCount = 0;
     private boolean isFirstAttempt = true;
     private boolean isUpgradeMode = false;
-    private boolean isNewChild = false;  // ⭐ חדש - מציין אם זה ילד חדש
-    private boolean isIntroShown = false; // ⭐ חדש - למנוע כפילות דיאלוג
+    private boolean isNewChild = false;
+    private boolean isIntroShown = false;
     private UserChild selectedChild;
     private String currentLevel;
     private TextToSpeech tts;

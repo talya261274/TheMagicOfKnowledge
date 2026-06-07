@@ -105,33 +105,23 @@ public class LoginActivity extends BaseActivity implements View.OnClickListener 
     @Override
     public void onClick(View v) {
         if (v.getId() == btnLogin.getId()) {
-            Log.d(TAG, "onClick: Login button clicked");
             String UName = etUName.getText().toString() + "";
             String password = etPassword.getText().toString() + "";
-
-            Log.d(TAG, "onClick: User Name: " + UName);
-            Log.d(TAG, "onClick: Password: " + password);
-
-            Log.d(TAG, "onClick: Validating input...");
-
             if (!checkInput(UName, password)) {
                 return;
             }
 
-            Log.d(TAG, "onClick: Logging in user...");
             loginUser(UName, password);
         }
     }
     private boolean checkInput(String UName, String password) {
         if (!Validator.isUserNameValid(UName)) {
-            Log.e(TAG, "checkInput: Invalid user name");
             etUName.setError("שם משתמש לא חוקי");
             etUName.requestFocus();
             return false;
         }
 
         if (!Validator.isPasswordValid(password)) {
-            Log.e(TAG, "checkInput: Invalid password");
             etPassword.setError("הסיסמה חייבת להיות באורך של לפחות 6 תווים");
             etPassword.requestFocus();
             return false;
@@ -146,13 +136,11 @@ public class LoginActivity extends BaseActivity implements View.OnClickListener 
                     public void onCompleted(UserParent user) {
 
                         if (user == null) {
-                            // הצגת שגיאה
                             etPassword.setError("שם משתמש או סיסמה לא חוקיים");
                             etPassword.requestFocus();
-                            return; // יציאה מהפונקציה
+                            return;
                         }
 
-                        Log.d(TAG, "onCompleted: User logged in: " + user);
                         SharedPreferencesUtil.saveUser(LoginActivity.this, user);
 
                         Intent mainIntent;

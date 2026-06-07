@@ -76,7 +76,7 @@ public abstract class BaseActivity extends AppCompatActivity
             toolbar.setOnClickListener(v -> handleHomeNavigation());
         }
 
-        // 2. לחיצה על התמונה (Avatar) - מעבר לפרופיל (רק להורה/מנהל)
+        //  לחיצה על התמונה (Avatar) - מעבר לפרופיל (רק להורה/מנהל)
         View.OnClickListener profileListener = v -> {
             UserParent user = SharedPreferencesUtil.getUser(this);
             UserChild currentChild = SharedPreferencesUtil.getCurrentChild(this);
@@ -117,7 +117,7 @@ public abstract class BaseActivity extends AppCompatActivity
         ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(
                 this, drawerLayout, toolbar, R.string.open_drawer, R.string.close_drawer);
 
-        // כאן אנחנו מוודאים שה-Toggle עצמו מנהל את פתיחת התפריט בלחיצה על האייקון
+        // מוודאים שה-Toggle עצמו מנהל את פתיחת התפריט בלחיצה על האייקון
         drawerLayout.addDrawerListener(toggle);
         toggle.syncState();
     }

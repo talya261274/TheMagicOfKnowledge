@@ -103,7 +103,7 @@ public class ForgotPasswordActivity extends AppCompatActivity implements View.On
                     return;
                 }
 
-                // ← בדיקה שגם שם המשתמש תואם
+                //  בדיקה שגם שם המשתמש תואם
                 if (!user.getUserName().equals(username)) {
                     etUsername.setError("שם המשתמש לא תואם לאימייל");
                     etUsername.requestFocus();
