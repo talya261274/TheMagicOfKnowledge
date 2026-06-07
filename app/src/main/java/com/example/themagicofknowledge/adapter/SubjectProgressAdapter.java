@@ -26,7 +26,6 @@ public class SubjectProgressAdapter extends RecyclerView.Adapter<SubjectProgress
     @NonNull
     @Override
     public ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
-        // ודאי ששם הקובץ ב-layout הוא item_subject_progress
         View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.item_subject_progress, parent, false);
         return new ViewHolder(view);
     }
@@ -62,7 +61,6 @@ public class SubjectProgressAdapter extends RecyclerView.Adapter<SubjectProgress
             holder.tvProgressPercent.setTextColor(android.graphics.Color.GRAY);
         }
 
-        // בחירת אייקון - שימי לב: השתמשי בשמות בעברית כי זה מה שנשלח מה-Activity
         int iconRes;
         String name = stat.getSubjectName();
         if (name.equals("חיות")) iconRes = R.drawable.ic_animals;
@@ -79,26 +77,6 @@ public class SubjectProgressAdapter extends RecyclerView.Adapter<SubjectProgress
     @Override
     public int getItemCount() {
         return statsList != null ? statsList.size() : 0;
-    }
-
-    private String translateSubject(String sub) {
-        if (sub == null) return "";
-        switch (sub) {
-            case "animals":
-                return "חיות";
-            case "numbers":
-                return "מספרים";
-            case "colors":
-                return "צבעים";
-            case "letters":
-                return "אותיות";
-            case "shapes":
-                return "צורות";
-            case "bodyparts":
-                return "חלקי גוף";
-            default:
-                return sub;
-        }
     }
 
     public static class ViewHolder extends RecyclerView.ViewHolder {

@@ -2,62 +2,34 @@
 // services - חבילה של שירותים (פונקציות שעובדות "מתחת לפני השטח")
 package com.example.themagicofknowledge.services;
 
-
-// ===== Imports =====
 import android.util.Log;
 
-// אנוטציות לתיעוד שדות שלא יכולים להיות null או יכולים להיות null
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
-// המודל שלנו של הורה
 import com.example.themagicofknowledge.models.UserParent;
-
-// ===== הספרייה של Firebase =====
-
-// DataSnapshot - "צילום מצב" של נתונים מ-Firebase
-// זה אובייקט שמכיל את הנתונים בנקודת זמן מסוימת
 import com.google.firebase.database.DataSnapshot;
-
-// DatabaseError - כל שגיאה שמתרחשת מול Firebase
 import com.google.firebase.database.DatabaseError;
-
-// DatabaseReference - "מצביע" למקום מסוים במסד הנתונים
-// כמו: ההורה הזה / הילד הזה / השדה isAdmin של המשתמש הזה
 import com.google.firebase.database.DatabaseReference;
 
-// FirebaseDatabase - הכניסה הראשית למסד הנתונים
 import com.google.firebase.database.FirebaseDatabase;
-
-// MutableData - נתונים שניתן לשנות (משמש בעדכונים אטומיים)
 import com.google.firebase.database.MutableData;
 
-// Transaction - עדכון "אטומי" - או הכל מצליח או הכל נכשל
-// משמש כשצריך לעדכן ערך שתלוי בערך הקיים
 import com.google.firebase.database.ServerValue;
 import com.google.firebase.database.Transaction;
 
-// ValueEventListener - מאזין לשינויים בנתונים
 import com.google.firebase.database.ValueEventListener;
-
-// אנוטציה דומה ל-@NonNull, רק מספרייה אחרת
 import org.jetbrains.annotations.NotNull;
 
-// ===== ספריות Java סטנדרטיות =====
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 
-// UnaryOperator - "פונקציה שמקבלת אובייקט ומחזירה אובייקט מאותו סוג"
-// משמש בעדכוני transaction
 import java.util.function.UnaryOperator;
 
-
 public class DatabaseService {
-
-    // ===== קבועים =====
     private static final String TAG = "DatabaseService";
     private static final String USERS_PATH = "users";
     private static DatabaseService instance;

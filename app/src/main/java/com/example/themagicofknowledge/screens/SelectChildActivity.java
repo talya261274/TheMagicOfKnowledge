@@ -99,8 +99,6 @@ public class SelectChildActivity extends BaseActivity {
      */
     private void handleChildClick(UserChild child) {
         SharedPreferencesUtil.saveCurrentChild(this, child);
-        SharedPreferencesUtil.saveCurrentChildId(this, child.getId());
-
         if (child.getLastPlacementScore() != null) {
             // ✅ עשה מבדק - ישר ל-MainActivity
             Intent intent = new Intent(this, MainActivity.class);

@@ -130,33 +130,6 @@ public class UserAdapter extends RecyclerView.Adapter<UserAdapter.ViewHolder> {
         notifyDataSetChanged();
     }
 
-    public void addUser(UserParent user) {
-        userList.add(user);
-        notifyItemInserted(userList.size() - 1);
-    }
-
-    public void updateUser(UserParent user) {
-        if (user == null || user.getId() == null) return;
-        for (int i = 0; i < userList.size(); i++) {
-            if (Objects.equals(userList.get(i).getId(), user.getId())) {
-                userList.set(i, user);
-                notifyItemChanged(i);
-                return;
-            }
-        }
-    }
-
-    public void removeUser(UserParent user) {
-        if (user == null || user.getId() == null) return;
-        for (int i = 0; i < userList.size(); i++) {
-            if (Objects.equals(userList.get(i).getId(), user.getId())) {
-                userList.remove(i);
-                notifyItemRemoved(i);
-                return;
-            }
-        }
-    }
-
     // ===== Interface עם 5 פעולות =====
     public interface OnUserClickListener {
         void onUserClick(UserParent user);

@@ -19,15 +19,14 @@ import org.jetbrains.annotations.Nullable;
 
 import java.io.ByteArrayOutputStream;
 
-/// Utility class for image operations
-/// Contains methods for requesting permissions, converting images to base64 and vice versa
+/// מחלקת עזר לפעולות על תמונות
+/// מכילה פונקציות לבקשת הרשאות, המרת תמונות ל-base64 ולהפך
 public class ImageUtil {
 
-    /// Request permissions for camera and storage
-    /// @param activity The activity to request permissions from
-    /// @see ActivityCompat#requestPermissions(Activity, String[], int)
+    /// בקשת הרשאות למצלמה ולאחסון
+    /// @param activity ה-Activity שממנו מבקשים הרשאות
     public static void requestPermission(@NotNull Activity activity) {
-        // Request permissions for camera and storage
+        // בקשת הרשאות למצלמה ולאחסון
         ActivityCompat.requestPermissions(activity,
                 new String[]{
                         Manifest.permission.CAMERA,
@@ -36,23 +35,9 @@ public class ImageUtil {
                 }, 1);
     }
 
-    /// Convert an image to a base64 string
-    /// @param postImage The image to convert
-    /// @return The base64 string representation of the image
-    public static @Nullable String convertTo64Base(@NotNull final ImageView postImage) {
-        if (postImage.getDrawable() == null) {
-            return null;
-        }
-        Bitmap bitmap = ((BitmapDrawable) postImage.getDrawable()).getBitmap();
-        ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
-        bitmap.compress(Bitmap.CompressFormat.JPEG, 100, byteArrayOutputStream);
-        byte[] byteArray = byteArrayOutputStream.toByteArray();
-        return Base64.encodeToString(byteArray, Base64.DEFAULT);
-    }
-
-    /// Convert a base64 string to an image
-    /// @param base64Code The base64 string to convert
-    /// @return The image represented by the base64 string
+    /// המרת מחרוזת base64 לתמונה
+    /// @param base64Code מחרוזת base64 להמרה
+    /// @return תמונה המיוצגת על ידי מחרוזת base64, או null אם המחרוזת ריקה
     public static @Nullable Bitmap convertFrom64base(@NotNull final String base64Code) {
         if (base64Code.isEmpty()) {
             return null;
@@ -61,6 +46,9 @@ public class ImageUtil {
         return BitmapFactory.decodeByteArray(decodedString, 0, decodedString.length);
     }
 
+    /// המרת Bitmap למחרוזת base64 באיכות מופחתת (70%)
+    /// @param bitmap התמונה להמרה
+    /// @return מחרוזת base64 המייצגת את התמונה
     public static String convertBitmapTo64Base(Bitmap bitmap) {
         ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
         bitmap.compress(Bitmap.CompressFormat.JPEG, 70, byteArrayOutputStream);
@@ -68,14 +56,24 @@ public class ImageUtil {
         return Base64.encodeToString(byteArray, Base64.DEFAULT);
     }
 
+    /// טעינת אווטר לתוך ImageView לפי סוג התמונה
+    /// אם null - מציג לוגו ברירת מחדל
+    /// אם base64 - ממיר ומציג את התמונה
+    /// אם שם drawable - מחפש את התמונה במשאבים
+    /// @param context הקשר האפליקציה
+    /// @param imageView רכיב התמונה להצגה
+    /// @param avatar שם האווטר או מחרוזת base64
     public static void loadAvatar(Context context, ImageView imageView, String avatar) {
         if (avatar == null) {
+            // אין תמונה - מציג לוגו ברירת מחדל
             imageView.setImageResource(R.drawable.logo);
         } else if (avatar.startsWith("base64:")) {
+            // תמונה מגלריה/מצלמה - ממיר מ-base64
             String base64 = avatar.substring(7);
             Bitmap bitmap = convertFrom64base(base64);
             if (bitmap != null) imageView.setImageBitmap(bitmap);
         } else {
+            // אווטר רגיל - מחפש לפי שם ב-drawable
             int resId = context.getResources().getIdentifier(avatar, "drawable", context.getPackageName());
             imageView.setImageResource(resId != 0 ? resId : R.drawable.logo);
         }
